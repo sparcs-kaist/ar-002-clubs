@@ -1,0 +1,42 @@
+.calendar-list {
+  background-color: #ffffff;
+  height: 71px;
+  position: relative;
+  width: 360px;
+}
+
+.calendar-list .p {
+  color: #000000;
+  font-family: "NanumBarunGothic-Regular", Helvetica;
+  font-size: 20px;
+  font-weight: 400;
+  left: 43px;
+  letter-spacing: 0;
+  line-height: normal;
+  position: absolute;
+  top: 16px;
+  white-space: nowrap;
+}
+
+.calendar-list .text-wrapper-5 {
+  color: #000000;
+  font-family: "NanumBarunGothic-Regular", Helvetica;
+  font-size: 13px;
+  font-weight: 400;
+  left: 43px;
+  letter-spacing: 0;
+  line-height: normal;
+  position: absolute;
+  top: 41px;
+  white-space: nowrap;
+}
+
+.calendar-list .ellipse {
+  background-color: #7cd2d8;
+  border-radius: 6.5px;
+  height: 13px;
+  left: 8px;
+  position: absolute;
+  top: 29px;
+  width: 13px;
+}

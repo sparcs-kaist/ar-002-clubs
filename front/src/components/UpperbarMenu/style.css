@@ -1,0 +1,32 @@
+.upperbar-menu {
+  align-items: center;
+  display: inline-flex;
+  gap: 10px;
+  justify-content: center;
+  padding: 4px 0px;
+  position: relative;
+}
+
+.upperbar-menu .text-wrapper {
+  color: #ffffff;
+  font-family: "NanumBarunGothic-Regular", Helvetica;
+  font-size: 19px;
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: normal;
+  margin-top: -2px;
+  position: relative;
+  text-align: center;
+  white-space: nowrap;
+  width: fit-content;
+}
+
+.upperbar-menu:hover {
+  border-bottom-style: solid;
+  border-bottom-width: 3px;
+  border-color: #7cd2d8;
+}
+
+.upperbar-menu:hover .text-wrapper {
+  margin-top: -3px;
+}

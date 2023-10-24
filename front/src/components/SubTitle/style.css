@@ -1,0 +1,25 @@
+.sub-title {
+  align-items: center;
+  border-color: #7cd2d8;
+  border-left-style: solid;
+  border-left-width: 5px;
+  display: flex;
+  gap: 10px;
+  height: 39px;
+  padding: 5px 18px;
+  position: relative;
+  width: 260px;
+}
+
+.sub-title .text-wrapper-8 {
+  color: #000000;
+  font-family: "Inter", Helvetica;
+  font-size: 24px;
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: normal;
+  margin-right: -16px;
+  margin-top: -5px;
+  position: relative;
+  width: 300px;
+}

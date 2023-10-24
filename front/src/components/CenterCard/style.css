@@ -1,0 +1,68 @@
+.center-card {
+  height: 355px;
+  position: relative;
+  width: 443px;
+}
+
+.center-card .rectangle {
+  left: 0;
+  position: absolute;
+  width: 443px;
+}
+
+.center-card .rectangle-2 {
+  background-color: #f6feff;
+  height: 302px;
+  left: 0;
+  position: absolute;
+  top: 10px;
+  width: 443px;
+}
+
+.center-card .frame {
+  align-items: flex-start;
+  display: inline-flex;
+  flex-direction: column;
+  gap: 5px;
+  left: 1px;
+  padding: 10px;
+  position: absolute;
+  top: 40px;
+}
+
+.center-card .class {
+  left: 1px !important;
+  position: absolute !important;
+  top: 0 !important;
+}
+
+.center-card .class-2 {
+  left: 0 !important;
+  position: absolute !important;
+  top: 0 !important;
+}
+
+.center-card .text-wrapper-3 {
+  color: #000000;
+  font-family: "Inter", Helvetica;
+  font-size: 20px;
+  font-weight: 400;
+  height: 24px;
+  left: 369px;
+  letter-spacing: 0;
+  line-height: normal;
+  position: absolute;
+  top: 8px;
+  white-space: nowrap;
+}
+
+.center-card .default {
+  background-color: #f6feff;
+  height: 302px;
+  top: 53px;
+}
+
+.center-card .variant-2 {
+  height: 321px;
+  top: 43px;
+}

@@ -1,0 +1,39 @@
+.center-menu {
+  height: 185px;
+  position: relative;
+  width: 143px;
+}
+
+.center-menu .text-wrapper-10 {
+  color: #000000;
+  font-family: "Inter", Helvetica;
+  font-size: 20px;
+  font-weight: 400;
+  left: 4px;
+  letter-spacing: 0;
+  line-height: normal;
+  position: absolute;
+  text-align: center;
+  top: 160px;
+  white-space: nowrap;
+}
+
+.center-menu .overlap-group {
+  background-color: #ffffff;
+  border-radius: 71.5px;
+  box-shadow: 4px 4px 2px 1px #7cd2d81a;
+  height: 143px;
+  left: 0;
+  position: absolute;
+  top: 0;
+  width: 143px;
+}
+
+.center-menu .img {
+  height: 84px;
+  left: 29px;
+  object-fit: cover;
+  position: absolute;
+  top: 30px;
+  width: 84px;
+}

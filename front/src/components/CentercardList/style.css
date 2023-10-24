@@ -1,0 +1,34 @@
+.centercard-list {
+  height: 46px;
+  position: relative;
+  width: 421px;
+}
+
+.centercard-list .text-wrapper {
+  color: #000000;
+  font-family: "NanumBarunGothic-Regular", Helvetica;
+  font-size: 20px;
+  font-weight: 400;
+  height: 26px;
+  left: 7px;
+  letter-spacing: 0;
+  line-height: normal;
+  position: absolute;
+  top: 9px;
+  width: 284px;
+}
+
+.centercard-list .div {
+  color: #000000;
+  font-family: "NanumBarunGothic-Light", Helvetica;
+  font-size: 20px;
+  font-weight: 300;
+  height: 26px;
+  left: 291px;
+  letter-spacing: 0;
+  line-height: normal;
+  position: absolute;
+  text-align: right;
+  top: 9px;
+  width: 122px;
+}

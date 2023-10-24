@@ -1,0 +1,69 @@
+.calendar-day {
+  height: 93px;
+  width: 118px;
+}
+
+.calendar-day .overlap {
+  /* background-image: url(../../../static/img/rectangle-22.svg); */
+  background-size: 100% 100%;
+  height: 94px;
+  position: relative;
+  width: 119px;
+  border-width: 1px;
+  border-color: #000000;
+  border-style:solid
+}
+
+.calendar-day .text-wrapper-11 {
+  color: #000000;
+  font-family: "NanumBarunGothic-Regular", Helvetica;
+  font-size: 25px;
+  font-weight: 400;
+  height: 52px;
+  left: 32px;
+  letter-spacing: 0;
+  line-height: normal;
+  position: absolute;
+  text-align: center;
+  top: 24px;
+  width: 57px;
+}
+
+.calendar-day .overlap-group-wrapper {
+  height: 27px;
+  left: 84px;
+  position: absolute;
+  top: 6px;
+  width: 34px;
+}
+
+.calendar-day .overlap-group-2 {
+  height: 27px;
+  position: relative;
+  width: 32px;
+}
+
+.calendar-day .ellipse-2 {
+  background-color: #7cd2d8;
+  border-radius: 13.5px;
+  height: 27px;
+  left: 3px;
+  position: absolute;
+  top: 0;
+  width: 27px;
+}
+
+.calendar-day .text-wrapper-12 {
+  color: #000000;
+  font-family: "NanumBarunGothic-Light", Helvetica;
+  font-size: 15px;
+  font-weight: 300;
+  height: 17px;
+  left: 0;
+  letter-spacing: 0;
+  line-height: normal;
+  position: absolute;
+  text-align: center;
+  top: 5px;
+  width: 32px;
+}
