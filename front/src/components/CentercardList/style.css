@@ -16,6 +16,9 @@
   position: absolute;
   top: 9px;
   width: 284px;
+  white-space: nowrap;  /* Prevent text from wrapping onto next line */
+  overflow: hidden;  /* Hide text that overflows the element's box */
+  text-overflow: ellipsis; 
 }
 
 .centercard-list .div {

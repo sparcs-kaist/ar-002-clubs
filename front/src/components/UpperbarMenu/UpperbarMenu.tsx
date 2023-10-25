@@ -5,16 +5,18 @@ Please share your feedback here: https://form.asana.com/?k=uvp-HPgd3_hyoXRBw1IcN
 
 import PropTypes from "prop-types";
 import React from "react";
-import "./style.css";
+import "./UpperbarMenu.css";
 
 interface Props {
   className: any;
   text: string;
+  active: boolean;
 }
 
-export const UpperbarMenu = ({ className, text = "동아리" }: Props): JSX.Element => {
+export const UpperbarMenu = ({ className, text, active }: Props): JSX.Element => {
+  const combinedClassName = active ? `${className} active` : className;
   return (
-    <div className={`upperbar-menu ${className}`}>
+    <div className={`upper-menu ${combinedClassName}`}>
       <div className="text-wrapper">{text}</div>
     </div>
   );

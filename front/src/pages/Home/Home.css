@@ -19,7 +19,7 @@
   top: 0 !important;
 }
 
-.home .frame-3 {
+.home .under-bar {
   background-color: #f6feff;
   height: 81px;
   left: 0;
@@ -27,7 +27,7 @@
   top: 1665px;
   width: 1728px;
 }
-
+/* 
 .home .group-2 {
   height: 50px;
   left: 20px;
@@ -95,7 +95,7 @@
   text-align: right;
   top: 33px;
   white-space: nowrap;
-}
+} */
 
 .home .frame-5 {
   background-color: #ffffff;

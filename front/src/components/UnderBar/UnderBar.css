@@ -1,0 +1,75 @@
+.under-bar {
+  background-color: #f6feff;
+  height: 81px;
+  position: relative;
+  width: 1728px;
+}
+
+.under-bar .group {
+  height: 50px;
+  left: 20px;
+  position: absolute;
+  top: 15px;
+  width: 245px;
+}
+
+.under-bar .image {
+  height: 44px;
+  left: 0;
+  object-fit: cover;
+  position: absolute;
+  top: 0;
+  width: 65px;
+}
+
+.under-bar .text-wrapper {
+  color: #000000;
+  font-family: "Noto Sans Arabic-SemiBold", Helvetica;
+  font-size: 31px;
+  font-weight: 600;
+  height: 47px;
+  left: 65px;
+  letter-spacing: 0;
+  line-height: normal;
+  position: absolute;
+  top: 2px;
+  width: 178px;
+}
+
+.under-bar .div {
+  align-items: flex-start;
+  display: inline-flex;
+  gap: 35px;
+  left: 321px;
+  position: absolute;
+  top: 34px;
+}
+
+.under-bar .text-wrapper-2 {
+  color: #000000;
+  font-family: "NanumBarunGothic-Regular", Helvetica;
+  font-size: 19px;
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: normal;
+  margin-top: -1px;
+  position: relative;
+  text-align: center;
+  white-space: nowrap;
+  width: fit-content;
+}
+
+.under-bar .text-wrapper-3 {
+  color: #000000;
+  font-family: "NanumBarunGothic-Regular", Helvetica;
+  font-size: 19px;
+  font-weight: 400;
+  height: 22px;
+  left: 1445px;
+  letter-spacing: 0;
+  line-height: normal;
+  position: absolute;
+  text-align: right;
+  top: 33px;
+  white-space: nowrap;
+}

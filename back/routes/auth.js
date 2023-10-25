@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const session = require('express-session');
 require('dotenv').config();
-const Client = require('./sparcssso');
+const Client = require('../utils/sparcssso');
 
 
 const clientId = process.env.SSO_CLIENT_ID;
