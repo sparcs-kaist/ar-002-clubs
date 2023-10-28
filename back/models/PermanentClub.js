@@ -1,19 +1,26 @@
 const Sequelize = require('sequelize');
 module.exports = function(sequelize, DataTypes) {
-  return sequelize.define('DivisionGroup', {
-    id: {
-      autoIncrement: true,
+  return sequelize.define('PermanentClub', {
+    club_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
-      primaryKey: true
+      primaryKey: true,
+      references: {
+        model: 'Club',
+        key: 'id'
+      }
     },
-    name: {
-      type: DataTypes.STRING(255),
+    start_date: {
+      type: DataTypes.DATEONLY,
       allowNull: false
+    },
+    end_date: {
+      type: DataTypes.DATEONLY,
+      allowNull: true
     }
   }, {
     sequelize,
-    tableName: 'DivisionGroup',
+    tableName: 'PermanentClub',
     timestamps: false,
     indexes: [
       {
@@ -21,7 +28,7 @@ module.exports = function(sequelize, DataTypes) {
         unique: true,
         using: "BTREE",
         fields: [
-          { name: "id" },
+          { name: "club_id" },
         ]
       },
     ]

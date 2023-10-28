@@ -14,6 +14,7 @@ import { useAuth } from "contexts/authContext";
 import Logo from "assets/Images/Logo.png";
 import BackImg from "assets/Images/BackImg.png";
 import "./UpperBar.css";
+import Profile from "assets/Images/profile.png";
 
 interface Props {
   className: any;
@@ -82,7 +83,6 @@ export const UpperBar = ({ className, title }: Props): JSX.Element => {
             {showSubMenu1 && (
               <div className="sub-menu">
                   <button onClick={() => navigate("/club_list")}>동아리 목록</button>
-                  <button onClick={() => navigate("/division_list")}>분과 목록</button>
                   <button onClick={() => navigate("/cafe_notice")}>카페 공지사항</button>
                   <button onClick={() => navigate("/myclub")}>나의 동아리</button>
                   <button onClick={() => navigate("/maneger")}>동아리/분과 관리</button>
@@ -156,7 +156,7 @@ export const UpperBar = ({ className, title }: Props): JSX.Element => {
         
       <LoadingBar className="loading-bar-instance" />
       <div className="frame-2">
-        <img className="img" alt="Image" src="image-5.png" />
+        <img className="img" alt="Image" src={Profile} />
         <div className="login">
           {user ? (
             <div className="text-wrapper" onClick={handleLogout} style={{cursor: "pointer"}}>{user.first_name}님</div> // 로그인한 경우 사용자의 이름 표시

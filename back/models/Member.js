@@ -6,9 +6,14 @@ module.exports = function(sequelize, DataTypes) {
       allowNull: false,
       primaryKey: true
     },
+    uid: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      unique: "uid"
+    },
     kaist_uid: {
       type: DataTypes.INTEGER,
-      allowNull: false,
+      allowNull: true,
       unique: "kaist_uid"
     },
     sparcs_uid: {
@@ -22,15 +27,26 @@ module.exports = function(sequelize, DataTypes) {
     },
     email: {
       type: DataTypes.STRING(255),
-      allowNull: false,
-      unique: "email"
+      allowNull: true
     },
     department: {
       type: DataTypes.STRING(255),
-      allowNull: false
+      allowNull: true
     },
     phone_number: {
-      type: DataTypes.STRING(15),
+      type: DataTypes.STRING(255),
+      allowNull: true
+    },
+    bank: {
+      type: DataTypes.STRING(255),
+      allowNull: true
+    },
+    account_number: {
+      type: DataTypes.STRING(255),
+      allowNull: true
+    },
+    account_holder: {
+      type: DataTypes.STRING(255),
       allowNull: true
     }
   }, {
@@ -47,19 +63,19 @@ module.exports = function(sequelize, DataTypes) {
         ]
       },
       {
+        name: "uid",
+        unique: true,
+        using: "BTREE",
+        fields: [
+          { name: "uid" },
+        ]
+      },
+      {
         name: "kaist_uid",
         unique: true,
         using: "BTREE",
         fields: [
           { name: "kaist_uid" },
-        ]
-      },
-      {
-        name: "email",
-        unique: true,
-        using: "BTREE",
-        fields: [
-          { name: "email" },
         ]
       },
       {

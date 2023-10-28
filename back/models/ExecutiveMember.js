@@ -1,6 +1,6 @@
 const Sequelize = require('sequelize');
 module.exports = function(sequelize, DataTypes) {
-  return sequelize.define('MemberStatus', {
+  return sequelize.define('ExecutiveMember', {
     student_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
@@ -10,23 +10,25 @@ module.exports = function(sequelize, DataTypes) {
         key: 'student_id'
       }
     },
-    is_regular_member: {
-      type: DataTypes.BOOLEAN,
-      allowNull: true,
-      defaultValue: 1
-    },
-    semester_id: {
+    main_officer: {
       type: DataTypes.INTEGER,
-      allowNull: true,
-      references: {
-        model: 'Semester',
-        key: 'id'
-      }
+      allowNull: false
+    },
+    sub_officer: {
+      type: DataTypes.INTEGER,
+      allowNull: false
+    },
+    start_term: {
+      type: DataTypes.DATEONLY,
+      allowNull: false
+    },
+    end_term: {
+      type: DataTypes.DATEONLY,
+      allowNull: true
     }
   }, {
     sequelize,
-    tableName: 'MemberStatus',
-    hasTrigger: true,
+    tableName: 'ExecutiveMember',
     timestamps: false,
     indexes: [
       {
@@ -35,13 +37,6 @@ module.exports = function(sequelize, DataTypes) {
         using: "BTREE",
         fields: [
           { name: "student_id" },
-        ]
-      },
-      {
-        name: "semester_id",
-        using: "BTREE",
-        fields: [
-          { name: "semester_id" },
         ]
       },
     ]

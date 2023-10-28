@@ -1,6 +1,6 @@
 const Sequelize = require('sequelize');
 module.exports = function(sequelize, DataTypes) {
-  return sequelize.define('SemesterClub', {
+  return sequelize.define('ClubRepresentative', {
     club_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
@@ -10,38 +10,35 @@ module.exports = function(sequelize, DataTypes) {
         key: 'id'
       }
     },
-    semester_id: {
+    student_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
       primaryKey: true,
       references: {
-        model: 'Semester',
-        key: 'id'
+        model: 'Member',
+        key: 'student_id'
       }
     },
     type_id: {
       type: DataTypes.INTEGER,
-      allowNull: true,
+      allowNull: false,
+      primaryKey: true,
       references: {
-        model: 'SemesterClubType',
+        model: 'ClubRepresentativeType',
         key: 'id'
       }
     },
-    characteristic_kr: {
-      type: DataTypes.TEXT,
-      allowNull: true
+    start_term: {
+      type: DataTypes.DATEONLY,
+      allowNull: false
     },
-    characteristic_en: {
-      type: DataTypes.TEXT,
-      allowNull: true
-    },
-    advisor: {
-      type: DataTypes.STRING(255),
+    end_term: {
+      type: DataTypes.DATEONLY,
       allowNull: true
     }
   }, {
     sequelize,
-    tableName: 'SemesterClub',
+    tableName: 'ClubRepresentative',
     timestamps: false,
     indexes: [
       {
@@ -50,14 +47,15 @@ module.exports = function(sequelize, DataTypes) {
         using: "BTREE",
         fields: [
           { name: "club_id" },
-          { name: "semester_id" },
+          { name: "student_id" },
+          { name: "type_id" },
         ]
       },
       {
-        name: "semester_id",
+        name: "student_id",
         using: "BTREE",
         fields: [
-          { name: "semester_id" },
+          { name: "student_id" },
         ]
       },
       {

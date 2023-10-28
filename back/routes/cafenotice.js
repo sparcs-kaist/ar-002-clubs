@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const axios = require('axios');
 const cheerio = require('cheerio');
-const { Post } = require('../models');
+const { CafeNotice } = require('../models');
 const iconv = require('iconv-lite');
 const moment = require('moment');
 const urlPrefix = 'https://cafe.naver.com/kaistclubs';
@@ -54,7 +54,7 @@ async function scrapeAndSave() {
       }
 
       if (title && author && date && link) {
-        await Post.findOrCreate({
+        await CafeNotice.findOrCreate({
             where: { link: link },
             defaults: {
                 title: title,
@@ -89,12 +89,12 @@ router.get('/', async (req, res) => {
 
   try {
       const [posts, totalPosts] = await Promise.all([
-          Post.findAll({
+          CafeNotice.findAll({
               order: [['date', 'DESC']],  // Order by date descending
               offset: offset,
               limit: limit
           }),
-          Post.count()  // Get total count of posts
+          CafeNotice.count()  // Get total count of posts
       ]);
 
       res.json({ posts, totalPosts });  // Return posts and totalPosts in the response

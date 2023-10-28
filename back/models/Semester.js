@@ -1,19 +1,31 @@
 const Sequelize = require('sequelize');
 module.exports = function(sequelize, DataTypes) {
-  return sequelize.define('DivisionGroup', {
+  return sequelize.define('Semester', {
     id: {
       autoIncrement: true,
       type: DataTypes.INTEGER,
       allowNull: false,
       primaryKey: true
     },
-    name: {
+    year: {
+      type: DataTypes.INTEGER,
+      allowNull: false
+    },
+    semester: {
       type: DataTypes.STRING(255),
+      allowNull: false
+    },
+    start_date: {
+      type: DataTypes.DATEONLY,
+      allowNull: false
+    },
+    end_date: {
+      type: DataTypes.DATEONLY,
       allowNull: false
     }
   }, {
     sequelize,
-    tableName: 'DivisionGroup',
+    tableName: 'Semester',
     timestamps: false,
     indexes: [
       {

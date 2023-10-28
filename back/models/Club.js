@@ -1,28 +1,23 @@
 const Sequelize = require('sequelize');
 module.exports = function(sequelize, DataTypes) {
   return sequelize.define('Club', {
-    club_id: {
+    id: {
       autoIncrement: true,
       type: DataTypes.INTEGER,
       allowNull: false,
       primaryKey: true
     },
-    club_name_kor: {
+    name: {
       type: DataTypes.STRING(255),
       allowNull: false,
-      unique: "club_name_kor"
-    },
-    club_name_eng: {
-      type: DataTypes.STRING(255),
-      allowNull: false,
-      unique: "club_name_eng"
+      unique: "name"
     },
     division_id: {
       type: DataTypes.INTEGER,
       allowNull: true,
       references: {
         model: 'Division',
-        key: 'division_id'
+        key: 'id'
       }
     },
     description: {
@@ -31,7 +26,35 @@ module.exports = function(sequelize, DataTypes) {
     },
     founding_year: {
       type: DataTypes.INTEGER,
-      allowNull: false
+      allowNull: true
+    },
+    bank: {
+      type: DataTypes.STRING(255),
+      allowNull: true
+    },
+    account_number: {
+      type: DataTypes.STRING(255),
+      allowNull: true
+    },
+    account_holder: {
+      type: DataTypes.STRING(255),
+      allowNull: true
+    },
+    building_id: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      references: {
+        model: 'ClubBuilding',
+        key: 'id'
+      }
+    },
+    room_location: {
+      type: DataTypes.STRING(255),
+      allowNull: true
+    },
+    room_password: {
+      type: DataTypes.STRING(255),
+      allowNull: true
     }
   }, {
     sequelize,
@@ -43,23 +66,15 @@ module.exports = function(sequelize, DataTypes) {
         unique: true,
         using: "BTREE",
         fields: [
-          { name: "club_id" },
+          { name: "id" },
         ]
       },
       {
-        name: "club_name_kor",
+        name: "name",
         unique: true,
         using: "BTREE",
         fields: [
-          { name: "club_name_kor" },
-        ]
-      },
-      {
-        name: "club_name_eng",
-        unique: true,
-        using: "BTREE",
-        fields: [
-          { name: "club_name_eng" },
+          { name: "name" },
         ]
       },
       {
@@ -67,6 +82,13 @@ module.exports = function(sequelize, DataTypes) {
         using: "BTREE",
         fields: [
           { name: "division_id" },
+        ]
+      },
+      {
+        name: "building_id",
+        using: "BTREE",
+        fields: [
+          { name: "building_id" },
         ]
       },
     ]

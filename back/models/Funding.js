@@ -1,19 +1,26 @@
 const Sequelize = require('sequelize');
 module.exports = function(sequelize, DataTypes) {
-  return sequelize.define('DivisionGroup', {
-    id: {
-      autoIncrement: true,
+  return sequelize.define('Funding', {
+    club_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
       primaryKey: true
     },
-    name: {
-      type: DataTypes.STRING(255),
+    semester_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false
+    },
+    allocated_amount: {
+      type: DataTypes.DECIMAL(10,0),
+      allowNull: false
+    },
+    final_amount: {
+      type: DataTypes.DECIMAL(10,0),
       allowNull: false
     }
   }, {
     sequelize,
-    tableName: 'DivisionGroup',
+    tableName: 'Funding',
     timestamps: false,
     indexes: [
       {
@@ -21,7 +28,7 @@ module.exports = function(sequelize, DataTypes) {
         unique: true,
         using: "BTREE",
         fields: [
-          { name: "id" },
+          { name: "club_id" },
         ]
       },
     ]

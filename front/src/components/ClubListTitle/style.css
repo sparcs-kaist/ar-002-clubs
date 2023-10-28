@@ -1,0 +1,30 @@
+.club-list-title {
+  background-color: #ffffff;
+  border-radius: 20px;
+  box-shadow: 4px 4px 2px 1px #7cd2d833;
+  height: 46px;
+  position: relative;
+  width: 1394px;
+}
+
+.club-list-title .text-wrapper-2 {
+  color: #000000;
+  font-family: "NanumBarunGothic-Regular", Helvetica;
+  font-size: 20px;
+  font-weight: 400;
+  left: 17px;
+  letter-spacing: 0;
+  line-height: normal;
+  position: absolute;
+  top: 10px;
+  white-space: nowrap;
+}
+
+.club-list-title .image {
+  height: 24px;
+  left: 1358px;
+  object-fit: cover;
+  position: absolute;
+  top: 11px;
+  width: 24px;
+}

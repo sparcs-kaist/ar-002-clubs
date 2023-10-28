@@ -1,32 +1,31 @@
 const Sequelize = require('sequelize');
 module.exports = function(sequelize, DataTypes) {
-  return sequelize.define('MemberStatus', {
-    student_id: {
+  return sequelize.define('Warning', {
+    id: {
+      autoIncrement: true,
       type: DataTypes.INTEGER,
       allowNull: false,
-      primaryKey: true,
-      references: {
-        model: 'Member',
-        key: 'student_id'
-      }
+      primaryKey: true
     },
-    is_regular_member: {
-      type: DataTypes.BOOLEAN,
-      allowNull: true,
-      defaultValue: 1
-    },
-    semester_id: {
+    club_id: {
       type: DataTypes.INTEGER,
-      allowNull: true,
+      allowNull: false,
       references: {
-        model: 'Semester',
+        model: 'Club',
         key: 'id'
       }
+    },
+    issued_date: {
+      type: DataTypes.DATEONLY,
+      allowNull: false
+    },
+    reason: {
+      type: DataTypes.TEXT,
+      allowNull: false
     }
   }, {
     sequelize,
-    tableName: 'MemberStatus',
-    hasTrigger: true,
+    tableName: 'Warning',
     timestamps: false,
     indexes: [
       {
@@ -34,14 +33,14 @@ module.exports = function(sequelize, DataTypes) {
         unique: true,
         using: "BTREE",
         fields: [
-          { name: "student_id" },
+          { name: "id" },
         ]
       },
       {
-        name: "semester_id",
+        name: "club_id",
         using: "BTREE",
         fields: [
-          { name: "semester_id" },
+          { name: "club_id" },
         ]
       },
     ]

@@ -1,31 +1,20 @@
 const Sequelize = require('sequelize');
 module.exports = function(sequelize, DataTypes) {
-  return sequelize.define('Post', {
+  return sequelize.define('AgendaType', {
     id: {
       autoIncrement: true,
       type: DataTypes.INTEGER,
       allowNull: false,
       primaryKey: true
     },
-    title: {
+    type: {
       type: DataTypes.STRING(255),
-      allowNull: false
-    },
-    author: {
-      type: DataTypes.STRING(255),
-      allowNull: false
-    },
-    date: {
-      type: DataTypes.STRING(255),
-      allowNull: false
-    },
-    link: {
-      type: DataTypes.STRING(255),
-      allowNull: false
+      allowNull: false,
+      unique: "type"
     }
   }, {
     sequelize,
-    tableName: 'Post',
+    tableName: 'AgendaType',
     timestamps: false,
     indexes: [
       {
@@ -34,6 +23,14 @@ module.exports = function(sequelize, DataTypes) {
         using: "BTREE",
         fields: [
           { name: "id" },
+        ]
+      },
+      {
+        name: "type",
+        unique: true,
+        using: "BTREE",
+        fields: [
+          { name: "type" },
         ]
       },
     ]

@@ -1,19 +1,20 @@
 const Sequelize = require('sequelize');
 module.exports = function(sequelize, DataTypes) {
-  return sequelize.define('DivisionGroup', {
+  return sequelize.define('MeetingMemberType', {
     id: {
       autoIncrement: true,
       type: DataTypes.INTEGER,
       allowNull: false,
       primaryKey: true
     },
-    name: {
+    position: {
       type: DataTypes.STRING(255),
-      allowNull: false
+      allowNull: false,
+      unique: "position"
     }
   }, {
     sequelize,
-    tableName: 'DivisionGroup',
+    tableName: 'MeetingMemberType',
     timestamps: false,
     indexes: [
       {
@@ -22,6 +23,14 @@ module.exports = function(sequelize, DataTypes) {
         using: "BTREE",
         fields: [
           { name: "id" },
+        ]
+      },
+      {
+        name: "position",
+        unique: true,
+        using: "BTREE",
+        fields: [
+          { name: "position" },
         ]
       },
     ]

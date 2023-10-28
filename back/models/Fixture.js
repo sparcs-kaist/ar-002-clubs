@@ -1,27 +1,39 @@
 const Sequelize = require('sequelize');
 module.exports = function(sequelize, DataTypes) {
-  return sequelize.define('Division', {
+  return sequelize.define('Fixture', {
     id: {
       autoIncrement: true,
       type: DataTypes.INTEGER,
       allowNull: false,
       primaryKey: true
     },
+    club_id: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      references: {
+        model: 'Club',
+        key: 'id'
+      }
+    },
     name: {
       type: DataTypes.STRING(255),
       allowNull: false
     },
-    division_group_id: {
-      type: DataTypes.INTEGER,
-      allowNull: true,
-      references: {
-        model: 'DivisionGroup',
-        key: 'id'
-      }
+    start_date: {
+      type: DataTypes.DATEONLY,
+      allowNull: false
+    },
+    end_date: {
+      type: DataTypes.DATEONLY,
+      allowNull: true
+    },
+    image_url: {
+      type: DataTypes.TEXT,
+      allowNull: true
     }
   }, {
     sequelize,
-    tableName: 'Division',
+    tableName: 'Fixture',
     timestamps: false,
     indexes: [
       {
@@ -33,10 +45,10 @@ module.exports = function(sequelize, DataTypes) {
         ]
       },
       {
-        name: "division_group_id",
+        name: "club_id",
         using: "BTREE",
         fields: [
-          { name: "division_group_id" },
+          { name: "club_id" },
         ]
       },
     ]

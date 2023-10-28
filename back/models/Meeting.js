@@ -1,47 +1,39 @@
 const Sequelize = require('sequelize');
 module.exports = function(sequelize, DataTypes) {
-  return sequelize.define('SemesterClub', {
+  return sequelize.define('Meeting', {
+    id: {
+      autoIncrement: true,
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      primaryKey: true
+    },
     club_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
-      primaryKey: true,
       references: {
         model: 'Club',
         key: 'id'
       }
     },
-    semester_id: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      primaryKey: true,
-      references: {
-        model: 'Semester',
-        key: 'id'
-      }
-    },
     type_id: {
       type: DataTypes.INTEGER,
-      allowNull: true,
+      allowNull: false,
       references: {
-        model: 'SemesterClubType',
+        model: 'MeetingType',
         key: 'id'
       }
     },
-    characteristic_kr: {
-      type: DataTypes.TEXT,
-      allowNull: true
+    meeting_date: {
+      type: DataTypes.DATEONLY,
+      allowNull: false
     },
-    characteristic_en: {
+    minutes: {
       type: DataTypes.TEXT,
-      allowNull: true
-    },
-    advisor: {
-      type: DataTypes.STRING(255),
       allowNull: true
     }
   }, {
     sequelize,
-    tableName: 'SemesterClub',
+    tableName: 'Meeting',
     timestamps: false,
     indexes: [
       {
@@ -49,15 +41,14 @@ module.exports = function(sequelize, DataTypes) {
         unique: true,
         using: "BTREE",
         fields: [
-          { name: "club_id" },
-          { name: "semester_id" },
+          { name: "id" },
         ]
       },
       {
-        name: "semester_id",
+        name: "club_id",
         using: "BTREE",
         fields: [
-          { name: "semester_id" },
+          { name: "club_id" },
         ]
       },
       {

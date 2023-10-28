@@ -16,16 +16,16 @@ module.exports = function(sequelize, DataTypes) {
       primaryKey: true,
       references: {
         model: 'Club',
-        key: 'club_id'
+        key: 'id'
       }
     },
-    activity_id: {
+    semester_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
       primaryKey: true,
       references: {
-        model: 'SemesterActivity',
-        key: 'activity_id'
+        model: 'Semester',
+        key: 'id'
       }
     }
   }, {
@@ -40,7 +40,7 @@ module.exports = function(sequelize, DataTypes) {
         fields: [
           { name: "student_id" },
           { name: "club_id" },
-          { name: "activity_id" },
+          { name: "semester_id" },
         ]
       },
       {
@@ -51,10 +51,10 @@ module.exports = function(sequelize, DataTypes) {
         ]
       },
       {
-        name: "activity_id",
+        name: "semester_id",
         using: "BTREE",
         fields: [
-          { name: "activity_id" },
+          { name: "semester_id" },
         ]
       },
     ]
