@@ -84,7 +84,7 @@ export const UpperBar = ({ className, title }: Props): JSX.Element => {
               <div className="sub-menu">
                   <button onClick={() => navigate("/club_list")}>동아리 목록</button>
                   <button onClick={() => navigate("/cafe_notice")}>카페 공지사항</button>
-                  <button onClick={() => navigate("/myclub")}>나의 동아리</button>
+                  <button onClick={() => navigate("/my_club")}>나의 동아리</button>
                   <button onClick={() => navigate("/maneger")}>동아리/분과 관리</button>
               </div>
             )}
@@ -159,7 +159,7 @@ export const UpperBar = ({ className, title }: Props): JSX.Element => {
         <img className="img" alt="Image" src={Profile} />
         <div className="login">
           {user ? (
-            <div className="text-wrapper" onClick={handleLogout} style={{cursor: "pointer"}}>{user.first_name}님</div> // 로그인한 경우 사용자의 이름 표시
+            <div className="text-wrapper" onClick={handleLogout} style={{cursor: "pointer"}}>{user.name} 님</div> // 로그인한 경우 사용자의 이름 표시
           ) : (
             <div className="text-wrapper" onClick={handleLogin} style={{cursor: "pointer"}}>로그인 </div> // 로그인하지 않은 경우 로그인 버튼 표시
           )}

@@ -17,7 +17,10 @@
   line-height: normal;
   position: absolute;
   top: 18px;
+  width: 1150px; /* 이 너비는 아마도 조정이 필요할 것입니다. */
   white-space: nowrap;
+  overflow: hidden; /* 내용이 넘칠 때 숨김 처리 */
+  text-overflow: ellipsis; /* 넘친 텍스트를 "..."으로 표시 */
 }
 
 .cafenotice-list .text-wrapper-3 {

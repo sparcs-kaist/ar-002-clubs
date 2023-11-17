@@ -7,19 +7,18 @@ module.exports = function(sequelize, DataTypes) {
       primaryKey: true
     },
     uid: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.STRING(30),
       allowNull: true,
       unique: "uid"
     },
     kaist_uid: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.STRING(30),
       allowNull: true,
       unique: "kaist_uid"
     },
-    sparcs_uid: {
-      type: DataTypes.INTEGER,
-      allowNull: true,
-      unique: "sparcs_uid"
+    sid: {
+      type: DataTypes.STRING(30),
+      allowNull: true
     },
     name: {
       type: DataTypes.STRING(255),
@@ -76,14 +75,6 @@ module.exports = function(sequelize, DataTypes) {
         using: "BTREE",
         fields: [
           { name: "kaist_uid" },
-        ]
-      },
-      {
-        name: "sparcs_uid",
-        unique: true,
-        using: "BTREE",
-        fields: [
-          { name: "sparcs_uid" },
         ]
       },
     ]

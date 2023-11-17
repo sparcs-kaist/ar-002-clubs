@@ -17,7 +17,8 @@ module.exports = function(sequelize, DataTypes) {
     },
     semester_id: {
       type: DataTypes.INTEGER,
-      allowNull: true,
+      allowNull: false,
+      primaryKey: true,
       references: {
         model: 'Semester',
         key: 'id'
@@ -26,7 +27,6 @@ module.exports = function(sequelize, DataTypes) {
   }, {
     sequelize,
     tableName: 'MemberStatus',
-    hasTrigger: true,
     timestamps: false,
     indexes: [
       {
@@ -35,6 +35,7 @@ module.exports = function(sequelize, DataTypes) {
         using: "BTREE",
         fields: [
           { name: "student_id" },
+          { name: "semester_id" },
         ]
       },
       {

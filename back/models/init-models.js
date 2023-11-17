@@ -62,8 +62,10 @@ function initModels(sequelize) {
   var SemesterClubType = _SemesterClubType(sequelize, DataTypes);
   var Warning = _Warning(sequelize, DataTypes);
 
-  Club.belongsToMany(Semester, { as: 'semester_id_Semesters', through: SemesterClub, foreignKey: "club_id", otherKey: "semester_id" });
+  Club.belongsToMany(Semester, { as: 'semester_id_Semester_SemesterClubs', through: SemesterClub, foreignKey: "club_id", otherKey: "semester_id" });
+  Member.belongsToMany(Semester, { as: 'semester_id_Semesters', through: MemberStatus, foreignKey: "student_id", otherKey: "semester_id" });
   Semester.belongsToMany(Club, { as: 'club_id_Clubs', through: SemesterClub, foreignKey: "semester_id", otherKey: "club_id" });
+  Semester.belongsToMany(Member, { as: 'student_id_Members', through: MemberStatus, foreignKey: "semester_id", otherKey: "student_id" });
   ClubRepresentative.belongsTo(Club, { as: "club", foreignKey: "club_id"});
   Club.hasMany(ClubRepresentative, { as: "ClubRepresentatives", foreignKey: "club_id"});
   Fixture.belongsTo(Club, { as: "club", foreignKey: "club_id"});
@@ -92,12 +94,12 @@ function initModels(sequelize) {
   Member.hasMany(ClubRepresentative, { as: "ClubRepresentatives", foreignKey: "student_id"});
   ExecutiveMember.belongsTo(Member, { as: "student", foreignKey: "student_id"});
   Member.hasOne(ExecutiveMember, { as: "ExecutiveMember", foreignKey: "student_id"});
-  MemberClub.belongsTo(Member, { as: "student", foreignKey: "student_id"});
-  Member.hasMany(MemberClub, { as: "MemberClubs", foreignKey: "student_id"});
   MemberStatus.belongsTo(Member, { as: "student", foreignKey: "student_id"});
-  Member.hasOne(MemberStatus, { as: "MemberStatus", foreignKey: "student_id"});
-  MemberClub.belongsTo(Semester, { as: "semester", foreignKey: "semester_id"});
-  Semester.hasMany(MemberClub, { as: "MemberClubs", foreignKey: "semester_id"});
+  Member.hasMany(MemberStatus, { as: "MemberStatuses", foreignKey: "student_id"});
+  MemberClub.belongsTo(MemberStatus, { as: "student", foreignKey: "student_id"});
+  MemberStatus.hasMany(MemberClub, { as: "MemberClubs", foreignKey: "student_id"});
+  MemberClub.belongsTo(MemberStatus, { as: "semester", foreignKey: "semester_id"});
+  MemberStatus.hasMany(MemberClub, { as: "semester_MemberClubs", foreignKey: "semester_id"});
   MemberStatus.belongsTo(Semester, { as: "semester", foreignKey: "semester_id"});
   Semester.hasMany(MemberStatus, { as: "MemberStatuses", foreignKey: "semester_id"});
   SemesterClub.belongsTo(Semester, { as: "semester", foreignKey: "semester_id"});

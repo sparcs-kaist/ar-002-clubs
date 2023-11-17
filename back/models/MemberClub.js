@@ -6,7 +6,7 @@ module.exports = function(sequelize, DataTypes) {
       allowNull: false,
       primaryKey: true,
       references: {
-        model: 'Member',
+        model: 'MemberStatus',
         key: 'student_id'
       }
     },
@@ -24,8 +24,8 @@ module.exports = function(sequelize, DataTypes) {
       allowNull: false,
       primaryKey: true,
       references: {
-        model: 'Semester',
-        key: 'id'
+        model: 'MemberStatus',
+        key: 'semester_id'
       }
     }
   }, {
@@ -54,6 +54,14 @@ module.exports = function(sequelize, DataTypes) {
         name: "semester_id",
         using: "BTREE",
         fields: [
+          { name: "semester_id" },
+        ]
+      },
+      {
+        name: "MemberClub_MemberStatus_student_id_semester_id_fk",
+        using: "BTREE",
+        fields: [
+          { name: "student_id" },
           { name: "semester_id" },
         ]
       },

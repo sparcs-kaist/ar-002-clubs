@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router()
 const { Op } = require('sequelize');
-const { Division, Club, SemesterClub, Semester, SemesterClubType, PermanentClub, ClubRepresentative, Member, MemberClub } = require('../models');
+const { Division, Club, SemesterClub, Semester, SemesterClubType, PermanentClub, ClubRepresentative, Member, MemberClub, MemberStatus } = require('../models');
 
 router.get('/division_list', async (req, res) => {
   try {
@@ -57,6 +57,174 @@ router.get('/division_clubs', async (req, res) => {
               }
           }],
           attributes: ['id', 'name']
+      });
+
+      if (!currentSemester) {
+          return res.status(404).json({ success: false, message: 'No current semester found' });
+      }
+
+      // Get the SemesterClub information for each club in the current semester
+      const clubInfos = await Promise.all(clubs.map(async (club) => {
+        const semesterClubInfo = await SemesterClub.findOne({
+            where: {
+                club_id: club.id,
+                semester_id: currentSemester.id
+            },
+            attributes: ['type_id', 'characteristic_kr', 'advisor']
+        });
+
+        // Get the type from the SemesterClubType model
+        const semesterClubType = await SemesterClubType.findByPk(semesterClubInfo.type_id);
+
+        let clubType;
+        let clubPresident = "";
+        
+        //PermanentClub에 club_id가 존재하고, 그 start-date가 현재보다 이전이며, end_date가 없거나, 현재보다 이후일 경우 clubType = "상임동아리", 그렇치 않을경우 clubType =  semesterClubType.type으로 설정
+        const permanentClub = await PermanentClub.findOne({
+            where: {
+                club_id: club.id,
+                start_date: { [Op.lte]: currentDate },
+                [Op.or]: [
+                    { end_date: { [Op.gte]: currentDate } },
+                    { end_date: null }
+                ]
+            }
+        });
+        if (permanentClub) {
+            clubType = "상임동아리";
+        } else {
+            clubType = semesterClubType.type;
+        }
+
+        //ClubRepresentative에 club_id가 존재하고, type_id가 1이며, 그 start-date가 현재보다 이전이며, end_date가 없거나, 현재보다 이후일 경우 student_id를 반환
+        //만약 student_id 가 존재한다면, Member에 그 student_id의 name을 clubPresident로 반환. 없으면 "" 반환
+        const clubRepresentative = await ClubRepresentative.findOne({
+            where: {
+                club_id: club.id,
+                type_id: 1,
+                start_term: { [Op.lte]: currentDate },
+                [Op.or]: [
+                    { end_term: { [Op.gte]: currentDate } },
+                    { end_term: null }
+                ]
+            }
+        });
+        if (clubRepresentative) {
+            const presidentMember = await Member.findByPk(clubRepresentative.student_id);
+            clubPresident = presidentMember ? presidentMember.name : "";
+        }
+        //MemberClub에서 currentSemester에 대해서 해당 club_id를 갖고 있는 student가 모두 몇명인지 count해서 totalMembers로 반환, 없거나 문제 생기면 0 반환
+        const totalMembersCount = await MemberClub.count({
+          where: {
+              club_id: club.id,
+              semester_id: currentSemester.id
+          }
+        });
+
+        return {
+            id: club.id,
+            clubName: club.name,
+            characteristicKr: semesterClubInfo.characteristic_kr,
+            clubType: clubType,  // Use the type value from the SemesterClubType model
+            clubPresident: clubPresident,
+            advisor: semesterClubInfo.advisor,
+            totalMembers: totalMembersCount,
+        };
+    }));
+
+      res.json({
+          success: true,
+          data: clubInfos
+      });
+  } catch (error) {
+      console.error(error);
+      res.status(500).json({
+          success: false,
+          message: 'Internal Server Error'
+      });
+  }
+});
+
+router.get('/my_semester/:student_id', async (req, res) => {
+  const { student_id } = req.params;
+
+  try {
+      const memberStatuses = await MemberStatus.findAll({
+          where: { student_id },
+          include: {
+              as: 'semester',
+              model: Semester,
+              attributes: ['year', 'semester'],
+          },
+          order: [
+            [{ model: Semester, as: 'semester' }, 'id', 'DESC'],
+          ],
+      });
+
+      if (!memberStatuses || memberStatuses.length === 0) {
+          return res.status(404).json({ error: 'No records found for the provided student_id' });
+      }
+
+      const result = memberStatuses.map(status => ({
+          semester_id: status.semester_id,
+          year_semester: `${status.semester.year} ${status.semester.semester}`
+      }));
+
+      res.status(200).json(result);
+  } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: 'Server error' });
+  }
+});
+
+//특정 유저의 특정 학기에 대한 동아리 목록 가져오기
+router.get('/my_semester_clubs', async (req, res) => {
+  let { semester_id, student_id } = req.query; // 쿼리 파라미터에서 semester_id와 student_id를 추출합니다.
+
+  // semester_id와 student_id가 모두 제공되었는지 확인합니다.
+  if (!student_id) {
+    return res.status(400).json({ success: false, message: 'student_id query parameter is required' });
+  }
+
+  try {
+      // Get the current semester
+      const currentDate = new Date();
+      const currentSemester = await Semester.findOne({
+          where: {
+              start_date: { [Op.lte]: currentDate },
+              end_date: { [Op.gte]: currentDate }
+          }
+      });
+
+      if(!currentSemester) {
+        return res.status(400).json({ success: false, message: 'CurrentSemeter does not exist' });
+      }
+
+      if (!semester_id) {
+        semester_id = currentSemester.id;
+        console.log(semester_id);
+      }
+
+      // Get the clubs that the student is a member of for the given semester
+      const memberClubs = await MemberClub.findAll({
+        where: {
+          student_id: student_id,
+          semester_id: semester_id
+        },
+        attributes: ['club_id'],
+        raw: true // raw 데이터만 필요합니다.
+      });
+
+      // Map the array of memberClubs to get an array of club_ids
+      const clubIds = memberClubs.map(mc => mc.club_id);
+
+      // Get the club details for the club_ids
+      const clubs = await Club.findAll({
+        where: {
+          id: { [Op.in]: clubIds }
+        },
+        attributes: ['id', 'name'],
+        raw: true
       });
 
       if (!currentSemester) {

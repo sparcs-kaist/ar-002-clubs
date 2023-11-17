@@ -9,6 +9,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from 'contexts/authContext';
 import "./Home.css";
 import { UnderBar } from "components/UnderBar";
+import axios from 'axios';
 
 export const Home = (): JSX.Element => {
   const { login } = useAuth();
@@ -21,8 +22,44 @@ export const Home = (): JSX.Element => {
     
     if (userInfoStr) {
       const userInfo = JSON.parse(userInfoStr);
-      login(userInfo);
-      console.log(userInfo);
+
+      const DEVUID = process.env.REACT_APP_DEVUID;
+      const KAIST_UID = process.env.REACT_APP_KAIST_UID;
+      
+      if (userInfo.uid ===DEVUID) {
+        userInfo.kaist_info = {
+          kaist_uid: process.env.REACT_APP_kaist_uid,
+          mail: process.env.REACT_APP_mail,
+          ku_sex: process.env.REACT_APP_ku_sex,
+          ku_acad_prog_code: process.env.REACT_APP_ku_acad_prog_code,
+          ku_kaist_org_id: process.env.REACT_APP_ku_kaist_org_id,
+          ku_kname: process.env.REACT_APP_ku_kname,
+          ku_person_type: process.env.REACT_APP_ku_person_type,
+          ku_person_type_kor: process.env.REACT_APP_ku_person_type_kor,
+          ku_psft_user_status_kor: process.env.REACT_APP_ku_psft_user_status_kor,
+          ku_born_date: process.env.REACT_APP_ku_born_date,
+          ku_std_no: process.env.REACT_APP_ku_std_no,
+          ku_psft_user_status: process.env.REACT_APP_ku_psft_user_status,
+          employeeType: process.env.REACT_APP_employeeType,
+          givenname: process.env.REACT_APP_givenname,
+          displayname: process.env.REACT_APP_displayname,
+          sn: process.env.REACT_APP_sn,
+        };
+      }
+
+      axios.post('http://localhost/api/user/', userInfo)
+        .then(response => {
+          console.log(response.data);  // 성공 응답을 출력합니다.
+        })
+        .catch(error => {
+          console.error(error);  // 오류를 출력합니다.
+        });
+      
+      axios.get(`http://localhost/api/user/${parseInt(userInfo.kaist_info.ku_std_no)}`).then(response => {
+        console.log(response.data);
+        login(response.data);
+      });
+      
       navigate('/');
     }
     
