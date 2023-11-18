@@ -15,9 +15,10 @@ const client = new Client(clientId, secretKey);
 //   saveUninitialized: true
 // }));
 
-router.get('/login', (req, res) => {
+router.get('/login', async (req, res) => {
   const { url, state } = client.getLoginParams();
   req.session.state = state;
+  await req.session.save();
   
   // 클라이언트에게 SPARCS SSO 로그인 URL 응답으로 보내기
   res.json({ loginUrl: url });
@@ -31,7 +32,7 @@ router.get('/callback', async (req, res) => {
     const userInfo = await client.getUserInfo(code, state);
     // req.session.user = userInfo;
     // console.log("session");
-    // console.log(req.session.user);
+    // console.log(req.session);
     
     // 사용자 정보를 query parameter로 추가하여 클라이언트로 리다이렉트
     res.redirect(`http://127.0.0.1:3000/?userInfo=${JSON.stringify(userInfo)}`);

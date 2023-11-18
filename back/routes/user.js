@@ -20,18 +20,8 @@ router.post('/', async (req, res) => {
             email: kaist_info.mail,
             department: kaist_info.ku_kaist_org_id
         };
-        req.session.user = {
-            student_id: parseInt(kaist_info.ku_std_no),
-            uid : uid,
-            kaist_uid: kaist_info.kaist_uid,
-            sid: sid,
-            name: kaist_info.ku_kname,
-            email: kaist_info.mail,
-            department: kaist_info.ku_kaist_org_id
-        };
+        req.session.user = userData;
         await req.session.save();
-        console.log("session");
-        console.log(req.session);
         await sequelize.transaction(async (t) => {
             const [member, created] = await Member.upsert(userData, { transaction: t, returning: true });
 
@@ -47,16 +37,13 @@ router.post('/', async (req, res) => {
     }
 });
 
-router.get('/:student_id', async (req, res) => {
-    console.log("get");
-    console.log(req.session);
-    const { student_id } = req.params;
+router.get('/', async (req, res) => {
+    const { student_id } = req.session.user;
     
     try {
         const member = await Member.findOne({
             where: { student_id }
         });
-        // console.log(member.dataValues);
         if (!member) {
             res.status(404).json({ error: '멤버를 찾을 수 없습니다.' });
         } else {

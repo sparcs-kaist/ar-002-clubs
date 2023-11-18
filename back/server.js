@@ -3,8 +3,9 @@ const http = require('http');
 const path = require('path');
 const cors = require('cors');
 const session = require('express-session');
+const FileStore = require('session-file-store')(session);
 const { sequelize } = require('./models');
-// const { scrapeAndSave } = require('./utils/scrapeAndSave');
+require('dotenv').config();
 
 const app = express();
 
@@ -21,8 +22,10 @@ app.use(express.static(frontBuildPath));
 app.set('trust proxy', true);
 app.use(session({
   secret: secretKey,
-  resave: true,
+  resave: false,
+  HttpOnly: true,
   saveUninitialized: true,
+  cookie: { secure: false }
 }));
 
 sequelize

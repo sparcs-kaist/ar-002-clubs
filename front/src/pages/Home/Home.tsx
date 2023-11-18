@@ -17,13 +17,13 @@ export const Home = (): JSX.Element => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const queryParams = new URLSearchParams(location.search);
-    const userInfoStr = queryParams.get('userInfo');
-    
-    if (userInfoStr) {
-      const userInfo = JSON.parse(userInfoStr);
-
-      const DEVUID = process.env.REACT_APP_DEVUID;
+    const fetchData = async () => {
+      const queryParams = new URLSearchParams(location.search);
+      const userInfoStr = queryParams.get('userInfo');
+  
+      if (userInfoStr) {
+        const userInfo = JSON.parse(userInfoStr);
+        const DEVUID = process.env.REACT_APP_DEVUID;
       
       if (userInfo.uid ===DEVUID) {
         userInfo.kaist_info = {
@@ -46,23 +46,24 @@ export const Home = (): JSX.Element => {
         };
       }
 
-      axios.post('http://localhost/api/user/', userInfo, { withCredentials: true })
-        .then(response => {
-          console.log(response.data);  // 성공 응답을 출력합니다.
-        })
-        .catch(error => {
-          console.error(error);  // 오류를 출력합니다.
-        });
-      
-      axios.get(`http://localhost/api/user/${parseInt(userInfo.kaist_info.ku_std_no)}`, { withCredentials: true }).then(response => {
-        console.log(response.data);
+      try {
+        // 첫 번째 요청: POST
+        await axios.post('http://127.0.0.1/api/user/', userInfo, { withCredentials: true });
+
+        // 두 번째 요청: GET
+        const response = await axios.get(`http://127.0.0.1/api/user/`, { withCredentials: true });
         login(response.data);
-      });
-      
-      navigate('/');
+
+        // 모든 요청 완료 후 페이지 이동
+        navigate('/');
+      } catch (error) {
+        console.error(error);
+      }
     }
-    
-  }, [location, login]);
+  };
+
+  fetchData();
+}, [location, login, navigate]);
 
   return (
     <div className="home">
