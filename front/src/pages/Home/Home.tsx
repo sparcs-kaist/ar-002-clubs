@@ -1,4 +1,4 @@
-import React, { useEffect }  from "react";
+import React, { useEffect, useState }  from "react";
 import { CalendarDay } from "components/CalendarDay";
 import { CalendarList } from "components/CalendarList";
 import { CenterCard } from "components/CenterCard";
@@ -24,7 +24,6 @@ export const Home = (): JSX.Element => {
       const userInfo = JSON.parse(userInfoStr);
 
       const DEVUID = process.env.REACT_APP_DEVUID;
-      const KAIST_UID = process.env.REACT_APP_KAIST_UID;
       
       if (userInfo.uid ===DEVUID) {
         userInfo.kaist_info = {
@@ -47,7 +46,7 @@ export const Home = (): JSX.Element => {
         };
       }
 
-      axios.post('http://localhost/api/user/', userInfo)
+      axios.post('http://localhost/api/user/', userInfo, { withCredentials: true })
         .then(response => {
           console.log(response.data);  // 성공 응답을 출력합니다.
         })
@@ -55,7 +54,7 @@ export const Home = (): JSX.Element => {
           console.error(error);  // 오류를 출력합니다.
         });
       
-      axios.get(`http://localhost/api/user/${parseInt(userInfo.kaist_info.ku_std_no)}`).then(response => {
+      axios.get(`http://localhost/api/user/${parseInt(userInfo.kaist_info.ku_std_no)}`, { withCredentials: true }).then(response => {
         console.log(response.data);
         login(response.data);
       });

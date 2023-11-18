@@ -70,7 +70,7 @@ async function scrapeAndSave() {
   }
 }
 
-scrapeAndSave();
+// scrapeAndSave();
 const scrapeInterval = 600000;
 setInterval(() => scrapeAndSave(), scrapeInterval);  // Set up periodic scraping
 

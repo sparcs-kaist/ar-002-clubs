@@ -70,8 +70,6 @@ function initModels(sequelize) {
   Club.hasMany(ClubRepresentative, { as: "ClubRepresentatives", foreignKey: "club_id"});
   Fixture.belongsTo(Club, { as: "club", foreignKey: "club_id"});
   Club.hasMany(Fixture, { as: "Fixtures", foreignKey: "club_id"});
-  Meeting.belongsTo(Club, { as: "club", foreignKey: "club_id"});
-  Club.hasMany(Meeting, { as: "Meetings", foreignKey: "club_id"});
   MemberClub.belongsTo(Club, { as: "club", foreignKey: "club_id"});
   Club.hasMany(MemberClub, { as: "MemberClubs", foreignKey: "club_id"});
   PermanentClub.belongsTo(Club, { as: "club", foreignKey: "club_id"});

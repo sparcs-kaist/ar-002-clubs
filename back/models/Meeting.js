@@ -7,14 +7,6 @@ module.exports = function(sequelize, DataTypes) {
       allowNull: false,
       primaryKey: true
     },
-    club_id: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      references: {
-        model: 'Club',
-        key: 'id'
-      }
-    },
     type_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
@@ -27,9 +19,14 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.DATEONLY,
       allowNull: false
     },
-    minutes: {
+    MeetingRecord: {
       type: DataTypes.TEXT,
       allowNull: true
+    },
+    isRegular: {
+      type: DataTypes.TINYINT,
+      allowNull: false,
+      defaultValue: 0
     }
   }, {
     sequelize,
@@ -42,13 +39,6 @@ module.exports = function(sequelize, DataTypes) {
         using: "BTREE",
         fields: [
           { name: "id" },
-        ]
-      },
-      {
-        name: "club_id",
-        using: "BTREE",
-        fields: [
-          { name: "club_id" },
         ]
       },
       {

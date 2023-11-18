@@ -9,22 +9,31 @@ router.post('/', async (req, res) => {
         sid
     } = req.body;
 
-    console.log(uid);
-    console.log(sid);
-    console.log(kaist_info);
-
     try {
         // 트랜잭션 시작
+        const userData = {
+            student_id: parseInt(kaist_info.ku_std_no),
+            uid : uid,
+            kaist_uid: kaist_info.kaist_uid,
+            sid: sid,
+            name: kaist_info.ku_kname,
+            email: kaist_info.mail,
+            department: kaist_info.ku_kaist_org_id
+        };
+        req.session.user = {
+            student_id: parseInt(kaist_info.ku_std_no),
+            uid : uid,
+            kaist_uid: kaist_info.kaist_uid,
+            sid: sid,
+            name: kaist_info.ku_kname,
+            email: kaist_info.mail,
+            department: kaist_info.ku_kaist_org_id
+        };
+        await req.session.save();
+        console.log("session");
+        console.log(req.session);
         await sequelize.transaction(async (t) => {
-            const [member, created] = await Member.upsert({
-                student_id: parseInt(kaist_info.ku_std_no),
-                uid : uid,
-                kaist_uid: kaist_info.kaist_uid,
-                sid: sid,
-                name: kaist_info.ku_kname,
-                email: kaist_info.mail,
-                department: kaist_info.ku_kaist_org_id
-            }, { transaction: t, returning: true });
+            const [member, created] = await Member.upsert(userData, { transaction: t, returning: true });
 
             if (created) {
                 res.status(201).json({ message: '새 멤버가 추가되었습니다.', member });
@@ -39,14 +48,15 @@ router.post('/', async (req, res) => {
 });
 
 router.get('/:student_id', async (req, res) => {
+    console.log("get");
+    console.log(req.session);
     const { student_id } = req.params;
     
     try {
         const member = await Member.findOne({
             where: { student_id }
         });
-        console.log("back");
-        console.log(member.dataValues);
+        // console.log(member.dataValues);
         if (!member) {
             res.status(404).json({ error: '멤버를 찾을 수 없습니다.' });
         } else {

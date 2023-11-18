@@ -35,7 +35,7 @@ export const UpperBar = ({ className, title }: Props): JSX.Element => {
     e.preventDefault();
     
     try {
-      const response = await axios.get('http://127.0.0.1/api/auth/login');
+      const response = await axios.get('http://127.0.0.1/api/auth/login', { withCredentials: true });
       const loginUrl = response.data.loginUrl;
       
       window.location.href = loginUrl;
@@ -52,7 +52,7 @@ export const UpperBar = ({ className, title }: Props): JSX.Element => {
       // 만약 user 객체가 id 속성을 가지고 있다면
       console.log(user)
       if (user) {
-        const response = await axios.get(`http://127.0.0.1/api/auth/logout?userId=${user.sid}`);
+        const response = await axios.get(`http://127.0.0.1/api/auth/logout?userId=${user.sid}`, { withCredentials: true });
         const logoutUrl = response.data.logoutUrl;
         window.location.href = logoutUrl;
         logout();

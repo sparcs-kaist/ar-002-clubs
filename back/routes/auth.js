@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const session = require('express-session');
+// const session = require('express-session');
 require('dotenv').config();
 const Client = require('../utils/sparcssso');
 
@@ -9,11 +9,11 @@ const clientId = process.env.SSO_CLIENT_ID;
 const secretKey = process.env.SSO_SECRET_KEY;
 const client = new Client(clientId, secretKey);
 
-router.use(session({
-  secret: secretKey,
-  resave: false,
-  saveUninitialized: true
-}));
+// router.use(session({
+//   secret: secretKey,
+//   resave: false,
+//   saveUninitialized: true
+// }));
 
 router.get('/login', (req, res) => {
   const { url, state } = client.getLoginParams();
@@ -29,8 +29,9 @@ router.get('/callback', async (req, res) => {
 
   try {
     const userInfo = await client.getUserInfo(code, state);
-    console.log(userInfo);
-    req.session.user = userInfo;
+    // req.session.user = userInfo;
+    // console.log("session");
+    // console.log(req.session.user);
     
     // 사용자 정보를 query parameter로 추가하여 클라이언트로 리다이렉트
     res.redirect(`http://127.0.0.1:3000/?userInfo=${JSON.stringify(userInfo)}`);
