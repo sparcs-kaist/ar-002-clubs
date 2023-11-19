@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import { CafenoticeList } from "components/CafenoticeList";
 import { LoadingBar } from "components/LoadingBar";
 import { SubTitle } from "components/SubTitle";
 import { UpperBar } from "components/UpperBar";
 import "./CafeNotice.css";
 import { UnderBar } from "components/UnderBar";
+import { getRequest } from 'utils/api';
 
 interface Post {
   id: string;
@@ -23,9 +23,12 @@ export const CafeNotice = (): JSX.Element => {
   useEffect(() => {
     const fetchPosts = async () => {
       try {
-        const response = await axios.get(`http://127.0.0.1/api/cafenotice/?pageOffset=${page}&itemCount=10`);
-        setPosts(response.data.posts);
-        setTotalPosts(response.data.totalPosts);
+        getRequest(`cafenotice/?pageOffset=${page}&itemCount=10`,
+          data=>{
+            setPosts(data.posts);
+            setTotalPosts(data.totalPosts);
+          }
+        )
       } catch (error) {
         console.error('Failed to fetch posts:', error);
       }

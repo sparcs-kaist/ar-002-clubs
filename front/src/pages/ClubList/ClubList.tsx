@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useRef } from "react";
-import axios from "axios";
 import { ClubListTitle } from "../../components/ClubListTitle";
 import { ClubListElement } from "components/ClubListElement";
 import { SubTitle } from "../../components/SubTitle";
 import { UpperBar } from "components/UpperBar";
 import { UnderBar } from "components/UnderBar";
 import "./ClubList.css";
+import { getRequest } from "utils/api";
 
 type DivisionType = {
   id: number;
@@ -36,33 +36,25 @@ export const ClubList = (): JSX.Element => {
   }, []);
 
   useEffect(() => {
-    axios.get('http://localhost/api/club/division_list')
-      .then(response => {
-        const divisionsWithProps = response.data.data.map((division: DivisionType) => ({
-          ...division,
-          prop: 0,
-          clubs: []
-        }));
-        setDivisions(divisionsWithProps);
-      })
-      .catch(error => {
-        console.error("There was an error fetching the data!", error);
-      });
+    getRequest('club/division_list',data=>{
+      const divisionsWithProps = data.data.map((division: DivisionType) => ({
+        ...division,
+        prop: 0,
+        clubs: []
+      }));
+      setDivisions(divisionsWithProps);
+    });
   }, []);
 
   const handleTitleClick = (divisionId: number) => {
     const updatedDivisions = divisions.map(division => {
       if (division.id === divisionId) {
         if (division.prop === 0) {
-          axios.get(`http://localhost/api/club/division_clubs?division_id=${divisionId}`)
-            .then(response => {
-              division.prop = 1;
-              division.clubs = response.data.data;
+          getRequest(`club/division_clubs?division_id=${divisionId}`,data=>{
+            division.prop = 1;
+              division.clubs = data.data;
               setDivisions([...divisions]);
-            })
-            .catch(error => {
-              console.error("There was an error fetching the clubs data!", error);
-            });
+          });
         } else {
           division.prop = 0;
           division.clubs = [];
@@ -95,6 +87,7 @@ export const ClubList = (): JSX.Element => {
                     {clubPair.map((club, idx) => (
                       <ClubListElement 
                         key={idx}
+                        id={club.id}
                         name={club.clubName} 
                         character={club.characteristicKr} 
                         type={club.clubType}

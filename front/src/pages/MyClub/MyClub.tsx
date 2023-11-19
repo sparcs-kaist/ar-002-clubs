@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from "react";
-import axios from "axios";
 import { ClubListTitle } from "../../components/ClubListTitle";
 import { ClubListElement } from "components/ClubListElement";
 import { SubTitle } from "../../components/SubTitle";
@@ -7,6 +6,7 @@ import { UpperBar } from "components/UpperBar";
 import { UnderBar } from "components/UnderBar";
 import "./MyClub.css";
 import { useAuth } from "contexts/authContext";
+import { getRequest } from "utils/api";
 
 type DivisionType = {
   semester_id: number;
@@ -40,20 +40,15 @@ export const MyClub = (): JSX.Element => {
 
   useEffect(() => {
     // 사용자 정보가 유효한 경우에만 요청을 수행합니다.
-    if (user && user.student_id) {
-      axios.get(`http://localhost/api/club/my_semester/${user.student_id}`)
-        .then(response => {
-          console.log(response.data);
-          const divisionsWithProps = response.data.map((semesterInfo: DivisionType) => ({
-            ...semesterInfo,
-            prop: 0,
-            clubs: []
-          }));
-          setDivisions(divisionsWithProps);
-        })
-        .catch(error => {
-          console.error("There was an error fetching the data!", error);
-        });
+    if (user) {
+      getRequest('club/my_semester',data=>{
+        const divisionsWithProps = data.map((semesterInfo: DivisionType) => ({
+          ...semesterInfo,
+          prop: 0,
+          clubs: []
+        }));
+        setDivisions(divisionsWithProps);
+      });
     }
   }, [user]);
 
@@ -61,15 +56,11 @@ export const MyClub = (): JSX.Element => {
     const updatedDivisions = divisions.map(division => {
       if (division.semester_id === divisionId) {
         if (division.prop === 0) {
-          axios.get(`http://localhost/api/club/my_semester_clubs?semester_id=${divisionId}&student_id=${user.student_id}`)
-            .then(response => {
-              division.prop = 1;
-              division.clubs = response.data.data;
-              setDivisions([...divisions]);
-            })
-            .catch(error => {
-              console.error("There was an error fetching the clubs data!", error);
-            });
+          getRequest(`club/my_semester_clubs?semester_id=${divisionId}`,data=>{
+            division.prop = 1;
+            division.clubs = data.data;
+            setDivisions([...divisions]);
+          });
         } else {
           division.prop = 0;
           division.clubs = [];
@@ -102,6 +93,7 @@ export const MyClub = (): JSX.Element => {
                     {clubPair.map((club, idx) => (
                       <ClubListElement 
                         key={idx}
+                        id={club.id}
                         name={club.clubName} 
                         character={club.characteristicKr} 
                         type={club.clubType}

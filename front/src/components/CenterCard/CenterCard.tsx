@@ -4,7 +4,7 @@ import { CentercardList } from "../CentercardList";
 import { SubTitle } from "../SubTitle";
 import "./style.css";
 import { useAuth } from "contexts/authContext";
-import axios from "axios";
+import { getRequest } from "utils/api";
 
 interface Props {
   SubTitleText: string;
@@ -34,9 +34,8 @@ export const CenterCard = ({ SubTitleText }: Props): JSX.Element => {
 
   useEffect(() => {
     if (SubTitleText === "카페 공지사항") {
-      axios.get('http://127.0.0.1/api/cafenotice/?pageOffset=1&itemCount=6', { withCredentials: true })
-        .then(response => {
-          const data = response.data;
+      getRequest(`cafenotice/?pageOffset=1&itemCount=6`,
+        data=>{
           if (data && data.posts && Array.isArray(data.posts)) {
             setPosts(data.posts.map((item: { id: any; title: any; date: any; link: any; }) => ({
               id: item.id.toString(),
@@ -47,24 +46,23 @@ export const CenterCard = ({ SubTitleText }: Props): JSX.Element => {
           } else {
             console.error('Unexpected data format:', data);
           }
-        })
-        .catch((error: any) => console.error('Error fetching data:', error));
+        }
+      )
     } else if (SubTitleText === "나의 동아리" && user && user.student_id) {
-      axios.get(`http://127.0.0.1/api/club/my_semester_clubs/?student_id=${user.student_id}`, { withCredentials: true })
-        .then((response: { data: any; }) => {
-          const data = response.data;
+      getRequest(`club/my_semester_clubs`, 
+        data => {
           if (data && data.data && Array.isArray(data.data)) {
             setPosts(data.data.map((item: { id: any; clubName: any; clubPresident: any; }) => ({
               id: item.id.toString(),
               title: item.clubName,
               subtitle: item.clubPresident,
-              url: `http://localhost:3000/club_detail/${item.id}`
+              url: `${process.env.REACT_APP_FRONTEND_URL}/club_detail/${item.id}`
             })));
           } else {
             console.error('Unexpected data format:', data);
           }
-        })
-        .catch((error: any) => console.error('Error fetching data:', error));
+        }
+      );
     } else {
         setPosts([]);  // 다른 경우에는 비워둡니다.
       }

@@ -5,7 +5,6 @@ Please share your feedback here: https://form.asana.com/?k=uvp-HPgd3_hyoXRBw1IcN
 
 import React, { useState, FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from 'axios';
 import { LoadingBar } from "../LoadingBar";
 import { UpperbarMenu } from "../UpperbarMenu";
 
@@ -15,6 +14,7 @@ import Logo from "assets/Images/Logo.png";
 import BackImg from "assets/Images/BackImg.png";
 import "./UpperBar.css";
 import Profile from "assets/Images/profile.png";
+import { getRequest } from "utils/api";
 
 interface Props {
   className: any;
@@ -35,10 +35,12 @@ export const UpperBar = ({ className, title }: Props): JSX.Element => {
     e.preventDefault();
     
     try {
-      const response = await axios.get('http://127.0.0.1/api/auth/login', { withCredentials: true });
-      const loginUrl = response.data.loginUrl;
-      
-      window.location.href = loginUrl;
+      getRequest('auth/login',
+        data => {
+          const loginUrl = data.loginUrl;
+          window.location.href = loginUrl;
+        }
+      )  
     } catch (error) {
       console.error('Login Error:', error);
       alert('Login failed!');
@@ -49,13 +51,15 @@ export const UpperBar = ({ className, title }: Props): JSX.Element => {
     e.preventDefault();
     
     try {
-      // 만약 user 객체가 id 속성을 가지고 있다면
       console.log(user)
       if (user) {
-        const response = await axios.get(`http://127.0.0.1/api/auth/logout?userId=${user.sid}`, { withCredentials: true });
-        const logoutUrl = response.data.logoutUrl;
-        window.location.href = logoutUrl;
-        logout();
+        getRequest(`auth/logout?userId=${user.sid}`,
+          data=>{
+            const logoutUrl = data.logoutUrl;
+            logout();
+            window.location.href = logoutUrl;
+          }
+        )
       } else {
         alert('Invalid user information!'); // 유효하지 않은 사용자 정보에 대한 경고 메시지
       }

@@ -9,7 +9,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from 'contexts/authContext';
 import "./Home.css";
 import { UnderBar } from "components/UnderBar";
-import axios from 'axios';
+import { getRequest, postRequest } from "utils/api";
 
 export const Home = (): JSX.Element => {
   const { login } = useAuth();
@@ -47,14 +47,10 @@ export const Home = (): JSX.Element => {
       }
 
       try {
-        // 첫 번째 요청: POST
-        await axios.post('http://127.0.0.1/api/user/', userInfo, { withCredentials: true });
-
-        // 두 번째 요청: GET
-        const response = await axios.get(`http://127.0.0.1/api/user/`, { withCredentials: true });
-        login(response.data);
-
-        // 모든 요청 완료 후 페이지 이동
+        await postRequest('user/', userInfo, () => {});
+        await getRequest('user',
+          data=>login(data)
+        );
         navigate('/');
       } catch (error) {
         console.error(error);

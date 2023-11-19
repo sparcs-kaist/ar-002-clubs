@@ -9,6 +9,7 @@ import "./style.css";
 import Members from "assets/Images/members.png";
 
 interface Props {
+  id: number;
   name: string;
   character : string;
   type: string;
@@ -17,9 +18,11 @@ interface Props {
   totalNumbers : number;
 }
 
-export const ClubListElement = ({ name, character, type, president, advisor, totalNumbers }: Props): JSX.Element => {
+export const ClubListElement = ({ id, name, character, type, president, advisor, totalNumbers }: Props): JSX.Element => {
   return (
-    <div className="club-list-element">
+    <div className="club-list-element" style= {{cursor: "pointer"}} onClick={() => {
+      window.location.href = `${process.env.REACT_APP_FRONTEND_URL}/club_detail/${id}`;
+    }}>
       <p className="p">
         <span className="span">{type}</span>
         <span className="text-wrapper-3"> {president? `| 회장 ${president}`:""} {advisor? `| 지도교수 ${advisor}`:""}</span>
@@ -34,8 +37,4 @@ export const ClubListElement = ({ name, character, type, president, advisor, tot
       </div>
     </div>
   );
-};
-
-ClubListElement.propTypes = {
-  text: PropTypes.string,
 };

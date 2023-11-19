@@ -30,12 +30,7 @@ router.get('/callback', async (req, res) => {
 
   try {
     const userInfo = await client.getUserInfo(code, state);
-    // req.session.user = userInfo;
-    // console.log("session");
-    // console.log(req.session);
-    
-    // 사용자 정보를 query parameter로 추가하여 클라이언트로 리다이렉트
-    res.redirect(`http://127.0.0.1:3000/?userInfo=${JSON.stringify(userInfo)}`);
+    res.redirect(`${process.env.FRONTEND_URL}/?userInfo=${JSON.stringify(userInfo)}`);
   } catch (error) {
     res.send('Error: ' + error.message);
   }
@@ -45,7 +40,7 @@ router.get('/logout', (req, res) => {
   const userIdFromQuery = req.query.userId; // 쿼리 파라미터에서 userId 값을 가져옵니다.
 
   if (req.query.userId) {
-    const logoutUrl = client.getLogoutUrl(req.query.userId, 'http://127.0.0.1:3000');
+    const logoutUrl = client.getLogoutUrl(req.query.userId, process.env.FRONTEND_URL);
     req.session.destroy(); // 세션을 삭제합니다.
     console.log(logoutUrl);
     res.json({logoutUrl}); // SPARCS SSO 로그아웃 URL로 리다이렉트합니다.

@@ -145,8 +145,12 @@ router.get('/division_clubs', async (req, res) => {
   }
 });
 
-router.get('/my_semester/:student_id', async (req, res) => {
-  const { student_id } = req.params;
+router.get('/my_semester', async (req, res) => {
+    if (!req.session.user || !req.session.user.student_id) {
+        return res.status(401).json({ success: false, message: 'Unauthorized - Please login first' });
+      }
+    console.log(req.session);
+    const { student_id } = req.session.user;
 
   try {
       const memberStatuses = await MemberStatus.findAll({
@@ -179,7 +183,12 @@ router.get('/my_semester/:student_id', async (req, res) => {
 
 //특정 유저의 특정 학기에 대한 동아리 목록 가져오기
 router.get('/my_semester_clubs', async (req, res) => {
-  let { semester_id, student_id } = req.query; // 쿼리 파라미터에서 semester_id와 student_id를 추출합니다.
+    if (!req.session.user || !req.session.user.student_id) {
+        return res.status(401).json({ success: false, message: 'Unauthorized - Please login first' });
+        }
+  let { semester_id } = req.query; // 쿼리 파라미터에서 semester_id와 student_id를 추출합니다.
+  console.log(req.session.user);
+  const { student_id } = req.session.user;
 
   // semester_id와 student_id가 모두 제공되었는지 확인합니다.
   if (!student_id) {

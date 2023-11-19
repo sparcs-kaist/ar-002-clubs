@@ -3,29 +3,45 @@ const http = require('http');
 const path = require('path');
 const cors = require('cors');
 const session = require('express-session');
-const FileStore = require('session-file-store')(session);
+const MySQLStore = require('express-mysql-session')(session);
 const { sequelize } = require('./models');
+const config = require('./config/config');
 require('dotenv').config();
 
 const app = express();
 
 const frontBuildPath = path.join(__dirname, '../front/build');
 const secretKey = process.env.SSO_SECRET_KEY;
+// MySQL 세션 저장소 옵션
+const sessionStoreOptions = {
+  host: config.host,
+  port: config.port,
+  user: config.username,
+  password: config.password,
+  database: config.database
+};
+// MySQL 세션 저장소 생성
+const sessionStore = new MySQLStore(sessionStoreOptions);
 
 app.use(express.json());
 app.use(cors({
-  origin: 'http://127.0.0.1:3000', // 프론트엔드 서버 주소
+  origin: process.env.FRONTEND_URL,
   credentials: true
 }));
 app.use(express.urlencoded({ extended: false }));
 app.use(express.static(frontBuildPath));
 app.set('trust proxy', true);
 app.use(session({
+  key: 'session_cookie_name',
   secret: secretKey,
+  store: sessionStore,
   resave: false,
-  HttpOnly: true,
-  saveUninitialized: true,
-  cookie: { secure: false }
+  saveUninitialized: false,
+  cookie: {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production', // HTTPS 환경에서만 true
+      // maxAge: 1000 * 60 * 60 * 24 // 예: 24시간
+  }
 }));
 
 sequelize

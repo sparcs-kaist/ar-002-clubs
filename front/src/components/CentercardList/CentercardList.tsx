@@ -12,10 +12,20 @@ interface Props {
   url: string;
 }
 
-export const CentercardList = ({title, subtitle, url}:Props): JSX.Element => {
+export const CentercardList = ({ title, subtitle, url }: Props): JSX.Element => {
   const handleClick = () => {
-    window.open(url, '_blank');
+    const currentDomain = window.location.hostname;
+    const linkUrl = new URL(url);
+
+    if (linkUrl.hostname === currentDomain) {
+      // 같은 도메인인 경우 현재 탭에서 URL로 이동
+      window.location.href = url;
+    } else {
+      // 다른 도메인인 경우 새 탭에서 URL 열기
+      window.open(url, '_blank');
+    }
   };
+
   return (
     <div className="centercard-list" onClick={handleClick} style={{cursor: 'pointer'}}>
       <div className="text-wrapper">{title}</div>
