@@ -28,6 +28,8 @@ export const CenterCard = ({ SubTitleText }: Props): JSX.Element => {
       navigate("/cafe_notice");
     } else if (SubTitleText === "나의 동아리") {
       navigate("/my_club");
+    } else if (SubTitleText === "최근 진행한 회의") {
+      navigate("/recent_meeting/0");
     }
   };
 

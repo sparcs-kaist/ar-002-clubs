@@ -29,6 +29,7 @@ var _Semester = require("./Semester");
 var _SemesterClub = require("./SemesterClub");
 var _SemesterClubType = require("./SemesterClubType");
 var _Warning = require("./Warning");
+var _sessions = require("./sessions");
 
 function initModels(sequelize) {
   var Activity = _Activity(sequelize, DataTypes);
@@ -61,11 +62,14 @@ function initModels(sequelize) {
   var SemesterClub = _SemesterClub(sequelize, DataTypes);
   var SemesterClubType = _SemesterClubType(sequelize, DataTypes);
   var Warning = _Warning(sequelize, DataTypes);
+  var sessions = _sessions(sequelize, DataTypes);
 
   Club.belongsToMany(Semester, { as: 'semester_id_Semester_SemesterClubs', through: SemesterClub, foreignKey: "club_id", otherKey: "semester_id" });
   Member.belongsToMany(Semester, { as: 'semester_id_Semesters', through: MemberStatus, foreignKey: "student_id", otherKey: "semester_id" });
   Semester.belongsToMany(Club, { as: 'club_id_Clubs', through: SemesterClub, foreignKey: "semester_id", otherKey: "club_id" });
   Semester.belongsToMany(Member, { as: 'student_id_Members', through: MemberStatus, foreignKey: "semester_id", otherKey: "student_id" });
+  Attendance.belongsTo(Club, { as: "fromClub", foreignKey: "fromClubId"});
+  Club.hasMany(Attendance, { as: "Attendances", foreignKey: "fromClubId"});
   ClubRepresentative.belongsTo(Club, { as: "club", foreignKey: "club_id"});
   Club.hasMany(ClubRepresentative, { as: "ClubRepresentatives", foreignKey: "club_id"});
   Fixture.belongsTo(Club, { as: "club", foreignKey: "club_id"});
@@ -82,8 +86,12 @@ function initModels(sequelize) {
   ClubBuilding.hasMany(Club, { as: "Clubs", foreignKey: "building_id"});
   ClubRepresentative.belongsTo(ClubRepresentativeType, { as: "type", foreignKey: "type_id"});
   ClubRepresentativeType.hasMany(ClubRepresentative, { as: "ClubRepresentatives", foreignKey: "type_id"});
+  Attendance.belongsTo(Division, { as: "fromDivision", foreignKey: "fromDivisionId"});
+  Division.hasMany(Attendance, { as: "Attendances", foreignKey: "fromDivisionId"});
   Club.belongsTo(Division, { as: "division", foreignKey: "division_id"});
   Division.hasMany(Club, { as: "Clubs", foreignKey: "division_id"});
+  Meeting.belongsTo(Division, { as: "division", foreignKey: "divisionId"});
+  Division.hasMany(Meeting, { as: "Meetings", foreignKey: "divisionId"});
   Division.belongsTo(DivisionGroup, { as: "division_group", foreignKey: "division_group_id"});
   DivisionGroup.hasMany(Division, { as: "Divisions", foreignKey: "division_group_id"});
   Meeting.belongsTo(MeetingType, { as: "type", foreignKey: "type_id"});
@@ -92,6 +100,8 @@ function initModels(sequelize) {
   Member.hasMany(ClubRepresentative, { as: "ClubRepresentatives", foreignKey: "student_id"});
   ExecutiveMember.belongsTo(Member, { as: "student", foreignKey: "student_id"});
   Member.hasOne(ExecutiveMember, { as: "ExecutiveMember", foreignKey: "student_id"});
+  Meeting.belongsTo(Member, { as: "editor", foreignKey: "editorId"});
+  Member.hasMany(Meeting, { as: "Meetings", foreignKey: "editorId"});
   MemberStatus.belongsTo(Member, { as: "student", foreignKey: "student_id"});
   Member.hasMany(MemberStatus, { as: "MemberStatuses", foreignKey: "student_id"});
   MemberClub.belongsTo(MemberStatus, { as: "student", foreignKey: "student_id"});
@@ -136,6 +146,7 @@ function initModels(sequelize) {
     SemesterClub,
     SemesterClubType,
     Warning,
+    sessions,
   };
 }
 module.exports = initModels;

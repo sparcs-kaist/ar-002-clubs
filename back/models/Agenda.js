@@ -11,10 +11,6 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.INTEGER,
       allowNull: false
     },
-    agenda_type_id: {
-      type: DataTypes.INTEGER,
-      allowNull: false
-    },
     agenda_number: {
       type: DataTypes.INTEGER,
       allowNull: false
@@ -26,6 +22,22 @@ module.exports = function(sequelize, DataTypes) {
     decision_text: {
       type: DataTypes.TEXT,
       allowNull: false
+    },
+    total_number: {
+      type: DataTypes.INTEGER,
+      allowNull: true
+    },
+    pros_number: {
+      type: DataTypes.INTEGER,
+      allowNull: true
+    },
+    cons_number: {
+      type: DataTypes.INTEGER,
+      allowNull: true
+    },
+    giveup_number: {
+      type: DataTypes.INTEGER,
+      allowNull: true
     }
   }, {
     sequelize,
