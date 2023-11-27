@@ -1,0 +1,56 @@
+.table-entry {
+  height: 41px;
+  width: 166px;
+}
+
+.table-entry .overlap-group {
+  border: 1px solid;
+  border-color: #ffffff;
+  height: 43px;
+  left: -1px;
+  position: relative;
+  top: -1px;
+  width: 168px;
+}
+
+.table-entry .text-wrapper-3 {
+  color: #000000;
+  font-family: "Inter", Helvetica;
+  font-size: 18px;
+  font-weight: 400;
+  left: 5px;
+  letter-spacing: 0;
+  line-height: normal;
+  position: absolute;
+  text-align: center;
+  top: 9px;
+  width: 158px;
+  height: 25px;
+}
+
+.table-entry .text-wrapper-4 {
+  color: #000000;
+  font-family: "Inter", Helvetica;
+  font-size: 18px;
+  font-weight: 400;
+  left: 28px;
+  letter-spacing: 0;
+  line-height: normal;
+  position: absolute;
+  text-align: center;
+  top: 9px;
+  width: 81px;
+}
+
+.table-entry .image {
+  height: 22px;
+  left: 129px;
+  object-fit: cover;
+  position: absolute;
+  top: 10px;
+  width: 26px;
+}
+
+.table-entry.variant-4 {
+  background-color: #7cd2d8;
+}

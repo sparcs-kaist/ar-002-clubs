@@ -1,0 +1,38 @@
+.option-button {
+  border: 1px solid;
+  border-radius: 15px;
+  height: 36px;
+  position: relative;
+  width: 103px;
+}
+
+.option-button .text-wrapper-2 {
+  font-family: "Inter", Helvetica;
+  font-size: 18px;
+  font-weight: 400;
+  left: 6px;
+  letter-spacing: 0;
+  line-height: normal;
+  position: absolute;
+  text-align: center;
+  top: 5px;
+  width: 90px;
+}
+
+.option-button.default {
+  background-color: #ffffff;
+  border-color: #7dd2d9;
+}
+
+.option-button.variant-2 {
+  background-color: #7cd2d8;
+  border-color: #7cd2d8;
+}
+
+.option-button.default .text-wrapper-2 {
+  color: #7dd2d9;
+}
+
+.option-button.variant-2 .text-wrapper-2 {
+  color: #ffffff;
+}

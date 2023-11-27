@@ -1,0 +1,440 @@
+.add-meeting {
+  background-color: #f6feff;
+  height: 1880px;
+  position: relative;
+  width: 1728px;
+}
+
+.add-meeting .upper-bar {
+  background-size: 100% 100%;
+  height: 245px;
+  left: 0;
+  position: absolute;
+  top: 0;
+  width: 1728px;
+}
+
+/* .add-meeting .group-5 {
+  height: 68px;
+  left: 21px;
+  position: absolute;
+  top: 19px;
+  width: 152px;
+}
+
+.add-meeting .image-2 {
+  height: 60px;
+  left: 0;
+  object-fit: cover;
+  position: absolute;
+  top: 0;
+  width: 65px;
+}
+
+.add-meeting .text-wrapper-19 {
+  color: #7cd2d8;
+  font-family: "Noto Sans Arabic-SemiBold", Helvetica;
+  font-size: 31px;
+  font-weight: 600;
+  height: 65px;
+  left: 65px;
+  letter-spacing: 0;
+  line-height: normal;
+  position: absolute;
+  top: 3px;
+}
+
+.add-meeting .clubs {
+  color: #ffffff;
+  font-family: "Inter-Bold", Helvetica;
+  font-size: 48px;
+  font-weight: 700;
+  left: 86px;
+  letter-spacing: 0;
+  line-height: normal;
+  position: absolute;
+  top: 100px;
+}
+
+.add-meeting .loading-bar-instance {
+  left: 0 !important;
+  position: absolute !important;
+  top: 0 !important;
+}
+
+.add-meeting .frame-12 {
+  align-items: flex-start;
+  display: inline-flex;
+  gap: 902px;
+  left: 286px;
+  position: absolute;
+  top: 39px;
+}
+
+.add-meeting .frame-13 {
+  align-items: flex-start;
+  display: flex;
+  gap: 60px;
+  height: 30px;
+  position: relative;
+  width: 422px;
+}
+
+.add-meeting .design-component-instance-node {
+  flex: 0 0 auto !important;
+} */
+
+.add-meeting .frame-14 {
+  align-items: center;
+  display: inline-flex;
+  flex: 0 0 auto;
+  gap: 11px;
+  justify-content: center;
+  position: relative;
+}
+
+.add-meeting .image-3 {
+  height: 18px;
+  object-fit: cover;
+  position: relative;
+  width: 18px;
+}
+
+.add-meeting .frame-15 {
+  align-items: flex-start;
+  display: inline-flex;
+  flex-direction: column;
+  gap: 20px;
+  left: 0;
+  position: absolute;
+  top: 285px;
+}
+
+.add-meeting .frame-16 {
+  align-items: flex-start;
+  display: inline-flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+  gap: 18px;
+  padding: 0px 155px;
+  position: relative;
+}
+
+.add-meeting .sub-title-instance {
+  margin-right: unset !important;
+}
+
+.add-meeting .frame-17 {
+  align-items: flex-start;
+  display: inline-flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+  gap: 19px;
+  padding: 0px 20px;
+  position: relative;
+}
+
+.add-meeting .frame-18 {
+  align-items: center;
+  display: flex;
+  flex: 0 0 auto;
+  gap: 40px;
+  position: relative;
+  width: 329px;
+}
+
+.add-meeting .text-wrapper-20 {
+  color: #000000;
+  font-family: "Inter-Regular", Helvetica;
+  font-size: 18px;
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: normal;
+  position: relative;
+  text-align: center;
+  width: fit-content;
+}
+
+.add-meeting .frame-19 {
+  align-items: center;
+  display: flex;
+  gap: 10px;
+  position: relative;
+  width: 216px;
+}
+
+.add-meeting .option-button-instance {
+  border: unset !important;
+  border-color: unset !important;
+}
+
+.add-meeting .option-button-2 {
+  left: 7px !important;
+  top: 6px !important;
+}
+
+.add-meeting .frame-20 {
+  align-items: center;
+  display: inline-flex;
+  flex: 0 0 auto;
+  gap: 25px;
+  position: relative;
+}
+
+.add-meeting .frame-21 {
+  align-items: center;
+  display: inline-flex;
+  flex: 0 0 auto;
+  gap: 10px;
+  position: relative;
+}
+
+.add-meeting .group-6 {
+  height: 34px;
+  position: relative;
+  width: 153px;
+}
+
+.add-meeting .overlap-group-4 {
+  background-color: #ffffff;
+  border: 1px solid;
+  border-color: #7cd2d8;
+  height: 34px;
+  position: relative;
+  width: 151px;
+}
+
+.add-meeting .text-wrapper-21 {
+  color: #000000;
+  font-family: "Inter-Regular", Helvetica;
+  font-size: 18px;
+  font-weight: 400;
+  left: 8px;
+  letter-spacing: 0;
+  line-height: normal;
+  position: absolute;
+  top: 5px;
+  width: 138px;
+}
+
+.add-meeting .frame-22 {
+  align-items: flex-start;
+  display: flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+  padding: 0px 20px;
+  position: relative;
+  width: 826px;
+}
+
+.add-meeting .frame-23 {
+  align-items: flex-start;
+  display: inline-flex;
+  flex: 0 0 auto;
+  gap: 1px;
+  margin-right: -40px;
+  position: relative;
+}
+
+.add-meeting .table-entry-instance {
+  position: relative !important;
+  width: 325px !important;
+}
+
+.add-meeting .table-entry-2 {
+  width: 327px !important;
+}
+
+.add-meeting .table-entry-3 {
+  left: 22px !important;
+  width: 278px !important;
+}
+
+.add-meeting .design-component-instance-node-2 {
+  position: relative !important;
+}
+
+.add-meeting .frame-24 {
+  align-items: flex-start;
+  display: inline-flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+  gap: 11px;
+  padding: 0px 20px;
+  position: relative;
+}
+
+.add-meeting .group-7 {
+  height: 46px;
+  position: relative;
+  width: 825px;
+}
+
+.add-meeting .overlap-3 {
+  border: 1px solid;
+  border-color: #7cd2d8;
+  border-radius: 20px;
+  height: 48px;
+  left: -1px;
+  position: relative;
+  top: -1px;
+  width: 827px;
+}
+
+.add-meeting .frame-25 {
+  align-items: center;
+  display: inline-flex;
+  gap: 20px;
+  left: 334px;
+  position: relative;
+  top: 5px;
+}
+
+.add-meeting .group-8 {
+  height: 36px;
+  position: relative;
+  width: 30px;
+}
+
+.add-meeting .overlap-group-5 {
+  height: 36px;
+  position: relative;
+  width: 28px;
+}
+
+.add-meeting .ellipse {
+  background-color: #7cd2d8;
+  border-radius: 14px;
+  height: 28px;
+  left: 0;
+  position: absolute;
+  top: 6px;
+  width: 28px;
+}
+
+.add-meeting .text-wrapper-22 {
+  color: #000000;
+  font-family: "Inter-Bold", Helvetica;
+  font-size: 30px;
+  font-weight: 700;
+  height: 36px;
+  left: 3px;
+  letter-spacing: 0;
+  line-height: normal;
+  position: absolute;
+  text-align: center;
+  top: 0;
+  white-space: nowrap;
+}
+
+.add-meeting .frame-26 {
+  height: 46px;
+  position: relative;
+  width: 828px;
+}
+
+.add-meeting .frame-27 {
+  align-items: center;
+  background-color: #7cd2d8;
+  border-radius: 10px;
+  display: flex;
+  gap: 10px;
+  height: 32px;
+  justify-content: center;
+  left: 356px;
+  overflow: hidden;
+  padding: 12px 9px;
+  position: relative;
+  top: 7px;
+  width: 116px;
+}
+
+.add-meeting .text-wrapper-23 {
+  color: #000000;
+  font-family: "Inter-Regular", Helvetica;
+  font-size: 18px;
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: 20px;
+  margin-bottom: -5px;
+  margin-top: -7px;
+  position: relative;
+  white-space: nowrap;
+  width: fit-content;
+}
+
+.add-meeting .under-bar {
+  background-color: #f6feff;
+  height: 81px;
+  position: relative;
+  width: 1728px;
+}
+
+.add-meeting .group-9 {
+  height: 50px;
+  left: 20px;
+  position: absolute;
+  top: 15px;
+  width: 245px;
+}
+
+.add-meeting .image-4 {
+  height: 44px;
+  left: 0;
+  object-fit: cover;
+  position: absolute;
+  top: 0;
+  width: 65px;
+}
+
+.add-meeting .text-wrapper-24 {
+  color: #000000;
+  font-family: "Noto Sans Arabic-SemiBold", Helvetica;
+  font-size: 31px;
+  font-weight: 600;
+  height: 47px;
+  left: 65px;
+  letter-spacing: 0;
+  line-height: normal;
+  position: absolute;
+  top: 2px;
+  width: 178px;
+}
+
+.add-meeting .frame-29 {
+  align-items: flex-start;
+  display: inline-flex;
+  gap: 35px;
+  left: 321px;
+  position: absolute;
+  top: 34px;
+}
+
+.add-meeting .text-wrapper-25 {
+  color: #000000;
+  font-family: "NanumBarunGothic-Regular", Helvetica;
+  font-size: 19px;
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: normal;
+  margin-top: -1px;
+  position: relative;
+  text-align: center;
+  white-space: nowrap;
+  width: fit-content;
+}
+
+.add-meeting .text-wrapper-26 {
+  color: #000000;
+  font-family: "NanumBarunGothic-Regular", Helvetica;
+  font-size: 19px;
+  font-weight: 400;
+  height: 22px;
+  left: 1445px;
+  letter-spacing: 0;
+  line-height: normal;
+  position: absolute;
+  text-align: right;
+  top: 33px;
+  white-space: nowrap;
+}

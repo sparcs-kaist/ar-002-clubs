@@ -8,7 +8,7 @@
 
 .home .div-2 {
   background-color: #f6feff;
-  height: 1746px;
+  height: 1046px;
   position: relative;
   width: 1728px;
 }
@@ -24,122 +24,9 @@
   height: 81px;
   left: 0;
   position: absolute;
-  top: 1665px;
+  top: 1015px;
   width: 1728px;
 }
-/* 
-.home .group-2 {
-  height: 50px;
-  left: 20px;
-  position: absolute;
-  top: 15px;
-  width: 245px;
-}
-
-.home .image-2 {
-  height: 44px;
-  left: 0;
-  object-fit: cover;
-  position: absolute;
-  top: 0;
-  width: 65px;
-}
-
-.home .text-wrapper-13 {
-  color: #000000;
-  font-family: "Noto Sans Arabic", Helvetica;
-  font-size: 31px;
-  font-weight: 600;
-  height: 47px;
-  left: 65px;
-  letter-spacing: 0;
-  line-height: normal;
-  position: absolute;
-  top: 2px;
-  width: 178px;
-}
-
-.home .frame-4 {
-  align-items: flex-start;
-  display: inline-flex;
-  gap: 35px;
-  left: 321px;
-  position: absolute;
-  top: 34px;
-}
-
-.home .text-wrapper-14 {
-  color: #000000;
-  font-family: "NanumBarunGothic-Regular", Helvetica;
-  font-size: 19px;
-  font-weight: 400;
-  letter-spacing: 0;
-  line-height: normal;
-  margin-top: -1px;
-  position: relative;
-  text-align: center;
-  white-space: nowrap;
-  width: fit-content;
-}
-
-.home .text-wrapper-15 {
-  color: #000000;
-  font-family: "NanumBarunGothic-Regular", Helvetica;
-  font-size: 19px;
-  font-weight: 400;
-  height: 22px;
-  left: 1445px;
-  letter-spacing: 0;
-  line-height: normal;
-  position: absolute;
-  text-align: right;
-  top: 33px;
-  white-space: nowrap;
-} */
-
-.home .frame-5 {
-  background-color: #ffffff;
-  border-radius: 25px;
-  box-shadow: 4px 4px 2px 1px #7cd2d833;
-  height: 629px;
-  left: 1127px;
-  position: absolute;
-  top: 1027px;
-  width: 434px;
-}
-
-.home .frame-6 {
-  align-items: flex-start;
-  display: inline-flex;
-  gap: 97px;
-  left: 38px;
-  position: absolute;
-  top: 29px;
-}
-
-.home .text-wrapper-16 {
-  color: #000000;
-  font-family: "NanumBarunGothic-Regular", Helvetica;
-  font-size: 20px;
-  font-weight: 400;
-  letter-spacing: 0;
-  line-height: normal;
-  margin-top: -1px;
-  position: relative;
-  text-align: center;
-  white-space: nowrap;
-  width: fit-content;
-}
-
-.home .frame-7 {
-  align-items: flex-start;
-  display: inline-flex;
-  flex-direction: column;
-  left: 37px;
-  position: absolute;
-  top: 96px;
-}
-
 .home .frame-8 {
   align-items: flex-start;
   display: inline-flex;
@@ -192,93 +79,4 @@
   left: 155px !important;
   position: absolute !important;
   top: 680px !important;
-}
-
-.home .frame-10 {
-  background-color: #ffffff;
-  border-radius: 25px;
-  box-shadow: 4px 4px 2px 1px #7cd2d81a;
-  height: 629px;
-  left: 160px;
-  position: absolute;
-  top: 1027px;
-  width: 937px;
-}
-
-.home .frame-11 {
-  align-items: center;
-  display: flex;
-  justify-content: space-between;
-  left: 346px;
-  position: absolute;
-  top: 27px;
-  width: 245px;
-}
-
-.home .text-wrapper-17 {
-  color: #000000;
-  font-family: "NanumBarunGothic-Regular", Helvetica;
-  font-size: 20px;
-  font-weight: 400;
-  letter-spacing: 0;
-  line-height: normal;
-  position: relative;
-  text-align: center;
-  white-space: nowrap;
-  width: fit-content;
-}
-
-.home .text-wrapper-18 {
-  color: #000000;
-  font-family: "NanumBarunGothic-Bold", Helvetica;
-  font-size: 24px;
-  font-weight: 700;
-  letter-spacing: 0;
-  line-height: normal;
-  margin-top: -1px;
-  position: relative;
-  text-align: center;
-  width: 161px;
-}
-
-.home .frame-12 {
-  align-items: flex-start;
-  display: inline-flex;
-  left: 55px;
-  position: absolute;
-  top: 88px;
-}
-
-.home .text-wrapper-19 {
-  color: #000000;
-  font-family: "NanumBarunGothic-Bold", Helvetica;
-  font-size: 20px;
-  font-weight: 700;
-  height: 28px;
-  letter-spacing: 0;
-  line-height: normal;
-  margin-top: -1px;
-  position: relative;
-  text-align: center;
-  width: 118px;
-}
-
-.home .frame-13 {
-  align-items: flex-start;
-  display: inline-flex;
-  flex-direction: column;
-  left: 55px;
-  position: absolute;
-  top: 123px;
-}
-
-.home .frame-14 {
-  align-items: flex-start;
-  display: inline-flex;
-  flex: 0 0 auto;
-  position: relative;
-}
-
-.home .calendar-day-instance {
-  position: relative !important;
 }

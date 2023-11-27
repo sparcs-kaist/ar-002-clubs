@@ -1,0 +1,466 @@
+.meeting-detail {
+  background-color: #f6feff;
+  height: 1880px;
+  position: relative;
+  width: 1728px;
+}
+
+.meeting-detail .upper-bar {
+  background-size: 100% 100%;
+  height: 245px;
+  left: 0;
+  position: absolute;
+  top: 0;
+  width: 1728px;
+}
+
+/* .meeting-detail .group-5 {
+  height: 68px;
+  left: 21px;
+  position: absolute;
+  top: 19px;
+  width: 152px;
+}
+
+.meeting-detail .image-2 {
+  height: 60px;
+  left: 0;
+  object-fit: cover;
+  position: absolute;
+  top: 0;
+  width: 65px;
+}
+
+.meeting-detail .text-wrapper-19 {
+  color: #7cd2d8;
+  font-family: "Noto Sans Arabic-SemiBold", Helvetica;
+  font-size: 31px;
+  font-weight: 600;
+  height: 65px;
+  left: 65px;
+  letter-spacing: 0;
+  line-height: normal;
+  position: absolute;
+  top: 3px;
+}
+
+.meeting-detail .clubs {
+  color: #ffffff;
+  font-family: "Inter-Bold", Helvetica;
+  font-size: 48px;
+  font-weight: 700;
+  left: 86px;
+  letter-spacing: 0;
+  line-height: normal;
+  position: absolute;
+  top: 100px;
+}
+
+.meeting-detail .loading-bar-instance {
+  left: 0 !important;
+  position: absolute !important;
+  top: 0 !important;
+}
+
+.meeting-detail .frame-12 {
+  align-items: flex-start;
+  display: inline-flex;
+  gap: 902px;
+  left: 286px;
+  position: absolute;
+  top: 39px;
+}
+
+.meeting-detail .frame-13 {
+  align-items: flex-start;
+  display: flex;
+  gap: 60px;
+  height: 30px;
+  position: relative;
+  width: 422px;
+}
+
+.meeting-detail .design-component-instance-node {
+  flex: 0 0 auto !important;
+} */
+
+.meeting-detail .frame-14 {
+  align-items: center;
+  display: inline-flex;
+  flex: 0 0 auto;
+  gap: 11px;
+  justify-content: center;
+  position: relative;
+}
+
+.meeting-detail .image-3 {
+  height: 18px;
+  object-fit: cover;
+  position: relative;
+  width: 18px;
+}
+
+.meeting-detail .frame-15 {
+  align-items: flex-start;
+  display: inline-flex;
+  flex-direction: column;
+  gap: 20px;
+  left: 0;
+  position: absolute;
+  top: 285px;
+}
+
+.meeting-detail .frame-16 {
+  align-items: flex-start;
+  display: inline-flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+  gap: 18px;
+  padding: 0px 155px;
+  position: relative;
+}
+
+.meeting-detail .sub-title-instance {
+  margin-right: unset !important;
+}
+
+.meeting-detail .frame-17 {
+  align-items: flex-start;
+  display: inline-flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+  gap: 19px;
+  padding: 0px 20px;
+  position: relative;
+}
+
+.meeting-detail .frame-18 {
+  align-items: center;
+  display: flex;
+  flex: 0 0 auto;
+  gap: 40px;
+  position: relative;
+  width: 329px;
+}
+
+.meeting-detail .text-wrapper-20 {
+  color: #000000;
+  font-family: "Inter-Regular", Helvetica;
+  font-size: 18px;
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: normal;
+  position: relative;
+  text-align: center;
+  width: fit-content;
+}
+
+.meeting-detail .frame-19 {
+  align-items: center;
+  display: flex;
+  gap: 10px;
+  position: relative;
+  width: 216px;
+}
+
+.meeting-detail .option-button-instance {
+  border: unset !important;
+  border-color: unset !important;
+}
+
+.meeting-detail .option-button-2 {
+  left: 7px !important;
+  top: 6px !important;
+}
+
+.meeting-detail .frame-20 {
+  align-items: center;
+  display: inline-flex;
+  flex: 0 0 auto;
+  gap: 25px;
+  position: relative;
+}
+
+.meeting-detail .frame-21 {
+  align-items: center;
+  display: inline-flex;
+  flex: 0 0 auto;
+  gap: 10px;
+  position: relative;
+}
+
+.meeting-detail .group-6 {
+  height: 34px;
+  position: relative;
+  width: 153px;
+}
+
+.meeting-detail .overlap-group-4 {
+  background-color: #ffffff;
+  border: 1px solid;
+  border-color: #7cd2d8;
+  height: 34px;
+  position: relative;
+  width: 151px;
+}
+
+.meeting-detail .text-wrapper-21 {
+  color: #000000;
+  font-family: "Inter-Regular", Helvetica;
+  font-size: 18px;
+  font-weight: 400;
+  left: 8px;
+  letter-spacing: 0;
+  line-height: normal;
+  position: absolute;
+  top: 5px;
+  width: 138px;
+}
+
+.meeting-detail .frame-22 {
+  align-items: flex-start;
+  display: flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+  padding: 0px 20px;
+  position: relative;
+  width: 826px;
+}
+
+.meeting-detail .frame-23 {
+  align-items: flex-start;
+  display: inline-flex;
+  flex: 0 0 auto;
+  gap: 1px;
+  margin-right: -40px;
+  position: relative;
+}
+
+.meeting-detail .table-entry-instance {
+  position: relative !important;
+  width: 325px !important;
+}
+
+.meeting-detail .table-entry-2 {
+  width: 327px !important;
+}
+
+.meeting-detail .table-entry-3 {
+  left: 22px !important;
+  width: 278px !important;
+}
+
+.meeting-detail .design-component-instance-node-2 {
+  position: relative !important;
+}
+
+.meeting-detail .frame-24 {
+  align-items: flex-start;
+  display: inline-flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+  gap: 11px;
+  padding: 0px 20px;
+  position: relative;
+}
+
+.meeting-detail .group-7 {
+  height: 46px;
+  position: relative;
+  width: 825px;
+}
+
+.meeting-detail .overlap-3 {
+  border: 1px solid;
+  border-color: #7cd2d8;
+  border-radius: 20px;
+  height: 48px;
+  left: -1px;
+  position: relative;
+  top: -1px;
+  width: 827px;
+}
+
+.meeting-detail .frame-25 {
+  align-items: center;
+  display: inline-flex;
+  gap: 20px;
+  left: 334px;
+  position: relative;
+  top: 5px;
+}
+
+.meeting-detail .group-8 {
+  height: 36px;
+  position: relative;
+  width: 30px;
+}
+
+.meeting-detail .overlap-group-5 {
+  height: 36px;
+  position: relative;
+  width: 28px;
+}
+
+.meeting-detail .ellipse {
+  background-color: #7cd2d8;
+  border-radius: 14px;
+  height: 28px;
+  left: 0;
+  position: absolute;
+  top: 6px;
+  width: 28px;
+}
+
+.meeting-detail .text-wrapper-22 {
+  color: #000000;
+  font-family: "Inter-Bold", Helvetica;
+  font-size: 30px;
+  font-weight: 700;
+  height: 36px;
+  left: 3px;
+  letter-spacing: 0;
+  line-height: normal;
+  position: absolute;
+  text-align: center;
+  top: 0;
+  white-space: nowrap;
+}
+
+.meeting-detail .frame-26 {
+  height: 46px;
+  position: relative;
+  width: 828px;
+}
+
+.meeting-detail .frame-27 {
+  align-items: center;
+  background-color: #7cd2d8;
+  border-radius: 10px;
+  display: flex;
+  gap: 10px;
+  height: 32px;
+  justify-content: center;
+  left: 356px;
+  overflow: hidden;
+  padding: 12px 9px;
+  position: relative;
+  top: 7px;
+  width: 116px;
+}
+
+.meeting-detail .text-wrapper-23 {
+  color: #000000;
+  font-family: "Inter-Regular", Helvetica;
+  font-size: 18px;
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: 20px;
+  margin-bottom: -5px;
+  margin-top: -7px;
+  position: relative;
+  white-space: nowrap;
+  width: fit-content;
+}
+
+.meeting-detail .under-bar {
+  background-color: #f6feff;
+  height: 81px;
+  position: relative;
+  width: 1728px;
+}
+
+.meeting-detail .group-9 {
+  height: 50px;
+  left: 20px;
+  position: absolute;
+  top: 15px;
+  width: 245px;
+}
+
+.meeting-detail .image-4 {
+  height: 44px;
+  left: 0;
+  object-fit: cover;
+  position: absolute;
+  top: 0;
+  width: 65px;
+}
+
+.meeting-detail .text-wrapper-24 {
+  color: #000000;
+  font-family: "Noto Sans Arabic-SemiBold", Helvetica;
+  font-size: 31px;
+  font-weight: 600;
+  height: 47px;
+  left: 65px;
+  letter-spacing: 0;
+  line-height: normal;
+  position: absolute;
+  top: 2px;
+  width: 178px;
+}
+
+.meeting-detail .frame-29 {
+  align-items: flex-start;
+  display: inline-flex;
+  gap: 35px;
+  left: 321px;
+  position: absolute;
+  top: 34px;
+}
+
+.meeting-detail .text-wrapper-25 {
+  color: #000000;
+  font-family: "NanumBarunGothic-Regular", Helvetica;
+  font-size: 19px;
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: normal;
+  margin-top: -1px;
+  position: relative;
+  text-align: center;
+  white-space: nowrap;
+  width: fit-content;
+}
+
+.meeting-detail .text-wrapper-26 {
+  color: #000000;
+  font-family: "NanumBarunGothic-Regular", Helvetica;
+  font-size: 19px;
+  font-weight: 400;
+  height: 22px;
+  left: 1445px;
+  letter-spacing: 0;
+  line-height: normal;
+  position: absolute;
+  text-align: right;
+  top: 33px;
+  white-space: nowrap;
+}
+
+.meeting-detail .text-wrapper-12 {
+  color: #000000;
+  font-family: "Inter-Regular", Helvetica;
+  font-size: 18px;
+  font-weight: 400;
+  left: 919px;
+  letter-spacing: 0;
+  line-height: normal;
+  position: absolute;
+  top: 278px;
+  width: 36px;
+}
+
+.meeting-detail .text-wrapper-13 {
+  color: #000000;
+  font-family: "Inter-Regular", Helvetica;
+  font-size: 18px;
+  font-weight: 400;
+  left: 966px;
+  letter-spacing: 0;
+  line-height: normal;
+  position: absolute;
+  top: 278px;
+  width: 36px;
+}

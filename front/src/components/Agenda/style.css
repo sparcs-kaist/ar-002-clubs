@@ -1,0 +1,420 @@
+.agenda .group {
+  height: 41px;
+  position: relative;
+  width: 256px;
+}
+
+.agenda .agenda-variant3 {
+  left: 0 !important;
+  position: absolute !important;
+  top: 0 !important;
+}
+
+.agenda .frame {
+  align-items: center;
+  display: inline-flex;
+  gap: 6px;
+  position: absolute;
+  top: 6px;
+  left: 0 !important;
+}
+
+.agenda .text-wrapper-4 {
+  color: #000000;
+  font-family: "Inter", Helvetica;
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: 0;
+  line-height: normal;
+  margin-top: -1px;
+  position: relative;
+  width: fit-content;
+}
+
+.agenda .overlap-wrapper {
+  height: 35px;
+  left: 55px;
+  position: absolute;
+  top: 3px;
+  width: 55px;
+}
+
+.agenda .overlap {
+  background-color: #ffffff;
+  border: 1px solid;
+  border-color: #7cd2d8;
+  height: 35px;
+  position: relative;
+  width: 53px;
+}
+
+.agenda .text-wrapper-5 {
+  color: #000000;
+  font-family: "Inter", Helvetica;
+  font-size: 24px;
+  font-weight: 700;
+  left: 9px;
+  letter-spacing: 0;
+  line-height: normal;
+  position: absolute;
+  text-align: center;
+  top: 4px;
+  white-space: nowrap;
+  width: 33px;
+}
+
+.agenda .overlap-group-wrapper {
+  height: 40px;
+  margin-right: -2px;
+  position: relative;
+  width: 830px;
+}
+
+.agenda .div-wrapper {
+  background-color: #ffffff;
+  border: 1px solid;
+  border-color: #7cd2d8;
+  height: 40px;
+  position: relative;
+  width: 828px;
+  padding: 10px;
+  font-family: "Inter", Helvetica;
+  font-size: 18px;
+  font-weight: 400;
+}
+
+.agenda .text-wrapper-6 {
+  color: #000000;
+  font-family: "Inter", Helvetica;
+  font-size: 18px;
+  font-weight: 400;
+  left: 8px;
+  letter-spacing: 0;
+  line-height: normal;
+  position: absolute;
+  top: 6px;
+  width: 80px;
+}
+
+.agenda .text-wrapper-7 {
+  color: #000000;
+  font-family: "Inter", Helvetica;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 0;
+  line-height: normal;
+  position: relative;
+  width: fit-content;
+}
+
+.agenda .group-2 {
+  height: 129px;
+  margin-right: -2px;
+  position: relative;
+  width: 830px;
+}
+
+.agenda .overlap-2 {
+  background-color: #ffffff;
+  border: 1px solid;
+  border-color: #7cd2d8;
+  height: 129px;
+  position: relative;
+  width: 828px;
+  color: #000000;
+  font-family: "Inter", Helvetica;
+  font-size: 18px;
+  font-weight: 400;
+  padding: 10px;
+  overflow: scroll;
+}
+
+.agenda .p {
+  color: #000000;
+  font-family: "Inter", Helvetica;
+  font-size: 18px;
+  font-weight: 400;
+  left: 12px;
+  letter-spacing: 0;
+  line-height: 27px;
+  position: absolute;
+  top: 9px;
+  width: 802px;
+}
+
+.agenda .frame-2 {
+  height: 122px;
+  position: relative;
+  width: 104px;
+}
+
+.agenda .frame-3 {
+  align-items: flex-end;
+  display: inline-flex;
+  left: 0;
+  position: absolute;
+  top: 0;
+}
+
+.agenda .text-wrapper-8 {
+  color: #000000;
+  font-family: "Inter", Helvetica;
+  font-size: 18px;
+  font-weight: 400;
+  height: 26px;
+  letter-spacing: 0;
+  line-height: 27px;
+  margin-top: -1px;
+  position: relative;
+  white-space: nowrap;
+  width: 47px;
+}
+
+.agenda .group-3 {
+  height: 25px;
+  position: relative;
+  width: 39px;
+}
+
+.agenda .overlap-group-2 {
+  height: 25px;
+  position: relative;
+  width: 37px;
+}
+
+.agenda .rectangle {
+  background-color: #ffffff;
+  border: 1px solid;
+  border-color: #7cd2d8;
+  height: 23px;
+  left: 0;
+  position: absolute;
+  top: 1px;
+  width: 37px;
+  font-family: "Inter", Helvetica;
+  font-size: 18px;
+  font-weight: 400;
+  text-align: center;
+}
+
+.agenda .text-wrapper-9 {
+  color: #000000;
+  font-family: "Inter", Helvetica;
+  font-size: 18px;
+  font-weight: 400;
+  left: 8px;
+  letter-spacing: 0;
+  line-height: 27px;
+  position: absolute;
+  top: 0;
+  white-space: nowrap;
+  width: 26px;
+}
+
+.agenda .text-wrapper-10 {
+  color: #000000;
+  font-family: "Inter", Helvetica;
+  font-size: 18px;
+  font-weight: 400;
+  height: 25px;
+  letter-spacing: 0;
+  line-height: 27px;
+  position: relative;
+  white-space: nowrap;
+  width: 20px;
+}
+
+.agenda .frame-4 {
+  align-items: flex-end;
+  display: inline-flex;
+  left: 0;
+  position: absolute;
+  top: 32px;
+}
+
+.agenda .frame-5 {
+  align-items: flex-end;
+  display: inline-flex;
+  left: 0;
+  position: absolute;
+  top: 64px;
+}
+
+.agenda .frame-6 {
+  align-items: flex-end;
+  display: inline-flex;
+  left: 0;
+  position: absolute;
+  top: 96px;
+}
+
+.agenda .frame-wrapper {
+  height: 46px;
+  position: relative;
+  width: 828px;
+}
+
+.agenda .frame-7 {
+  align-items: center;
+  background-color: #7cd2d8;
+  border-radius: 10px;
+  display: flex;
+  gap: 10px;
+  height: 32px;
+  justify-content: center;
+  left: 356px;
+  overflow: hidden;
+  padding: 12px 9px;
+  position: relative;
+  top: 7px;
+  width: 116px;
+}
+
+.agenda .text-wrapper-11 {
+  color: #000000;
+  font-family: "Inter", Helvetica;
+  font-size: 18px;
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: 20px;
+  margin-bottom: -5px;
+  margin-top: -7px;
+  position: relative;
+  white-space: nowrap;
+  width: fit-content;
+}
+
+.agenda .frame-8 {
+  align-items: flex-start;
+  display: inline-flex;
+  flex-direction: column;
+  gap: 8px;
+  position: relative;
+  height: flex;
+}
+
+.agenda .frame-9 {
+  height: 29px;
+  position: relative;
+  width: 828px;
+}
+
+.agenda .element-SPARCS {
+  color: #000000;
+  font-family: "Inter", Helvetica;
+  font-size: 24px;
+  font-weight: 400;
+  left: 0;
+  letter-spacing: 0;
+  line-height: normal;
+  position: absolute;
+  top: -1px;
+  width: 590px;
+}
+
+.agenda .span {
+  font-weight: 700;
+}
+
+.agenda .agenda-text-wrapper-12 {
+  color: #000000;
+  font-family: "Inter", Helvetica;
+  font-size: 24px;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+
+.agenda .text-wrapper-13 {
+  color: #000000;
+  font-family: "Inter", Helvetica;
+  font-size: 18px;
+  font-weight: 400;
+  left: 745px;
+  letter-spacing: 0;
+  line-height: normal;
+  position: absolute;
+  top: -1px;
+  width: 36px;
+}
+
+.agenda .text-wrapper-14 {
+  color: #000000;
+  font-family: "Inter", Helvetica;
+  font-size: 18px;
+  font-weight: 400;
+  left: 792px;
+  letter-spacing: 0;
+  line-height: normal;
+  position: absolute;
+  top: -1px;
+  width: 36px;
+}
+
+.agenda .group-4 {
+  height: 109px;
+  position: relative;
+  width: 804px;
+}
+
+.agenda .text-wrapper-15 {
+  height: 109px;
+  position: relative;
+  width: 804px;
+  color: #000000;
+  font-family: "Inter", Helvetica;
+  font-size: 18px;
+  font-weight: 400;
+  left: 0;
+  letter-spacing: 0;
+  line-height: 27px;
+  white-space: pre-wrap;
+  overflow: scroll;
+}
+
+.agenda .frame-10 {
+  align-items: flex-start;
+  display: inline-flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+  gap: 6px;
+  position: relative;
+}
+
+.agenda .frame-11 {
+  align-items: flex-end;
+  display: inline-flex;
+  flex: 0 0 auto;
+  position: relative;
+}
+
+.agenda .text-wrapper-16 {
+  color: #000000;
+  font-family: "Inter", Helvetica;
+  font-size: 18px;
+  font-weight: 400;
+  height: 25px;
+  letter-spacing: 0;
+  line-height: 27px;
+  position: relative;
+  white-space: nowrap;
+  width: 60px;
+}
+
+.agenda.property-1-default {
+  align-items: flex-start;
+  display: inline-flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 2px 0px;
+  position: relative;
+}
+
+.agenda.property-1-variant-3 {
+  height: 358px;
+  width: 828px;
+}
+
+.agenda.property-1-variant-2 {
+  height: 358px;
+  width: 828px;
+}

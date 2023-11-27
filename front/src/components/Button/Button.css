@@ -1,0 +1,21 @@
+.button {
+  all: unset;
+  border: 1px solid;
+  border-color: #000000;
+  box-sizing: border-box;
+  height: 43px;
+  position: relative;
+  width: 94px;
+}
+
+.button .text-wrapper {
+  color: #000000;
+  font-family: "Inter-Regular", Helvetica;
+  font-size: 18px;
+  font-weight: 400;
+  left: 21px;
+  letter-spacing: 0;
+  line-height: normal;
+  position: absolute;
+  top: 9px;
+}

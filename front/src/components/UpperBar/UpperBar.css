@@ -72,7 +72,7 @@
   color: #ffffff;
   font-weight: 700;
 }
-.upper-bar .text-wrapper-21 {
+.upper-bar .text-wrapper-title {
   color: #ffffff;
   font-weight: 600;
   font-size: 40px !important;
@@ -137,7 +137,7 @@
 }
 
 .upper-menu-group {
-  padding-bottom:10px;
+  padding-bottom: 10px;
 }
 
 .upper-bar .sub-menu {

@@ -18,11 +18,10 @@ import { getRequest } from "utils/api";
 
 interface Props {
   className: any;
-  title?: string|null;
+  title?: string | null;
 }
 
 export const UpperBar = ({ className, title }: Props): JSX.Element => {
-
   const { user, logout } = useAuth(); // authContext에서 user 정보 가져오기
   const navigate = useNavigate();
 
@@ -33,115 +32,165 @@ export const UpperBar = ({ className, title }: Props): JSX.Element => {
 
   const handleLogin = async (e: FormEvent) => {
     e.preventDefault();
-    
+
     try {
-      getRequest('auth/login',
-        data => {
-          const loginUrl = data.loginUrl;
-          window.location.href = loginUrl;
-        }
-      )  
+      getRequest("auth/login", (data) => {
+        const loginUrl = data.loginUrl;
+        window.location.href = loginUrl;
+      });
     } catch (error) {
-      console.error('Login Error:', error);
-      alert('Login failed!');
+      console.error("Login Error:", error);
+      alert("Login failed!");
     }
   };
 
   const handleLogout = async (e: FormEvent) => {
     e.preventDefault();
-    
+
     try {
-      console.log(user)
+      console.log(user);
       if (user) {
-        getRequest(`auth/logout?userId=${user.sid}`,
-          data=>{
-            const logoutUrl = data.logoutUrl;
-            logout();
-            window.location.href = logoutUrl;
-          }
-        )
+        getRequest(`auth/logout?userId=${user.sid}`, (data) => {
+          const logoutUrl = data.logoutUrl;
+          logout();
+          window.location.href = logoutUrl;
+        });
       } else {
-        alert('Invalid user information!'); // 유효하지 않은 사용자 정보에 대한 경고 메시지
+        alert("Invalid user information!"); // 유효하지 않은 사용자 정보에 대한 경고 메시지
       }
     } catch (error) {
-      console.error('Logout Error:', error);
-      alert('Logout failed!');
+      console.error("Logout Error:", error);
+      alert("Logout failed!");
     }
   };
 
   return (
     <div className={`upper-bar ${className}`}>
-      <img className="background" src = {BackImg}/>
-      <div className="group" onClick={() => navigate("/")} style={{cursor: "pointer"}}>
+      <img className="background" src={BackImg} />
+      <div
+        className="group"
+        onClick={() => navigate("/")}
+        style={{ cursor: "pointer" }}
+      >
         <img className="image" alt="Image" src={Logo} />
         <div className="div-clubs">Clubs</div>
       </div>
       <div className="frame">
-      <div
+        <div
           className="upper-menu-group"
           onMouseEnter={() => setShowSubMenu1(true)}
           onMouseLeave={() => setShowSubMenu1(false)}
-          style={{position: 'relative'}} 
+          style={{ position: "relative" }}
         >
-          <UpperbarMenu className="upperbar-menu-instance" text="동아리" active={showSubMenu1}/>  
-            {showSubMenu1 && (
-              <div className="sub-menu">
-                  <button onClick={() => navigate("/club_list")}>동아리 목록</button>
-                  <button onClick={() => navigate("/cafe_notice")}>카페 공지사항</button>
-                  <button onClick={() => navigate("/my_club")}>나의 동아리</button>
-                  <button onClick={() => navigate("/maneger")}>동아리/분과 관리</button>
-              </div>
-            )}
+          <UpperbarMenu
+            className="upperbar-menu-instance"
+            text="동아리"
+            active={showSubMenu1}
+          />
+          {showSubMenu1 && (
+            <div className="sub-menu">
+              <button onClick={() => navigate("/club_list")}>
+                동아리 목록
+              </button>
+              <button onClick={() => navigate("/cafe_notice")}>
+                카페 공지사항
+              </button>
+              <button onClick={() => navigate("/my_club")}>나의 동아리</button>
+              <button onClick={() => alert("접근 권한이 없습니다.")}>
+                동아리/분과 관리
+              </button>
+            </div>
+          )}
         </div>
         <div
           className="upper-menu-group"
           onMouseEnter={() => setShowSubMenu2(true)}
           onMouseLeave={() => setShowSubMenu2(false)}
-          style={{position: 'relative'}} 
+          style={{ position: "relative" }}
         >
-          <UpperbarMenu className="upperbar-menu-instance" text="의결기구" active={showSubMenu2}/>  
-            {showSubMenu2 && (
-              <div className="sub-menu">
-                  <button onClick={() => navigate("/ceo-message")}>최근 진행한 회의</button>
-                  <button onClick={() => navigate("/history")}>전동대회</button>
-                  <button onClick={() => navigate("/map")}>확대운영위원회</button>
-                  <button onClick={() => navigate("/map")}>운영위원회</button>
-                  <button onClick={() => navigate("/map")}>분과회의</button>
-              </div>
-            )}
+          <UpperbarMenu
+            className="upperbar-menu-instance"
+            text="의결기구"
+            active={showSubMenu2}
+          />
+          {showSubMenu2 && (
+            <div className="sub-menu">
+              <button
+                onClick={() => (window.location.href = "/recent_meeting/0")}
+              >
+                최근 진행한 회의
+              </button>
+              <button
+                onClick={() => (window.location.href = "/recent_meeting/1")}
+              >
+                전동대회
+              </button>
+              <button
+                onClick={() => (window.location.href = "/recent_meeting/2")}
+              >
+                확대운영위원회
+              </button>
+              <button
+                onClick={() => (window.location.href = "/recent_meeting/3")}
+              >
+                운영위원회
+              </button>
+              <button
+                onClick={() => (window.location.href = "/recent_meeting/4")}
+              >
+                분과회의
+              </button>
+            </div>
+          )}
         </div>
         <div
           className="upper-menu-group"
           onMouseEnter={() => setShowSubMenu3(true)}
           onMouseLeave={() => setShowSubMenu3(false)}
-          style={{position: 'relative'}} 
+          style={{ position: "relative" }}
         >
-          <UpperbarMenu className="upperbar-menu-instance" text="소통" active={showSubMenu3}/>  
-            {showSubMenu3 && (
-              <div className="sub-menu">
-                  <button onClick={() => navigate("/ceo-message")}>소통채널 안내</button>
-                  <button onClick={() => navigate("/history")}>카카오톡 문의하기</button>
-                  <button onClick={() => navigate("/map")}>동아리연합회칙</button>
-              </div>
-            )}
+          <UpperbarMenu
+            className="upperbar-menu-instance"
+            text="소통"
+            active={showSubMenu3}
+          />
+          {showSubMenu3 && (
+            <div className="sub-menu">
+              <button onClick={() => navigate("/contacts")}>
+                소통채널 안내
+              </button>
+              <button onClick={() => navigate("/history")}>
+                카카오톡 문의하기
+              </button>
+              {/* <button onClick={() => navigate("/map")}>동아리연합회칙</button> */}
+            </div>
+          )}
         </div>
         <div
           className="upper-menu-group"
           onMouseEnter={() => setShowSubMenu4(true)}
           onMouseLeave={() => setShowSubMenu4(false)}
-          style={{position: 'relative'}} 
+          style={{ position: "relative" }}
         >
-          <UpperbarMenu className="upperbar-menu-instance" text="서비스 신청" active={showSubMenu4}/>  
-            {showSubMenu4 && (
-              <div className="sub-menu">
-                  <button onClick={() => navigate("/ceo-message")}>공용공간 임시사용</button>
-                  <button onClick={() => navigate("/history")}>활동확인서 발급</button>
-                  <button onClick={() => navigate("/map")}>서비스 신청</button>
-              </div>
-            )}
+          <UpperbarMenu
+            className="upperbar-menu-instance"
+            text="서비스 신청"
+            active={showSubMenu4}
+          />
+          {showSubMenu4 && (
+            <div className="sub-menu">
+              <button onClick={() => navigate("/ceo-message")}>
+                공용공간 임시사용
+              </button>
+              <button onClick={() => navigate("/history")}>
+                활동확인서 발급
+              </button>
+              <button onClick={() => navigate("/map")}>서비스 신청</button>
+            </div>
+          )}
         </div>
       </div>
-        {!title ?
+      {!title ? (
         <p className="clubs">
           <span className="span">동아리</span>
           <span className="text-wrapper-2">
@@ -152,20 +201,32 @@ export const UpperBar = ({ className, title }: Props): JSX.Element => {
           <span className="text-wrapper-3">Clubs</span>
           <span className="text-wrapper-4"> 입니다.</span>
         </p>
-        :
-          <p className="clubs">
-            <span className="text-wrapper-21">{title}</span>
-          </p>
-        }
-        
+      ) : (
+        <p className="clubs">
+          <span className="text-wrapper-title">{title}</span>
+        </p>
+      )}
+
       <LoadingBar className="loading-bar-instance" />
       <div className="frame-2">
         <img className="img" alt="Image" src={Profile} />
         <div className="login">
           {user ? (
-            <div className="text-wrapper" onClick={handleLogout} style={{cursor: "pointer"}}>{user.name} 님</div> // 로그인한 경우 사용자의 이름 표시
+            <div
+              className="text-wrapper"
+              onClick={handleLogout}
+              style={{ cursor: "pointer" }}
+            >
+              {user.name} 님
+            </div> // 로그인한 경우 사용자의 이름 표시
           ) : (
-            <div className="text-wrapper" onClick={handleLogin} style={{cursor: "pointer"}}>로그인 </div> // 로그인하지 않은 경우 로그인 버튼 표시
+            <div
+              className="text-wrapper"
+              onClick={handleLogin}
+              style={{ cursor: "pointer" }}
+            >
+              로그인{" "}
+            </div> // 로그인하지 않은 경우 로그인 버튼 표시
           )}
         </div>
       </div>
