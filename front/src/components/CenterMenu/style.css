@@ -9,12 +9,11 @@
   font-family: "Inter", Helvetica;
   font-size: 20px;
   font-weight: 400;
-  left: 4px;
-  letter-spacing: 0;
-  line-height: normal;
   position: absolute;
   text-align: center;
+  left: 0px;
   top: 160px;
+  width: 143px;
   white-space: nowrap;
 }
 

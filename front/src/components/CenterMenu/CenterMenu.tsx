@@ -7,6 +7,7 @@ import PropTypes from "prop-types";
 import React from "react";
 import "./style.css";
 import Certifi from "assets/Images/Certification.png";
+import { Unavailable } from "utils/util";
 
 interface Props {
   divClassName: any;
@@ -18,7 +19,11 @@ export const CenterMenu = ({
   text = "활동확인서 발급",
 }: Props): JSX.Element => {
   return (
-    <div className="center-menu">
+    <div
+      className="center-menu"
+      onClick={Unavailable}
+      style={{ cursor: "pointer" }}
+    >
       <div className={`text-wrapper-10 ${divClassName}`}>{text}</div>
       <div className="overlap-group">
         <img className="img" alt="Image" src={Certifi} />

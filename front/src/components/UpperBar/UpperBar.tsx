@@ -15,6 +15,7 @@ import BackImg from "assets/Images/BackImg.png";
 import "./UpperBar.css";
 import Profile from "assets/Images/profile.png";
 import { getRequest } from "utils/api";
+import { Unavailable } from "utils/util";
 
 interface Props {
   className: any;
@@ -156,13 +157,18 @@ export const UpperBar = ({ className, title }: Props): JSX.Element => {
           />
           {showSubMenu3 && (
             <div className="sub-menu">
-              <button onClick={() => navigate("/contacts")}>
-                소통채널 안내
+              <button onClick={Unavailable}>소통채널 안내</button>
+              <button onClick={Unavailable}>카카오톡 문의하기</button>
+              <button
+                onClick={() =>
+                  window.open(
+                    "https://cafe.naver.com/ArticleList.nhn?search.clubid=26985838&search.menuid=19&search.boardtype=L",
+                    "_blank"
+                  )
+                }
+              >
+                동아리연합회칙
               </button>
-              <button onClick={() => navigate("/history")}>
-                카카오톡 문의하기
-              </button>
-              {/* <button onClick={() => navigate("/map")}>동아리연합회칙</button> */}
             </div>
           )}
         </div>
@@ -179,13 +185,9 @@ export const UpperBar = ({ className, title }: Props): JSX.Element => {
           />
           {showSubMenu4 && (
             <div className="sub-menu">
-              <button onClick={() => navigate("/ceo-message")}>
-                공용공간 임시사용
-              </button>
-              <button onClick={() => navigate("/history")}>
-                활동확인서 발급
-              </button>
-              <button onClick={() => navigate("/map")}>서비스 신청</button>
+              <button onClick={Unavailable}>공용공간 임시사용</button>
+              <button onClick={Unavailable}>활동확인서 발급</button>
+              <button onClick={Unavailable}>서비스 신청</button>
             </div>
           )}
         </div>

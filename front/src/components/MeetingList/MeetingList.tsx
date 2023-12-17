@@ -1,6 +1,6 @@
 import React from "react";
 import "./style.css";
-import CafeLogo from "assets/Images/CafeLogo.png";
+import CafeLogo from "assets/Images/MeetingLogo.png";
 import { useNavigate } from "react-router-dom";
 
 interface Props {
