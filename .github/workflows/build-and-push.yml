@@ -37,12 +37,12 @@ jobs:
       - name: "Checkout Repository"
         uses: actions/checkout@v2
 
-      - name: "Create .env File"
-        run: |
-          echo "Creating .env file"
-          echo "${{ secrets.ENV_VARS_FRONT }}" >> front/.env
-          echo "${{ secrets.ENV_VARS_BACK }}" >> back/.env
-          echo "done"
+      # - name: "Create .env File"
+      #   run: |
+      #     echo "Creating .env file"
+      #     echo "${{ secrets.ENV_VARS_FRONT }}" >> front/.env
+      #     echo "${{ secrets.ENV_VARS_BACK }}" >> back/.env
+      #     echo "done"
 
       - name: "Log in to Github Container Registry"
         uses: docker/login-action@v2
