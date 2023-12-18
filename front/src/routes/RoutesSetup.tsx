@@ -7,6 +7,7 @@ import { RecentMeeting } from "pages/RecentMeeting";
 import { AddMeeting } from "pages/AddMeeting";
 import { MeetingDetail } from "pages/MeetingDetail";
 import { EditMeeting } from "pages/EditMeeting";
+import { ClubDetail } from "pages/ClubDetail";
 
 export default function RouteSetup() {
   return (
@@ -23,6 +24,7 @@ export default function RouteSetup() {
       <Route path="/add_meeting/:id" element={<AddMeeting />} />
       <Route path="/meeting_detail/:id" element={<MeetingDetail />} />
       <Route path="/edit_meeting/:id" element={<EditMeeting />} />
+      <Route path="/club_detail/:id" element={<ClubDetail />} />
     </Routes>
   );
 }
