@@ -1,0 +1,17 @@
+version: "3.8"
+
+services:
+  client:
+    container_name: sparcs-clubs-front
+    image: sparcs-clubs-front
+    build:
+      context: .
+      dockerfile: .docker/Front.Dockerfile
+      target: production
+
+  back:
+    container_name: sparcs-clubs-back
+    image: sparcs-clubs-back
+    build:
+      context: .
+      dockerfile: .docker/Back.Dockerfile

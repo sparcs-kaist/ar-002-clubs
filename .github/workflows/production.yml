@@ -1,0 +1,24 @@
+name: Continuous Deployment to Production Server
+
+on:
+  push:
+    tags:
+      - "v*"
+      - "!*-rc*"
+      - "!*-alpha*"
+      - "!*-beta*"
+
+concurrency:
+  group: cd-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  deploy-production:
+    name: "Deploy Production Build (CD)"
+    uses: "./.github/workflows/build-and-push.yml"
+    secrets:
+      ENV_VARS_FRONT: ${{ secrets.ENV_VARS_FRONT }}
+      ENV_VARS_BACK: ${{ secrets.ENV_VARS_BACK }}
+      HOST: ${{ secrets.HOST }}
+      USERNAME: ${{ secrets.USERNAME }}
+      PASSWORD: ${{ secrets.PASSWORD }}
