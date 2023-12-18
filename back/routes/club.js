@@ -12,7 +12,144 @@ const {
   Member,
   MemberClub,
   MemberStatus,
+  ClubBuilding,
 } = require("../models");
+
+router.get("/club_detail", async (req, res) => {
+  const clubId = req.query.club_id;
+  if (!clubId) {
+    return res.status(400).json({
+      success: false,
+      message: "club_id query parameter is required",
+    });
+  }
+
+  try {
+    const currentDate = new Date();
+
+    // Find the current semester
+    const currentSemester = await Semester.findOne({
+      where: {
+        start_date: { [Op.lte]: currentDate },
+        end_date: { [Op.gte]: currentDate },
+      },
+    });
+
+    if (!currentSemester) {
+      return res
+        .status(404)
+        .json({ success: false, message: "No current semester found" });
+    }
+
+    // Find the club by id, including the Division and ClubBuilding
+    const club = await Club.findByPk(clubId, {
+      include: [
+        {
+          model: Division,
+          attributes: ["name"],
+          as: "division",
+        },
+        {
+          model: ClubBuilding,
+          attributes: ["building_name"],
+          as: "building",
+        },
+      ],
+    });
+
+    if (!club) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Club not found" });
+    }
+
+    // Get SemesterClub information
+    const semesterClubInfo = await SemesterClub.findOne({
+      where: {
+        club_id: club.id,
+        semester_id: currentSemester.id,
+      },
+      attributes: ["type_id", "characteristic_kr", "advisor"],
+    });
+
+    if (!semesterClubInfo) {
+      return res.status(404).json({
+        success: false,
+        message: "Semester club information not found",
+      });
+    }
+
+    // Find the type from the SemesterClubType model
+    const semesterClubType = await SemesterClubType.findByPk(
+      semesterClubInfo.type_id
+    );
+
+    // Determine clubType based on PermanentClub existence
+    let clubType;
+    const permanentClub = await PermanentClub.findOne({
+      where: {
+        club_id: club.id,
+        start_date: { [Op.lte]: currentDate },
+        [Op.or]: [{ end_date: { [Op.gte]: currentDate } }, { end_date: null }],
+      },
+    });
+    clubType = permanentClub ? "상임동아리" : semesterClubType.type;
+
+    // Get the club president
+    let clubPresident = "";
+    const clubRepresentative = await ClubRepresentative.findOne({
+      where: {
+        club_id: club.id,
+        type_id: 1,
+        start_term: { [Op.lte]: currentDate },
+        [Op.or]: [{ end_term: { [Op.gte]: currentDate } }, { end_term: null }],
+      },
+    });
+    if (clubRepresentative) {
+      const presidentMember = await Member.findByPk(
+        clubRepresentative.student_id
+      );
+      clubPresident = presidentMember ? presidentMember.name : "";
+    }
+
+    // Count total members
+    const totalMembersCount = await MemberClub.count({
+      where: {
+        club_id: club.id,
+        semester_id: currentSemester.id,
+      },
+    });
+
+    // Construct room location string
+    const roomLocation =
+      club.building && club.room_location
+        ? `${club.building.building_name} ${club.room_location}`
+        : "없음";
+
+    res.json({
+      success: true,
+      data: {
+        id: club.id,
+        clubName: club.name,
+        divisionName: club.division.name ? club.division.name : "",
+        clubType: clubType,
+        characteristicKr: semesterClubInfo.characteristic_kr,
+        advisor: semesterClubInfo.advisor,
+        totalMembers: totalMembersCount,
+        clubPresident: clubPresident,
+        description: club.description,
+        foundingYear: club.founding_year,
+        room: roomLocation,
+      },
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+    });
+  }
+});
 
 router.get("/division_list", async (req, res) => {
   try {
@@ -41,12 +178,10 @@ router.get("/division_list", async (req, res) => {
 router.get("/division_clubs", async (req, res) => {
   const divisionId = req.query.division_id;
   if (!divisionId) {
-    return res
-      .status(400)
-      .json({
-        success: false,
-        message: "division_id query parameter is required",
-      });
+    return res.status(400).json({
+      success: false,
+      message: "division_id query parameter is required",
+    });
   }
 
   try {
@@ -222,12 +357,10 @@ router.get("/my_semester_clubs", async (req, res) => {
 
   // semester_id와 student_id가 모두 제공되었는지 확인합니다.
   if (!student_id) {
-    return res
-      .status(400)
-      .json({
-        success: false,
-        message: "student_id query parameter is required",
-      });
+    return res.status(400).json({
+      success: false,
+      message: "student_id query parameter is required",
+    });
   }
 
   try {

@@ -1,0 +1,108 @@
+.club-detail {
+  background-color: #f6feff;
+  height: 216px;
+  width: 1728px;
+}
+
+.club-detail .frame-2 {
+  align-items: flex-start;
+  background-color: #f6feff;
+  display: inline-flex;
+  flex-direction: column;
+  gap: 23px;
+  position: relative;
+}
+
+.club-detail .upper-bar {
+  background-size: 100% 100%;
+  height: 245px;
+  position: relative;
+  width: 1728px;
+}
+
+.club-detail .frame-wrapper {
+  align-items: flex-start;
+  display: inline-flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+  gap: 10px;
+  padding: 10px 155px;
+  position: relative;
+}
+
+.club-detail .frame-6 {
+  align-items: flex-start;
+  display: inline-flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+  gap: 40px;
+  position: relative;
+}
+
+.club-detail .frame-7 {
+  align-items: flex-start;
+  display: inline-flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+  gap: 15px;
+  position: relative;
+}
+
+.club-detail .sub-title-instance {
+  margin-right: unset !important;
+}
+
+.club-detail .frame-8 {
+  align-items: flex-start;
+  display: inline-flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+  gap: 15px;
+  padding: 0px 20px;
+  position: relative;
+}
+
+.club-detail .p {
+  color: #000000;
+  font-family: "Inter-Bold", Helvetica;
+  font-size: 20px;
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: normal;
+  margin-top: -1px;
+  position: relative;
+  white-space: nowrap;
+  width: fit-content;
+}
+
+.club-detail .span {
+  font-weight: 700;
+}
+
+.club-detail .text-wrapper-6 {
+  font-family: "Inter-Regular", Helvetica;
+}
+
+.club-detail .div-2 {
+  color: #000000;
+  font-family: "Inter-Bold", Helvetica;
+  font-size: 20px;
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: normal;
+  position: relative;
+  white-space: nowrap;
+  width: fit-content;
+}
+
+.club-detail .text-wrapper-7 {
+  color: #000000;
+  font-family: "Nanum Gothic-Regular", Helvetica;
+  font-size: 20px;
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: 30px;
+  margin-top: -1px;
+  position: relative;
+  width: 1000px;
+}
