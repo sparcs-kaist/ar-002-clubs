@@ -1,0 +1,40 @@
+.activity-state {
+  align-items: center;
+  background-color: #ffffff;
+  border: 2px solid;
+  border-radius: 10px;
+  display: flex;
+  gap: 10px;
+  height: 32px;
+  justify-content: center;
+  overflow: hidden;
+  padding: 12px 9px;
+  position: relative;
+  width: 116px;
+}
+
+.activity-state .div-2 {
+  color: #000000;
+  font-family: "Inter", Helvetica;
+  font-size: 18px;
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: 20px;
+  margin-bottom: -4px;
+  margin-top: -8px;
+  position: relative;
+  white-space: nowrap;
+  width: fit-content;
+}
+
+.activity-state.property-1-0-default {
+  border-color: #7cd2d8;
+}
+
+.activity-state.property-1-0-variant-3 {
+  border-color: #d87c7c;
+}
+
+.activity-state.property-1-0-variant-2 {
+  border-color: #7cd89b;
+}
