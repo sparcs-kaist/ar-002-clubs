@@ -37,12 +37,13 @@ jobs:
       - name: "Checkout Repository"
         uses: actions/checkout@v2
 
-      # - name: "Create .env File"
-      #   run: |
-      #     echo "Creating .env file"
-      #     echo "${{ secrets.ENV_VARS_FRONT }}" >> front/.env
-      #     echo "${{ secrets.ENV_VARS_BACK }}" >> back/.env
-      #     echo "done"
+      # NOTE: Frontend variables are injected at this point because it is required in the build process
+      #       Backend variables are injected in the server (or else it would be included in the container)
+      - name: "Create .env File (Only Front)"
+        run: |
+          echo "Creating .env file"
+          echo "${{ secrets.ENV_VARS_FRONT }}" >> front/.env
+          echo "done"
 
       - name: "Log in to Github Container Registry"
         uses: docker/login-action@v2
