@@ -58,7 +58,7 @@ jobs:
           images: ${{ matrix.image }}
           labels: latest
 
-      - name: Build and push Docker image Drill4Net.Agent.Service
+      - name: Build and push Docker image
         uses: docker/build-push-action@v3
         with:
           context: .

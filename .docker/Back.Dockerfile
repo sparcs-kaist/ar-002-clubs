@@ -10,4 +10,6 @@ RUN npm install --omit=dev
 
 COPY ./back .
 
+ENV NODE_ENV production
+
 CMD ["npm", "start"]
