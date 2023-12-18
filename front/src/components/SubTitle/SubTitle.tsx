@@ -8,10 +8,14 @@ interface Props {
   text: string;
 }
 
-export const SubTitle = ({ className, divClassName, text = "카페 공지사항" }: Props): JSX.Element => {
+export const SubTitle = ({
+  className,
+  divClassName,
+  text = "카페 공지사항",
+}: Props): JSX.Element => {
   return (
     <div className={`sub-title ${className}`}>
-      <div className={`text-wrapper-8 ${divClassName}`}>{text}</div>
+      <div className={`text-wrapper-80 ${divClassName}`}>{text}</div>
     </div>
   );
 };

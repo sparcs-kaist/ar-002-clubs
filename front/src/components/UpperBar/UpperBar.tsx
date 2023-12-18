@@ -97,8 +97,8 @@ export const UpperBar = ({ className, title }: Props): JSX.Element => {
                 카페 공지사항
               </button>
               <button onClick={() => navigate("/my_club")}>나의 동아리</button>
-              <button onClick={() => alert("접근 권한이 없습니다.")}>
-                동아리/분과 관리
+              <button onClick={() => navigate("/club_manage")}>
+                동아리 관리
               </button>
             </div>
           )}
@@ -116,29 +116,19 @@ export const UpperBar = ({ className, title }: Props): JSX.Element => {
           />
           {showSubMenu2 && (
             <div className="sub-menu">
-              <button
-                onClick={() => (window.location.href = "/recent_meeting/0")}
-              >
+              <button onClick={() => navigate("/recent_meeting/0")}>
                 최근 진행한 회의
               </button>
-              <button
-                onClick={() => (window.location.href = "/recent_meeting/1")}
-              >
+              <button onClick={() => navigate("/recent_meeting/1")}>
                 전동대회
               </button>
-              <button
-                onClick={() => (window.location.href = "/recent_meeting/2")}
-              >
+              <button onClick={() => navigate("/recent_meeting/2")}>
                 확대운영위원회
               </button>
-              <button
-                onClick={() => (window.location.href = "/recent_meeting/3")}
-              >
+              <button onClick={() => navigate("/recent_meeting/3")}>
                 운영위원회
               </button>
-              <button
-                onClick={() => (window.location.href = "/recent_meeting/4")}
-              >
+              <button onClick={() => navigate("/recent_meeting/4")}>
                 분과회의
               </button>
             </div>
