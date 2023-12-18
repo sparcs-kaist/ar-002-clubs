@@ -8,6 +8,7 @@ import { AddMeeting } from "pages/AddMeeting";
 import { MeetingDetail } from "pages/MeetingDetail";
 import { EditMeeting } from "pages/EditMeeting";
 import { ClubDetail } from "pages/ClubDetail";
+import { ClubManage } from "pages/ClubManage";
 
 export default function RouteSetup() {
   return (
@@ -25,6 +26,7 @@ export default function RouteSetup() {
       <Route path="/meeting_detail/:id" element={<MeetingDetail />} />
       <Route path="/edit_meeting/:id" element={<EditMeeting />} />
       <Route path="/club_detail/:id" element={<ClubDetail />} />
+      <Route path="/club_manage" element={<ClubManage />} />
     </Routes>
   );
 }
