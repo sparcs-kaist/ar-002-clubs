@@ -67,12 +67,6 @@ export const Home = (): JSX.Element => {
     fetchData();
   }, [location, login, navigate]);
 
-  useEffect(() => {
-    getRequest("auth/front", (data) => {
-      console.log(data);
-    });
-  }, []);
-
   return (
     <div className="home">
       <div className="div-2">

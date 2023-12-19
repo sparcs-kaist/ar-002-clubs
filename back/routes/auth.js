@@ -30,7 +30,9 @@ router.get("/callback", async (req, res) => {
   try {
     const userInfo = await client.getUserInfo(code, state);
     res.redirect(
-      `https://clubs.sparcs.org/?userInfo=${JSON.stringify(userInfo)}`
+      `https://${process.env.FRONTEND_URL}/?userInfo=${JSON.stringify(
+        userInfo
+      )}`
     );
   } catch (error) {
     res.send("Error: " + error.message);
@@ -59,10 +61,6 @@ router.get("/welcome", (req, res) => {
   } else {
     res.send("Not logged in");
   }
-});
-
-router.get("/front", async (req, res) => {
-  res.json({ front: process.env.FRONTEND_URL });
 });
 
 module.exports = router;
