@@ -5,8 +5,10 @@ import "./style.css";
 interface Props {
   property1: "variant-2" | "default";
   className: string;
-  onUpload?: () => void; // Function to call when file is to be uploaded
-  url?: string; // URL of the uploaded file for preview
+  onUpload?: () => void;
+  url?: string;
+  fileName?: string;
+  onDelete?: (fileName: string) => void; // Function to call when file is to be deleted
 }
 
 export const ActivityProof = ({
@@ -14,12 +16,30 @@ export const ActivityProof = ({
   className,
   onUpload,
   url,
+  fileName,
+  onDelete,
 }: Props): JSX.Element => {
   const isImage = url?.match(/\.(jpeg|jpg|gif|png)$/) != null;
+  const proxyUrl = url
+    ? `${process.env.REACT_APP_BACKEND_URL}/activity/image-proxy?url=${url}`
+    : "";
+
+  const handleDelete = () => {
+    if (onDelete && fileName) {
+      onDelete(fileName);
+    }
+  };
 
   return (
     <div className={`activity-proof ${className}`}>
       <div className="rectangle">
+        <button
+          onClick={handleDelete}
+          className="delete-button"
+          style={{ zIndex: 100 }}
+        >
+          X
+        </button>
         {property1 === "variant-2" ? (
           <div className="frame" onClick={onUpload}>
             <div className="group">
@@ -33,10 +53,18 @@ export const ActivityProof = ({
         ) : (
           <div className="proof-content">
             {isImage ? (
-              <img src={url} alt="Uploaded Proof" />
+              <img
+                style={{
+                  width: "493px",
+                  height: "493px",
+                  objectFit: "contain",
+                }}
+                src={proxyUrl}
+                alt={fileName || "Uploaded Proof"} // Use file name as alt text
+              />
             ) : (
-              <a href={url} download>
-                Download File
+              <a href={proxyUrl} download={fileName}>
+                {fileName}
               </a>
             )}
           </div>

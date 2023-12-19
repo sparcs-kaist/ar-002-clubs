@@ -43,6 +43,10 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.TEXT,
       allowNull: false
     },
+    proof_text: {
+      type: DataTypes.STRING(255),
+      allowNull: true
+    },
     feedback_type: {
       type: DataTypes.INTEGER,
       allowNull: true,

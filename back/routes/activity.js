@@ -2,6 +2,9 @@ const express = require("express");
 const router = express.Router();
 const { Op } = require("sequelize");
 const AWS = require("aws-sdk");
+const multer = require("multer");
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
 const {
   MemberClub,
   Member,
@@ -10,6 +13,8 @@ const {
   Duration,
   Activity,
   ActivityType,
+  ActivityEvidence,
+  ActivityMember,
 } = require("../models");
 
 // Configure AWS with your access and secret key.
@@ -17,7 +22,127 @@ const {
 const s3 = new AWS.S3({
   accessKeyId: process.env.S3_ACCESS_KEY,
   secretAccessKey: process.env.S3_SECRET_ACCESS_KEY,
-  region: "ap-northeast-2", // Replace with your S3 bucket's region
+  region: "ap-northeast-2",
+});
+
+router.post("/addActivity", async (req, res) => {
+  const {
+    clubId,
+    name: title,
+    type: activityTypeId,
+    category,
+    startDate,
+    endDate,
+    location,
+    purpose,
+    content,
+    proofText,
+    participants,
+    proofImages,
+    feedbackResults,
+  } = req.body;
+
+  try {
+    // Create Activity
+    const activity = await Activity.create({
+      club_id: clubId,
+      title,
+      activity_type_id: activityTypeId,
+      start_date: startDate,
+      end_date: endDate,
+      location,
+      purpose,
+      content,
+      proof_text: proofText,
+      feedback_type: 1,
+      recent_edit: new Date(),
+
+      // Add any other fields you need to save
+    });
+
+    // Add Evidence
+    await Promise.all(
+      proofImages.map((image) => {
+        return ActivityEvidence.create({
+          activity_id: activity.id,
+          image_url: image.imageUrl,
+          description: image.fileName, // Assuming description is stored in fileName
+        });
+      })
+    );
+
+    // Add Participants
+    await Promise.all(
+      participants.map((participant) => {
+        return ActivityMember.create({
+          activity_id: activity.id,
+          member_student_id: participant.student_id,
+        });
+      })
+    );
+
+    res.status(200).send({
+      message: "Activity added successfully",
+      activityId: activity.id,
+    });
+  } catch (error) {
+    console.error("Error adding activity:", error);
+    res.status(500).send("Error adding activity");
+  }
+});
+
+router.post("/upload", upload.single("file"), async (req, res) => {
+  try {
+    const file = req.file;
+
+    // Check if file is not available
+    if (!file) {
+      return res.status(400).send("No file uploaded.");
+    }
+
+    // Generate a timestamp
+    const timestamp = new Date().toISOString().replace(/:/g, "-");
+    const encodedFileName = file.originalname;
+
+    // Set S3 parameters with timestamp and original file name
+    const s3Params = {
+      Bucket: "kaist-clubs-test", // Replace with your S3 bucket name
+      Key: `uploads/${timestamp}_${encodedFileName}`, // File name you want to save as
+      Body: file.buffer,
+      ContentType: file.mimetype,
+      ACL: "public-read", // Adjust the ACL as per your requirements
+    };
+
+    // Upload file to S3
+    s3.upload(s3Params, (s3Err, data) => {
+      if (s3Err) throw s3Err;
+      res.send({ message: "File uploaded successfully", data });
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Error in file upload.");
+  }
+});
+
+router.get("/image-proxy", async (req, res) => {
+  const imageUrl = req.query.url;
+
+  if (!imageUrl) {
+    return res.status(400).send("URL parameter is required");
+  }
+
+  const bucket = "kaist-clubs-test"; // Replace with your bucket name
+  const key = decodeURIComponent(new URL(imageUrl).pathname.slice(1));
+
+  try {
+    const stream = s3
+      .getObject({ Bucket: bucket, Key: key })
+      .createReadStream();
+    stream.pipe(res);
+  } catch (error) {
+    console.error("Error fetching image from S3:", error);
+    res.status(500).send("Error fetching image");
+  }
 });
 
 router.get("/is_report_duration", async (req, res) => {
@@ -164,11 +289,29 @@ router.get("/activity_list", async (req, res) => {
   }
 });
 
+router.post("/deleteImage", async (req, res) => {
+  const { fileName } = req.body;
+  const key = `uploads/${fileName}`;
+
+  s3.deleteObject(
+    {
+      Bucket: "kaist-clubs-test",
+      Key: key,
+    },
+    (err, data) => {
+      if (err) {
+        console.error(err);
+        res.status(500).send("Error deleting file.");
+      } else {
+        res.send({ message: "File deleted successfully" });
+      }
+    }
+  );
+});
+
 router.get("/search_members", async (req, res) => {
   const { club_id: clubId, query } = req.query;
   const currentDate = new Date();
-
-  console.log(query);
 
   if (!clubId) {
     return res.status(400).json({
@@ -228,43 +371,6 @@ router.get("/search_members", async (req, res) => {
     console.error(error);
     res.status(500).json({ message: "서버 오류가 발생했습니다." });
   }
-});
-
-// POST /file_upload
-router.post("/file_upload", (req, res) => {
-  const bucketName = "ar-002-clubs"; // Replace with your bucket name
-  const key = `uploads/${Date.now()}_${req.body.file_name}`; // File name in S3
-  const params = {
-    Bucket: bucketName,
-    Key: key,
-    Expires: 60, // Time in seconds until the pre-signed URL expires
-  };
-
-  s3.getSignedUrl("putObject", params, (err, url) => {
-    if (err) {
-      console.error(err);
-      return res.status(500).json({ error: "Error generating pre-signed URL" });
-    }
-    res.json({ url, key }); // Send pre-signed URL and file key back to client
-  });
-});
-
-router.get("/get_file_url", async (req, res) => {
-  const key = req.query.key; // The key of the file in S3
-
-  const params = {
-    Bucket: "ar-002-clubs",
-    Key: key,
-    Expires: 600, // URL expires in 60 seconds
-  };
-
-  s3.getSignedUrl("getObject", params, (err, url) => {
-    if (err) {
-      console.log(err);
-      return res.status(500).json({ error: "Error generating URL" });
-    }
-    res.json({ url });
-  });
 });
 
 module.exports = router;

@@ -7,6 +7,7 @@ import { UpperBar } from "components/UpperBar";
 import { ActivityFeedback } from "components/ActivityFeedback";
 import { getRequest, postRequest } from "utils/api";
 import { useUserRepresentativeStatus } from "hooks/useUserRepresentativeStatus";
+import { useNavigate } from "react-router-dom";
 
 interface Participant {
   student_id: string;
@@ -15,6 +16,7 @@ interface Participant {
 
 interface ProofImage {
   imageUrl: string;
+  fileName: string; // Added this line
 }
 
 interface FeedbackResult {
@@ -40,6 +42,7 @@ interface ActivityState {
 
 export const AddActivity = (): JSX.Element => {
   const { typeId, clubId, isLoading } = useUserRepresentativeStatus();
+  const navigate = useNavigate();
   const [activity, setActivity] = useState<ActivityState>({
     name: "",
     type: 0,
@@ -61,37 +64,6 @@ export const AddActivity = (): JSX.Element => {
   const [originalSearchResults, setOriginalSearchResults] = useState<
     Participant[]
   >([]);
-  const [fileUrls, setFileUrls] = useState<{ [key: string]: string }>({});
-
-  const getFileUrl = async (key: string): Promise<string | null> => {
-    try {
-      let preSignedUrl = "";
-      await getRequest(`get_file_url?key=${key}`, (response) => {
-        preSignedUrl = response.data.url;
-      });
-      return preSignedUrl;
-    } catch (error) {
-      console.error("Error fetching file URL:", error);
-      return null;
-    }
-  };
-
-  useEffect(() => {
-    const fetchFileUrls = async () => {
-      const urls: { [key: string]: string } = {};
-      for (const image of activity.proofImages) {
-        const url = await getFileUrl(image.imageUrl);
-        if (url) {
-          urls[image.imageUrl] = url;
-        }
-      }
-      setFileUrls(urls);
-    };
-
-    if (activity.proofImages.length > 0) {
-      fetchFileUrls();
-    }
-  }, [activity.proofImages]);
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -188,50 +160,118 @@ export const AddActivity = (): JSX.Element => {
     ));
   };
 
-  const handleFileUpload = async (file: File) => {
-    // Request a pre-signed URL from the backend
+  const handleDeleteImage = async (fileName: string) => {
+    // Confirm before deleting
+    const confirmDelete = window.confirm("첨부 파일을 삭제하시겠습니까?");
+    if (!confirmDelete) {
+      return; // Stop if the user cancels
+    }
+
+    // Remove from local state
+    const newProofImages = activity.proofImages.filter(
+      (image) => image.fileName !== fileName
+    );
+    setActivity((prevState) => ({ ...prevState, proofImages: newProofImages }));
+
+    // Make a request to delete from S3
     try {
-      postRequest(
-        "activity/file_upload",
-        {
-          file_name: file.name,
-        },
-        async (data) => {
-          // Use the pre-signed URL to upload the file
-          const { url, key } = data.data;
-
-          await fetch(url, {
-            method: "PUT",
-            body: file, // directly pass the file here
-            headers: {
-              "Content-Type": file.type, // set the content type header
-            },
-          });
-
-          // Update state with the URL of the uploaded file
-          setActivity({
-            ...activity,
-            proofImages: [...activity.proofImages, { imageUrl: key }],
-          });
-        }
+      const deleteResponse = await postRequest(
+        `activity/deleteImage`,
+        { fileName },
+        () => {}
       );
+      // Handle the deleteResponse as needed
     } catch (error) {
-      console.error("Error uploading file:", error);
+      console.error("Error deleting file:", error);
+      // Handle the error
     }
   };
 
+  const handleFileUpload = async (file: File) => {
+    const formData = new FormData();
+
+    // Generate a timestamp
+    const timestamp = new Date().toISOString().replace(/:/g, "-");
+
+    // Append the file with a timestamp
+    const newFileName = `${timestamp}_${file.name}`;
+    formData.append("file", file, newFileName);
+
+    const handleSuccess = (response: any) => {
+      const uploadedFileUrl = response.data.data.Location;
+
+      // Save the original file name in the state
+      setActivity((prevState) => ({
+        ...prevState,
+        proofImages: [
+          ...prevState.proofImages,
+          { imageUrl: uploadedFileUrl, fileName: file.name },
+        ],
+      }));
+    };
+
+    const handleError = (error: any) => {
+      console.error("Error uploading file:", error);
+    };
+
+    postRequest("activity/upload", formData, handleSuccess, handleError);
+  };
+
   const handleSubmit = async () => {
-    // Implement logic to send data to the server
+    // Prepare the data to be sent
+    const dataToSend = {
+      clubId, // Assuming clubId is obtained from useUserRepresentativeStatus or similar context
+      name: activity.name,
+      type: activity.type,
+      category: activity.category,
+      startDate: activity.startDate,
+      endDate: activity.endDate,
+      location: activity.location,
+      purpose: activity.purpose,
+      content: activity.content,
+      proofText: activity.proofText,
+      participants: activity.participants,
+      proofImages: activity.proofImages,
+      feedbackResults: activity.feedbackResults,
+    };
+
+    // Success callback
+    const handleSuccess = (response: any) => {
+      console.log("Activity added successfully:", response);
+      const activityId = response.data.activityId; // Adjust according to your API response structure
+      navigate(`/activity_detail/${activityId}`);
+      // Additional success logic here (e.g., redirecting or showing a success message)
+    };
+
+    // Error callback
+    const handleError = (error: any) => {
+      console.error("Error adding activity:", error);
+      // Additional error handling logic here (e.g., showing an error message)
+    };
+
+    // Send the POST request
+    postRequest("activity/addActivity", dataToSend, handleSuccess, handleError);
   };
 
   useEffect(() => {
     searchMember(""); // Call this with an empty string to fetch all members initially
   }, [clubId]);
 
+  const groupProofImagesInPairs = () => {
+    const pairs = [];
+    for (let i = 0; i < activity.proofImages.length; i += 2) {
+      pairs.push(activity.proofImages.slice(i, i + 2));
+    }
+    return pairs;
+  };
+
+  // Grouped proof images
+  const groupedProofImages = groupProofImagesInPairs();
+
   return (
     <div className="add-activity">
       <div className="frame-3">
-        <UpperBar className={"upper-bar"} />
+        <UpperBar title={"활동 추가"} className={"upper-bar"} />
         <div className="frame-wrapper">
           <div className="frame-7">
             <div className="frame-8">
@@ -382,47 +422,37 @@ export const AddActivity = (): JSX.Element => {
                   className="text-wrapper-10"
                   style={{ height: "150px" }}
                 />
-              </div>
-              <input
-                type="file"
-                onChange={(e) => {
-                  if (e.target.files?.[0]) {
-                    handleFileUpload(e.target.files[0]);
-                  }
-                }}
-              />
-              {activity.proofImages.map((image, index) => (
-                <ActivityProof
-                  key={index}
-                  property1="default"
-                  url={fileUrls[image.imageUrl]}
-                  className="activity-proof-instance"
+                <input
+                  type="file"
+                  onChange={(e) => {
+                    if (e.target.files?.[0]) {
+                      handleFileUpload(e.target.files[0]);
+                    }
+                  }}
                 />
-              ))}
-              {/* <div className="frame-9">
-                <div className="frame-13">
-                  <ActivityProof
-                    className="activity-proof-instance"
-                    property1="variant-2"
-                  />
-                  <ActivityProof
-                    className="activity-proof-instance"
-                    property1="default"
-                  />
-                </div>
-                <div className="frame-13">
-                  <ActivityProof
-                    className="activity-proof-instance"
-                    property1="default"
-                  />
-                  <ActivityProof
-                    className="activity-proof-instance"
-                    property1="default"
-                  />
-                </div>
-              </div> */}
+              </div>
+              <div className="frame-9">
+                {groupedProofImages.map((pair, pairIndex) => (
+                  <div key={pairIndex} className="frame-13">
+                    {pair.map((image, index) => (
+                      <ActivityProof
+                        key={index}
+                        url={image.imageUrl}
+                        className="activity-proof-instance"
+                        property1="default"
+                        fileName={image.fileName}
+                        onDelete={handleDeleteImage}
+                      />
+                    ))}
+                  </div>
+                ))}
+              </div>
               <div className="frame-14">
-                <div className="frame-15" onClick={handleSubmit}>
+                <div
+                  className="frame-15"
+                  onClick={handleSubmit}
+                  style={{ cursor: "pointer" }}
+                >
                   <div className="text-wrapper-11">활동 저장</div>
                 </div>
               </div>
