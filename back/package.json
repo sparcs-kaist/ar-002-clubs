@@ -12,6 +12,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "aws-sdk": "^2.1521.0",
     "axios": "^1.5.1",
     "axios-retry": "^3.8.0",
     "cheerio": "^1.0.0-rc.12",

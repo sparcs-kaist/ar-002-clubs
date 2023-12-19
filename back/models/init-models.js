@@ -1,6 +1,7 @@
 var DataTypes = require("sequelize").DataTypes;
 var _Activity = require("./Activity");
 var _ActivityEvidence = require("./ActivityEvidence");
+var _ActivityFeedbackType = require("./ActivityFeedbackType");
 var _ActivityMember = require("./ActivityMember");
 var _ActivityType = require("./ActivityType");
 var _Agenda = require("./Agenda");
@@ -15,6 +16,7 @@ var _ClubRepresentativeType = require("./ClubRepresentativeType");
 var _Division = require("./Division");
 var _DivisionGroup = require("./DivisionGroup");
 var _DivisionPresident = require("./DivisionPresident");
+var _Duration = require("./Duration");
 var _ExecutiveMember = require("./ExecutiveMember");
 var _Fixture = require("./Fixture");
 var _Funding = require("./Funding");
@@ -34,6 +36,7 @@ var _sessions = require("./sessions");
 function initModels(sequelize) {
   var Activity = _Activity(sequelize, DataTypes);
   var ActivityEvidence = _ActivityEvidence(sequelize, DataTypes);
+  var ActivityFeedbackType = _ActivityFeedbackType(sequelize, DataTypes);
   var ActivityMember = _ActivityMember(sequelize, DataTypes);
   var ActivityType = _ActivityType(sequelize, DataTypes);
   var Agenda = _Agenda(sequelize, DataTypes);
@@ -48,6 +51,7 @@ function initModels(sequelize) {
   var Division = _Division(sequelize, DataTypes);
   var DivisionGroup = _DivisionGroup(sequelize, DataTypes);
   var DivisionPresident = _DivisionPresident(sequelize, DataTypes);
+  var Duration = _Duration(sequelize, DataTypes);
   var ExecutiveMember = _ExecutiveMember(sequelize, DataTypes);
   var Fixture = _Fixture(sequelize, DataTypes);
   var Funding = _Funding(sequelize, DataTypes);
@@ -68,6 +72,10 @@ function initModels(sequelize) {
   Member.belongsToMany(Semester, { as: 'semester_id_Semesters', through: MemberStatus, foreignKey: "student_id", otherKey: "semester_id" });
   Semester.belongsToMany(Club, { as: 'club_id_Clubs', through: SemesterClub, foreignKey: "semester_id", otherKey: "club_id" });
   Semester.belongsToMany(Member, { as: 'student_id_Members', through: MemberStatus, foreignKey: "semester_id", otherKey: "student_id" });
+  Activity.belongsTo(ActivityFeedbackType, { as: "feedback_type_ActivityFeedbackType", foreignKey: "feedback_type"});
+  ActivityFeedbackType.hasMany(Activity, { as: "Activities", foreignKey: "feedback_type"});
+  Activity.belongsTo(ActivityType, { as: "activity_type", foreignKey: "activity_type_id"});
+  ActivityType.hasMany(Activity, { as: "Activities", foreignKey: "activity_type_id"});
   Attendance.belongsTo(Club, { as: "fromClub", foreignKey: "fromClubId"});
   Club.hasMany(Attendance, { as: "Attendances", foreignKey: "fromClubId"});
   ClubRepresentative.belongsTo(Club, { as: "club", foreignKey: "club_id"});
@@ -108,6 +116,8 @@ function initModels(sequelize) {
   MemberStatus.hasMany(MemberClub, { as: "MemberClubs", foreignKey: "student_id"});
   MemberClub.belongsTo(MemberStatus, { as: "semester", foreignKey: "semester_id"});
   MemberStatus.hasMany(MemberClub, { as: "semester_MemberClubs", foreignKey: "semester_id"});
+  Duration.belongsTo(Semester, { as: "semester", foreignKey: "semester_id"});
+  Semester.hasMany(Duration, { as: "Durations", foreignKey: "semester_id"});
   MemberStatus.belongsTo(Semester, { as: "semester", foreignKey: "semester_id"});
   Semester.hasMany(MemberStatus, { as: "MemberStatuses", foreignKey: "semester_id"});
   SemesterClub.belongsTo(Semester, { as: "semester", foreignKey: "semester_id"});
@@ -118,6 +128,7 @@ function initModels(sequelize) {
   return {
     Activity,
     ActivityEvidence,
+    ActivityFeedbackType,
     ActivityMember,
     ActivityType,
     Agenda,
@@ -132,6 +143,7 @@ function initModels(sequelize) {
     Division,
     DivisionGroup,
     DivisionPresident,
+    Duration,
     ExecutiveMember,
     Fixture,
     Funding,

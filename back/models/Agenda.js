@@ -38,6 +38,14 @@ module.exports = function(sequelize, DataTypes) {
     giveup_number: {
       type: DataTypes.INTEGER,
       allowNull: true
+    },
+    recent_edit: {
+      type: DataTypes.DATEONLY,
+      allowNull: true
+    },
+    recent_feedback: {
+      type: DataTypes.DATEONLY,
+      allowNull: true
     }
   }, {
     sequelize,

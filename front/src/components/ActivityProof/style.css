@@ -1,0 +1,68 @@
+.activity-proof {
+  background-color: #ffffff;
+  height: 493px;
+  width: 493px;
+}
+
+.activity-proof .rectangle {
+  background-color: #ffffff;
+  height: 493px;
+}
+
+.activity-proof .frame {
+  align-items: center;
+  display: inline-flex;
+  gap: 20px;
+  left: 170px;
+  position: relative;
+  top: 228px;
+}
+
+.activity-proof .group {
+  height: 36px;
+  position: relative;
+  width: 30px;
+}
+
+.activity-proof .overlap-group {
+  height: 36px;
+  position: relative;
+  width: 28px;
+}
+
+.activity-proof .ellipse {
+  background-color: #7cd2d8;
+  border-radius: 14px;
+  height: 28px;
+  left: 0;
+  position: absolute;
+  top: 6px;
+  width: 28px;
+}
+
+.activity-proof .text-wrapper-2 {
+  color: #000000;
+  font-family: "Inter", Helvetica;
+  font-size: 30px;
+  font-weight: 700;
+  height: 36px;
+  left: 3px;
+  letter-spacing: 0;
+  line-height: normal;
+  position: absolute;
+  text-align: center;
+  top: 0;
+  white-space: nowrap;
+}
+
+.activity-proof .text-wrapper-3 {
+  color: #000000;
+  font-family: "Inter", Helvetica;
+  font-size: 18px;
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: normal;
+  position: relative;
+  text-align: center;
+  width: fit-content;
+}

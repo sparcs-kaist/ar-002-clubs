@@ -30,9 +30,11 @@ router.get("/callback", async (req, res) => {
   try {
     const userInfo = await client.getUserInfo(code, state);
     res.redirect(
-      `https://${process.env.FRONTEND_URL}/?userInfo=${JSON.stringify(
-        userInfo
-      )}`
+      `${
+        process.env.FRONTEND_URL.includes("http")
+          ? process.env.FRONTEND_URL
+          : `https://${process.env.FRONTEND_URL}`
+      }/?userInfo=${JSON.stringify(userInfo)}`
     );
   } catch (error) {
     res.send("Error: " + error.message);
@@ -45,7 +47,11 @@ router.get("/logout", (req, res) => {
   if (req.query.userId) {
     const logoutUrl = client.getLogoutUrl(
       req.query.userId,
-      `https://${process.env.FRONTEND_URL}`
+      `${
+        process.env.FRONTEND_URL.includes("http")
+          ? process.env.FRONTEND_URL
+          : `https://${process.env.FRONTEND_URL}`
+      }`
     );
     req.session.destroy(); // 세션을 삭제합니다.
     console.log(logoutUrl);
