@@ -53,7 +53,6 @@ export const UpperBar = ({ className, title }: Props): JSX.Element => {
       if (user) {
         getRequest(`auth/logout?userId=${user.sid}`, (data) => {
           const logoutUrl = data.logoutUrl;
-          alert(logoutUrl);
           console.log(logoutUrl);
           logout();
           window.location.href = logoutUrl;
