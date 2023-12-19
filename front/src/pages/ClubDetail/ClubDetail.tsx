@@ -36,7 +36,6 @@ export const ClubDetail = (): JSX.Element => {
     room: "",
   });
 
-  console.log(id);
   useEffect(() => {
     const fetchClubDetails = async () => {
       await getRequest(
@@ -47,8 +46,6 @@ export const ClubDetail = (): JSX.Element => {
     };
     fetchClubDetails();
   }, [id]);
-
-  console.log(clubDetails);
 
   return (
     <div className="club-detail">

@@ -1,0 +1,208 @@
+.add-activity {
+  background-color: #f6feff;
+  height: 2493px;
+  width: 1728px;
+}
+
+.add-activity .frame-3 {
+  align-items: flex-start;
+  background-color: #f6feff;
+  display: inline-flex;
+  flex-direction: column;
+  gap: 23px;
+  position: relative;
+}
+
+.add-activity .upper-bar {
+  background-size: 100% 100%;
+  height: 245px;
+  position: relative;
+  width: 1728px;
+}
+
+.add-activity .frame-wrapper {
+  align-items: flex-start;
+  display: flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+  gap: 10px;
+  padding: 10px 155px;
+  position: relative;
+  width: 1195px;
+}
+
+.add-activity .frame-7 {
+  align-items: flex-start;
+  display: flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+  gap: 40px;
+  margin-right: -155px;
+  position: relative;
+  width: 1040px;
+}
+
+.add-activity .frame-8 {
+  align-items: flex-start;
+  display: flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+  gap: 15px;
+  position: relative;
+  width: 1040px;
+}
+
+.add-activity .sub-title-instance {
+  margin-right: unset !important;
+}
+
+.add-activity .frame-9 {
+  align-items: flex-start;
+  display: inline-flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+  gap: 15px;
+  padding: 0px 20px;
+  position: relative;
+}
+
+.add-activity .div-2 {
+  color: #000000;
+  font-family: "Inter", Helvetica;
+  font-size: 20px;
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: normal;
+  margin-top: -1px;
+  position: relative;
+  white-space: nowrap;
+  width: fit-content;
+}
+
+.add-activity .span {
+  font-weight: 700;
+}
+
+.add-activity .text-wrapper-8 {
+  color: #000000;
+  font-family: "Inter", Helvetica;
+  font-size: 20px;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+
+.add-activity .div-3 {
+  color: #000000;
+  font-family: "Inter", Helvetica;
+  font-size: 20px;
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: normal;
+  position: relative;
+  white-space: nowrap;
+  width: fit-content;
+}
+
+.add-activity .frame-10 {
+  align-items: flex-start;
+  display: inline-flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+  gap: 15px;
+  margin-right: -3px;
+  position: relative;
+}
+
+.add-activity .text-wrapper-9 {
+  color: #000000;
+  font-family: "Inter", Helvetica;
+  font-size: 20px;
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: 30px;
+  position: relative;
+  width: 1003px;
+}
+
+.add-activity .frame-11 {
+  align-items: flex-start;
+  display: inline-flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+  gap: 15px;
+  position: relative;
+}
+
+.add-activity .text-wrapper-10 {
+  color: #000000;
+  font-family: "Nanum Gothic", Helvetica;
+  font-size: 20px;
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: 30px;
+  margin-top: -1px;
+  position: relative;
+  width: 1000px;
+}
+
+.add-activity .frame-12 {
+  align-items: flex-start;
+  display: inline-flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+  gap: 15px;
+  margin-right: -1px;
+  position: relative;
+}
+
+.add-activity .frame-13 {
+  align-items: flex-start;
+  display: inline-flex;
+  flex: 0 0 auto;
+  gap: 15px;
+  position: relative;
+}
+
+.add-activity .activity-proof-instance {
+  position: relative !important;
+}
+
+.add-activity .frame-14 {
+  align-items: center;
+  display: flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+  gap: 10px;
+  justify-content: center;
+  padding: 10px;
+  position: relative;
+  width: 1041px;
+}
+
+.add-activity .frame-15 {
+  align-items: center;
+  background-color: #7cd2d8;
+  border-radius: 10px;
+  display: flex;
+  gap: 10px;
+  height: 32px;
+  justify-content: center;
+  overflow: hidden;
+  padding: 12px 9px;
+  position: relative;
+  width: 116px;
+}
+
+.add-activity .text-wrapper-11 {
+  color: #000000;
+  font-family: "Inter", Helvetica;
+  font-size: 18px;
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: 20px;
+  margin-bottom: -5px;
+  margin-top: -7px;
+  position: relative;
+  white-space: nowrap;
+  width: fit-content;
+}

@@ -62,11 +62,13 @@ const userRouter = require("./routes/user");
 const clubRouter = require("./routes/club");
 const meetingRouter = require("./routes/meeting");
 const cafenotice = require("./routes/cafenotice");
+const activity = require("./routes/activity");
 app.use("/api/auth", auth);
 app.use("/api/cafenotice", cafenotice);
 app.use("/api/user", userRouter);
 app.use("/api/club", clubRouter);
 app.use("/api/meeting", meetingRouter);
+app.use("/api/activity", activity);
 
 const httpServer = http.createServer(app);
 httpServer.listen(80, () => {

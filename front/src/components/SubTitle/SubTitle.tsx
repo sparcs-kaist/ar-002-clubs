@@ -4,7 +4,7 @@ import "./style.css";
 
 interface Props {
   className: any;
-  divClassName: any;
+  divClassName?: any;
   text: string;
 }
 

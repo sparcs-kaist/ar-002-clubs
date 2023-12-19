@@ -17,7 +17,11 @@ module.exports = function(sequelize, DataTypes) {
     },
     activity_type_id: {
       type: DataTypes.INTEGER,
-      allowNull: false
+      allowNull: false,
+      references: {
+        model: 'ActivityType',
+        key: 'id'
+      }
     },
     start_date: {
       type: DataTypes.DATEONLY,
@@ -38,6 +42,22 @@ module.exports = function(sequelize, DataTypes) {
     content: {
       type: DataTypes.TEXT,
       allowNull: false
+    },
+    feedback_type: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      references: {
+        model: 'ActivityFeedbackType',
+        key: 'id'
+      }
+    },
+    recent_edit: {
+      type: DataTypes.DATE,
+      allowNull: true
+    },
+    recent_feedback: {
+      type: DataTypes.DATE,
+      allowNull: true
     }
   }, {
     sequelize,
@@ -50,6 +70,20 @@ module.exports = function(sequelize, DataTypes) {
         using: "BTREE",
         fields: [
           { name: "id" },
+        ]
+      },
+      {
+        name: "Activity_ActivityFeedbackType_id_fk",
+        using: "BTREE",
+        fields: [
+          { name: "feedback_type" },
+        ]
+      },
+      {
+        name: "Activity_ActivityType_id_fk",
+        using: "BTREE",
+        fields: [
+          { name: "activity_type_id" },
         ]
       },
     ]

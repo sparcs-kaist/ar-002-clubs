@@ -1,6 +1,6 @@
 .club-manage {
   background-color: #f6feff;
-  height: 1879px;
+  height: 879px;
   width: 1728px;
 }
 
@@ -10,7 +10,7 @@
   display: inline-flex;
   flex-direction: column;
   gap: 23px;
-  height: 1879px;
+  height: 879px;
   position: relative;
 }
 

@@ -9,15 +9,25 @@ import { ActivityState } from "../ActivityState";
 import "./style.css";
 
 interface Props {
-  property1: "variant-2" | "default";
-  className: any;
-  activityStateProperty1: "variant-2" | "variant-3" | "default";
+  property1?: "variant-2" | "default";
+  className?: string;
+  activityStateProperty1: number;
+  index?: number;
+  name?: string;
+  type?: string;
+  start_date?: string;
+  end_date?: string;
 }
 
 export const Activity = ({
-  property1,
-  className,
-  activityStateProperty1 = "default",
+  property1 = "default",
+  className = "activity-instance",
+  activityStateProperty1 = 1,
+  index = 0,
+  name = "",
+  type = "",
+  start_date = "",
+  end_date = "",
 }: Props): JSX.Element => {
   return (
     <div className={`activity ${property1} ${className}`}>
@@ -25,19 +35,29 @@ export const Activity = ({
         {property1 === "default" && (
           <>
             <div className="frame">
-              <div className="text-wrapper-2">11</div>
+              <div className="text-wrapper-2">{index}</div>
             </div>
             <div className="div-wrapper">
-              <p className="text-wrapper-3">석림태울제 부스 홍보 및 준비</p>
+              <p className="text-wrapper-3">{name}</p>
             </div>
             <div className="frame-2">
-              <p className="text-wrapper-3">동아리 성격에 합치하지 않는 활동</p>
+              <p className="text-wrapper-3">{type}</p>
             </div>
             <div className="frame-3">
-              <div className="text-wrapper-3">2023.10.26.-2023.10.27.</div>
+              <div className="text-wrapper-3">
+                {start_date}~{end_date}
+              </div>
             </div>
             <div className="activity-state-wrapper">
-              <ActivityState property1={activityStateProperty1} />
+              <ActivityState
+                property1={
+                  activityStateProperty1 === 1
+                    ? "default"
+                    : activityStateProperty1 === 2
+                    ? "variant-2"
+                    : "variant-3"
+                }
+              />
             </div>
           </>
         )}

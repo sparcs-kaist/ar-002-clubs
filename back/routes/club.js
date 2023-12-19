@@ -182,6 +182,22 @@ router.get("/club_manage", async (req, res) => {
       });
     }
 
+    const currentDate = new Date();
+    const currentSemester = await Semester.findOne({
+      where: {
+        start_date: { [Op.lte]: currentDate },
+        end_date: { [Op.gte]: currentDate },
+      },
+    });
+    // Find additional info about the club including advisor
+    const semesterClubInfo = await SemesterClub.findOne({
+      where: {
+        club_id: club.id,
+        semester_id: currentSemester.id,
+      },
+      attributes: ["advisor"],
+    });
+
     // Retrieve club representatives
     const representatives = await Promise.all(
       [1, 2, 3].map(async (typeId) => {
@@ -203,9 +219,8 @@ router.get("/club_manage", async (req, res) => {
             },
           ],
         });
-        console.log(rep.student);
         return rep
-          ? { student_id: rep.stdent.student_id, name: rep.student.name }
+          ? { student_id: rep.student.student_id, name: rep.student.name }
           : { student_id: 0, name: "" };
       })
     );
@@ -217,6 +232,7 @@ router.get("/club_manage", async (req, res) => {
         clubName: club.name,
         description: club.description,
         representatives: representatives,
+        advisor: semesterClubInfo ? semesterClubInfo.advisor : "",
       },
     });
   } catch (error) {
