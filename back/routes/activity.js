@@ -106,7 +106,7 @@ router.post("/upload", upload.single("file"), async (req, res) => {
 
     // Set S3 parameters with timestamp and original file name
     const s3Params = {
-      Bucket: "kaist-clubs-test", // Replace with your S3 bucket name
+      Bucket: "ar-002-clubs", // Replace with your S3 bucket name
       Key: `uploads/${timestamp}_${encodedFileName}`, // File name you want to save as
       Body: file.buffer,
       ContentType: file.mimetype,
@@ -131,7 +131,7 @@ router.get("/image-proxy", async (req, res) => {
     return res.status(400).send("URL parameter is required");
   }
 
-  const bucket = "kaist-clubs-test"; // Replace with your bucket name
+  const bucket = "ar-002-clubs"; // Replace with your bucket name
   const key = decodeURIComponent(new URL(imageUrl).pathname.slice(1));
 
   try {
@@ -295,7 +295,7 @@ router.post("/deleteImage", async (req, res) => {
 
   s3.deleteObject(
     {
-      Bucket: "kaist-clubs-test",
+      Bucket: "ar-002-clubs",
       Key: key,
     },
     (err, data) => {
