@@ -26,6 +26,10 @@ export const Home = (): JSX.Element => {
         const userInfo = JSON.parse(userInfoStr);
         const DEVUID = process.env.REACT_APP_DEVUID;
 
+        if (userInfo.kaist_info && typeof userInfo.kaist_info === "string") {
+          userInfo.kaist_info = JSON.parse(userInfo.kaist_info);
+        }
+
         if (userInfo.uid === DEVUID) {
           userInfo.kaist_info = {
             kaist_uid: process.env.REACT_APP_kaist_uid,
