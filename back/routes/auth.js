@@ -30,9 +30,7 @@ router.get("/callback", async (req, res) => {
   try {
     const userInfo = await client.getUserInfo(code, state);
     res.redirect(
-      `https://${process.env.FRONTEND_URL}/?userInfo=${JSON.stringify(
-        userInfo
-      )}`
+      `https://clubs.sparcs.org/?userInfo=${JSON.stringify(userInfo)}`
     );
   } catch (error) {
     res.send("Error: " + error.message);
@@ -49,7 +47,7 @@ router.get("/logout", (req, res) => {
     );
     req.session.destroy(); // 세션을 삭제합니다.
     console.log(logoutUrl);
-    res.json(`https://${logoutUrl}`); // SPARCS SSO 로그아웃 URL로 리다이렉트합니다.
+    res.json({ logoutUrl }); // SPARCS SSO 로그아웃 URL로 리다이렉트합니다.
   } else {
     res.status(400).send("Invalid request"); // 유효하지 않은 요청인 경우 에러 메시지를 보냅니다.
   }
