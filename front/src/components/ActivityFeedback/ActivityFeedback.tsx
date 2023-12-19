@@ -19,7 +19,7 @@ export const ActivityFeedback = ({
   text1 = "증빙 사진1의 인원이 맞지 않습니다.<br/>증빙 사진2의 장소가 맞지 않습니다.",
 }: Props): JSX.Element => {
   return (
-    <div className={`activity ${className}`}>
+    <div className={`activity-feedback ${className}`}>
       <div className="element-wrapper">
         <div className="element">{text}</div>
       </div>

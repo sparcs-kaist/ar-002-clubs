@@ -1,4 +1,4 @@
-.activity {
+.activity-feedback {
   align-items: flex-start;
   display: inline-flex;
   flex-direction: column;
@@ -6,7 +6,7 @@
   position: relative;
 }
 
-.activity .element-wrapper {
+.activity-feedback .element-wrapper {
   align-items: flex-start;
   display: inline-flex;
   flex: 0 0 auto;
@@ -15,7 +15,7 @@
   position: relative;
 }
 
-.activity .element {
+.activity-feedback .element {
   color: #000000;
   font-family: "Nanum Gothic", Helvetica;
   font-size: 13px;
@@ -28,7 +28,7 @@
   width: fit-content;
 }
 
-.activity .div-wrapper {
+.activity-feedback .div-wrapper {
   align-items: flex-start;
   display: inline-flex;
   flex: 0 0 auto;
@@ -36,7 +36,7 @@
   position: relative;
 }
 
-.activity .p {
+.activity-feedback .p {
   color: #000000;
   font-family: "Nanum Gothic", Helvetica;
   font-size: 20px;
