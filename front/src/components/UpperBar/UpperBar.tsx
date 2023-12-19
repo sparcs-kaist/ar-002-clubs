@@ -54,8 +54,9 @@ export const UpperBar = ({ className, title }: Props): JSX.Element => {
         getRequest(`auth/logout?userId=${user.sid}`, (data) => {
           const logoutUrl = data.logoutUrl;
           alert(logoutUrl);
+          console.log(logoutUrl);
           logout();
-          window.location.href = logoutUrl;
+          // window.location.href = logoutUrl;
         });
       } else {
         alert("Invalid user information!"); // 유효하지 않은 사용자 정보에 대한 경고 메시지
