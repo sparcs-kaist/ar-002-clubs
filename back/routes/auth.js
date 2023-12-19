@@ -43,7 +43,7 @@ router.get("/logout", (req, res) => {
   if (req.query.userId) {
     const logoutUrl = client.getLogoutUrl(
       req.query.userId,
-      "https://clubs.sparcs.org"
+      process.env.FRONTEND_URL
     );
     req.session.destroy(); // 세션을 삭제합니다.
     console.log(logoutUrl);
@@ -59,6 +59,10 @@ router.get("/welcome", (req, res) => {
   } else {
     res.send("Not logged in");
   }
+});
+
+router.get("/front", async (req, res) => {
+  res.json({ front: process.env.FRONTEND_URL });
 });
 
 module.exports = router;
