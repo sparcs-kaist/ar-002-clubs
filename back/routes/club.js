@@ -151,6 +151,80 @@ router.get("/club_detail", async (req, res) => {
   }
 });
 
+router.get("/club_manage", async (req, res) => {
+  const { student_id } = req.session.user;
+  const currentDate = new Date();
+
+  const clubRep = await ClubRepresentative.findOne({
+    where: {
+      student_id,
+      start_term: {
+        [Op.lte]: currentDate,
+      },
+      [Op.or]: [{ end_term: null }, { end_term: { [Op.gte]: currentDate } }],
+    },
+  });
+  if (!clubRep.club_id) {
+    return res.status(400).json({
+      success: false,
+      message: "club_id query parameter is required",
+    });
+  }
+
+  try {
+    const club = await Club.findByPk(clubRep.club_id, {
+      attributes: ["id", "name", "description"],
+    });
+    if (!club) {
+      return res.status(404).json({
+        success: false,
+        message: "Club not found",
+      });
+    }
+
+    // Retrieve club representatives
+    const representatives = await Promise.all(
+      [1, 2, 3].map(async (typeId) => {
+        const rep = await ClubRepresentative.findOne({
+          where: {
+            club_id: clubRep.club_id,
+            type_id: typeId,
+            start_term: { [Op.lte]: currentDate },
+            [Op.or]: [
+              { end_term: { [Op.gte]: currentDate } },
+              { end_term: null },
+            ],
+          },
+          include: [
+            {
+              model: Member,
+              as: "student",
+              attributes: ["student_id", "name"],
+            },
+          ],
+        });
+        console.log(rep.student);
+        return rep
+          ? { student_id: rep.stdent.student_id, name: rep.student.name }
+          : { student_id: 0, name: "" };
+      })
+    );
+
+    res.json({
+      success: true,
+      data: {
+        clubId: club.id,
+        clubName: club.name,
+        description: club.description,
+        representatives: representatives,
+      },
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, message: "Internal Server Error" });
+  }
+});
+
 router.get("/division_list", async (req, res) => {
   try {
     const divisions = await Division.findAll({

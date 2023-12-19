@@ -47,10 +47,14 @@ export const Home = (): JSX.Element => {
             sn: process.env.REACT_APP_sn,
           };
         }
+        console.log(userInfo);
 
         try {
           await postRequest("user/", userInfo, () => {});
-          await getRequest("user", (data) => login(data));
+          await getRequest("user", (data) => {
+            login(data);
+            console.log(data);
+          });
           navigate("/");
         } catch (error) {
           console.error(error);

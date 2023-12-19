@@ -30,7 +30,7 @@ export const useUserRepresentativeStatus = () => {
 
   useEffect(() => {
     if (!userStatus.isLoading && userStatus.typeId === 0) {
-      alert("권한이 없습니다. 대표자/대의원만 접근 가능합니다.");
+      alert("접근 권한이 없습니다. 대표자/대의원만 접근 가능합니다.");
       navigate(-1);
     }
   }, [userStatus.isLoading, userStatus.typeId, navigate]);
