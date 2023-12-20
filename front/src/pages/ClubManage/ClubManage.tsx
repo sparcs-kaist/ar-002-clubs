@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useUserRepresentativeStatus } from "hooks/useUserRepresentativeStatus";
 import { Activity } from "components/Activity";
@@ -7,7 +7,7 @@ import { SubTitle } from "components/SubTitle";
 import { UnderBar } from "components/UnderBar";
 import { UpperBar } from "components/UpperBar";
 import "./ClubManage.css";
-import { getRequest } from "utils/api";
+import { getRequest, postRequest } from "utils/api";
 import { useReportDurationStatus } from "hooks/useReportDurationStatus";
 
 type Representative = {
@@ -44,6 +44,36 @@ export const ClubManage = (): JSX.Element => {
     advisor: "",
   });
   const [activities, setActivities] = useState<ActivityInfo[]>([]);
+
+  const handleDescriptionChange = (
+    event: React.ChangeEvent<HTMLTextAreaElement>
+  ) => {
+    setClubInfo({ ...clubInfo, description: event.target.value });
+  };
+
+  const handleSaveDescription = async () => {
+    try {
+      const dataToSend = {
+        clubId: clubInfo.clubId,
+        description: clubInfo.description,
+      };
+      await postRequest(
+        "club/updateDescription",
+        dataToSend,
+        () => {
+          console.log("Description updated successfully");
+          alert("설명이 저장되었습니다.");
+          // Optionally, show a success message
+        },
+        (error) => {
+          console.error("Error updating description:", error);
+          // Optionally, handle the error (e.g., show error message)
+        }
+      );
+    } catch (error) {
+      console.error("Error sending update request:", error);
+    }
+  };
 
   useEffect(() => {
     const fetchClubInfo = async () => {
@@ -91,37 +121,37 @@ export const ClubManage = (): JSX.Element => {
         />
         <div className="frame-wrapper">
           <div className="frame-12">
-            {typeId === 1 && (
-              <div className="frame-13">
-                <SubTitle
-                  className="sub-title-instance"
-                  divClassName="design-component-instance-node"
-                  text="동아리 대표자"
-                />
-                <div className="frame-14">
-                  {Array.isArray(clubInfo.representatives) &&
-                    clubInfo.representatives.map((rep, index) => (
-                      <div key={index} className="overlap-group-wrapper">
-                        <div className="overlap-group">
-                          <div className="frame-15">
-                            <div className="text-wrapper-8">
-                              {rep.student_id > 0
-                                ? `${rep.student_id} ${rep.name}`
-                                : "없음"}
-                            </div>
+            {/* {typeId === 1 && ( */}
+            <div className="frame-13">
+              <SubTitle
+                className="sub-title-instance"
+                divClassName="design-component-instance-node"
+                text="동아리 대표자"
+              />
+              <div className="frame-14">
+                {Array.isArray(clubInfo.representatives) &&
+                  clubInfo.representatives.map((rep, index) => (
+                    <div key={index} className="overlap-group-wrapper">
+                      <div className="overlap-group">
+                        <div className="frame-15">
+                          <div className="text-wrapper-8">
+                            {rep.student_id > 0
+                              ? `${rep.student_id} ${rep.name}`
+                              : "없음"}
                           </div>
-                          <p className="p">
-                            <span className="span">
-                              {index === 0 ? "대표자 :" : "대의원 :"}
-                            </span>
-                            <span className="text-wrapper-9">&nbsp;</span>
-                          </p>
                         </div>
+                        <p className="p">
+                          <span className="span">
+                            {index === 0 ? "대표자 :" : "대의원 :"}
+                          </span>
+                          <span className="text-wrapper-9">&nbsp;</span>
+                        </p>
                       </div>
-                    ))}
-                </div>
+                    </div>
+                  ))}
               </div>
-            )}
+            </div>
+            {/* )} */}
             <div className="frame-16">
               <SubTitle
                 className="sub-title-instance"
@@ -129,12 +159,18 @@ export const ClubManage = (): JSX.Element => {
                 text="동아리 설명"
               />
               <div className="frame-17">
-                <div className="frame-18">
-                  <p className="text-wrapper-10">{clubInfo.description}</p>
-                </div>
+                <textarea
+                  className="frame-18"
+                  value={clubInfo.description}
+                  onChange={handleDescriptionChange}
+                />
               </div>
               <div className="frame-19">
-                <div className="frame-20">
+                <div
+                  className="frame-20"
+                  onClick={handleSaveDescription}
+                  style={{ cursor: "pointer" }}
+                >
                   <div className="text-wrapper-11">설명 저장</div>
                 </div>
               </div>
@@ -207,7 +243,13 @@ export const ClubManage = (): JSX.Element => {
                           </div>
                           <ActivityState property1="default" />
                         </div>
-                        <div className="group-4">
+                        <div
+                          className="group-4"
+                          onClick={() => {
+                            alert("권한이 없습니다.");
+                          }}
+                          style={{ cursor: "pointer" }}
+                        >
                           <div className="frame-20">
                             <div className="text-wrapper-11">확인하기</div>
                           </div>

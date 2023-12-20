@@ -151,6 +151,84 @@ router.get("/club_detail", async (req, res) => {
   }
 });
 
+router.post("/updateDescription", async (req, res) => {
+  const { clubId, description } = req.body;
+
+  try {
+    // Find the club by ID
+    const club = await Club.findByPk(clubId);
+
+    // Check if club exists
+    if (!club) {
+      return res.status(404).send({ message: "Club not found" });
+    }
+
+    // Update the club description
+    await club.update({ description });
+
+    res.status(200).send({ message: "Club description updated successfully" });
+  } catch (error) {
+    console.error("Error updating club description:", error);
+    res.status(500).send({ message: "Error updating club description" });
+  }
+});
+
+router.get("/clubMembers/:clubId", async (req, res) => {
+  const { clubId } = req.params;
+  const today = new Date();
+
+  try {
+    // Find the current semester
+    const currentSemester = await Semester.findOne({
+      where: {
+        start_date: { [Op.lte]: today },
+        end_date: { [Op.gte]: today },
+      },
+    });
+
+    if (!currentSemester) {
+      return res.status(404).send({ message: "Current semester not found" });
+    }
+
+    // Fetch club representatives for the current semester
+    const representatives = await ClubRepresentative.findAll({
+      where: {
+        club_id: clubId,
+        start_term: { [Op.lte]: today },
+        end_term: { [Op.gte]: today },
+      },
+    });
+
+    const repStudentIds = representatives.map((rep) => rep.student_id);
+
+    // Fetch club members excluding representatives
+    const members = await MemberClub.findAll({
+      where: {
+        club_id: clubId,
+        semester_id: currentSemester.id,
+        student_id: { [Op.notIn]: repStudentIds },
+      },
+      include: [
+        {
+          model: Member,
+          attributes: ["student_id", "name"],
+        },
+      ],
+    });
+
+    // Prepare the response
+    const memberDetails = members.map((member) => ({
+      student_id: member.Member.student_id,
+      name: member.Member.name,
+    }));
+
+    res.json(memberDetails);
+  } catch (error) {
+    console.error("Error fetching club members:", error);
+    res.status(500).send({ message: "Error fetching club members" });
+  }
+});
+
 router.get("/club_manage", async (req, res) => {
   const { student_id } = req.session.user;
   const currentDate = new Date();

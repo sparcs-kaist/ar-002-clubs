@@ -98,13 +98,13 @@ router.post("/addActivity", async (req, res) => {
       // Add any other fields you need to save
     });
 
-    // Add Evidence
+    // Inside your route for adding or editing an activity
     await Promise.all(
       proofImages.map((image) => {
         return ActivityEvidence.create({
           activity_id: activity.id,
           image_url: image.imageUrl,
-          description: image.fileName, // Assuming description is stored in fileName
+          description: image.fileName,
         });
       })
     );

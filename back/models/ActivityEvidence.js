@@ -12,7 +12,8 @@ module.exports = function(sequelize, DataTypes) {
     },
     description: {
       type: DataTypes.STRING(511),
-      allowNull: true
+      allowNull: false,
+      primaryKey: true
     }
   }, {
     sequelize,
@@ -24,6 +25,7 @@ module.exports = function(sequelize, DataTypes) {
         unique: true,
         using: "BTREE",
         fields: [
+          { name: "description" },
           { name: "activity_id" },
         ]
       },

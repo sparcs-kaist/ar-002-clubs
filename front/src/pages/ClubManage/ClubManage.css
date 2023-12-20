@@ -143,6 +143,7 @@
   gap: 10px;
   margin-right: -19px;
   padding: 0px 20px;
+  height: 200px;
   position: relative;
 }
 
@@ -156,6 +157,16 @@
   padding: 15px;
   position: relative;
   width: 1378px;
+  height: 200px;
+  color: #000000;
+  flex: 1;
+  font-family: "Nanum Gothic-Regular", Helvetica;
+  font-size: 20px;
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: 30px;
+  margin-top: -1px;
+  position: relative;
 }
 
 .club-manage .text-wrapper-10 {
