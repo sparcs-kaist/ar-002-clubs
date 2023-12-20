@@ -172,7 +172,10 @@ export const EditMeeting = (): JSX.Element => {
         navigate(`/meeting_detail/${response.data.result}`);
       },
       (error) => {
-        alert(`에러가 발생했습니다. 다시 시도해주세요.`);
+        console.error("Error uploading file:", error);
+        alert(
+          `활동을 저장하는 도중 오류가 발생했습니다. 입력한 정보를 다시 확인해주세요. ${error}`
+        );
       }
     );
   };
