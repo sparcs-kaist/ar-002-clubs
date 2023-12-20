@@ -212,12 +212,48 @@ export const AddActivity = (): JSX.Element => {
 
     const handleError = (error: any) => {
       console.error("Error uploading file:", error);
+      alert(
+        `활동을 저장하는 도중 오류가 발생했습니다. 입력한 정보를 다시 확인해주세요. ${error}`
+      );
     };
 
     postRequest("activity/upload", formData, handleSuccess, handleError);
   };
 
   const handleSubmit = async () => {
+    const requiredFields = [
+      clubId,
+      activity.name,
+      activity.type,
+      activity.startDate,
+      activity.endDate,
+      activity.location,
+      activity.purpose,
+      activity.participants.length, // Check if there are participants
+    ];
+
+    const isAnyFieldEmpty = requiredFields.some((field) => !field);
+
+    if (isAnyFieldEmpty) {
+      alert("비어 있는 값이 있습니다. 다시 확인해주세요.");
+      return;
+    }
+
+    // Validation for date range and order
+    const startDate = new Date(activity.startDate);
+    const endDate = new Date(activity.endDate);
+    const minDate = new Date("2023-06-17");
+    const maxDate = new Date("2023-12-15");
+
+    if (
+      startDate > endDate ||
+      startDate < minDate ||
+      endDate > maxDate ||
+      endDate < minDate
+    ) {
+      alert("날짜 범위가 올바르지 않습니다. 다시 확인해주세요.");
+      return;
+    }
     // Prepare the data to be sent
     const dataToSend = {
       clubId, // Assuming clubId is obtained from useUserRepresentativeStatus or similar context

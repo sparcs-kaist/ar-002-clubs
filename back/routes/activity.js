@@ -81,6 +81,22 @@ router.post("/addActivity", async (req, res) => {
   } = req.body;
 
   try {
+    const existingActivitiesCount = await Activity.count({
+      where: { club_id: clubId },
+    });
+
+    // If there are already 20 or more activities, do not proceed
+    if (existingActivitiesCount >= 20) {
+      return res
+        .status(400)
+        .send({ message: "Cannot add more than 20 activities." });
+    }
+
+    // Calculate the current date/time in KST (Korean Standard Time)
+    const currentDateTimeUTC = new Date();
+    const kstOffset = 9 * 60; // 9 hours in minutes
+    currentDateTimeUTC.setMinutes(currentDateTimeUTC.getMinutes() + kstOffset);
+
     // Create Activity
     const activity = await Activity.create({
       club_id: clubId,
@@ -93,7 +109,7 @@ router.post("/addActivity", async (req, res) => {
       content,
       proof_text: proofText,
       feedback_type: 1,
-      recent_edit: new Date(),
+      recent_edit: currentDateTimeUTC,
 
       // Add any other fields you need to save
     });
@@ -149,6 +165,11 @@ router.post("/editActivity", async (req, res) => {
 
   const transaction = await sequelize.transaction();
 
+  // Calculate the current date/time in KST (Korean Standard Time)
+  const currentDateTimeUTC = new Date();
+  const kstOffset = 9 * 60; // 9 hours in minutes
+  currentDateTimeUTC.setMinutes(currentDateTimeUTC.getMinutes() + kstOffset);
+
   try {
     let activity;
     if (activityId) {
@@ -166,7 +187,7 @@ router.post("/editActivity", async (req, res) => {
           content,
           proof_text: proofText,
           feedback_type: 1,
-          recent_edit: new Date(),
+          recent_edit: currentDateTimeUTC,
         },
         { transaction }
       );

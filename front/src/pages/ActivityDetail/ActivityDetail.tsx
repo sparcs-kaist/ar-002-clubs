@@ -72,21 +72,28 @@ export const ActivityDetail = (): JSX.Element => {
         const response = await getRequest(
           `activity/getActivity/${id}`,
           (data) => {
-            setActivity({
-              name: data.name,
-              type: data.type,
-              category: data.category,
-              startDate: data.startDate,
-              endDate: data.endDate,
-              location: data.location,
-              purpose: data.purpose,
-              content: data.content,
-              members: "", // Handle this based on your data structure
-              proofText: data.proofText,
-              participants: data.participants,
-              proofImages: data.proofImages,
-              feedbackResults: data.feedbackResults,
-            });
+            // Check if the user has permission to access this activity
+            if (!isLoading && data.clubId !== clubId) {
+              navigate(-1);
+              // alert("접근 권한이 없습니다. 해당 동아리원만 접근 가능합니다.");
+            }
+            if (!isLoading && data.clubId == clubId) {
+              setActivity({
+                name: data.name,
+                type: data.type,
+                category: data.category,
+                startDate: data.startDate,
+                endDate: data.endDate,
+                location: data.location,
+                purpose: data.purpose,
+                content: data.content,
+                members: "", // Handle this based on your data structure
+                proofText: data.proofText,
+                participants: data.participants,
+                proofImages: data.proofImages,
+                feedbackResults: data.feedbackResults,
+              });
+            }
           }
         );
       } catch (error) {
@@ -98,7 +105,7 @@ export const ActivityDetail = (): JSX.Element => {
     if (id) {
       fetchActivityData();
     }
-  }, [id]);
+  }, [id, isLoading]);
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;

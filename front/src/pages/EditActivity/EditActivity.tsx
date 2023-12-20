@@ -72,25 +72,35 @@ export const EditActivity = (): JSX.Element => {
         const response = await getRequest(
           `activity/getActivity/${id}`,
           (data) => {
-            setActivity({
-              name: data.name,
-              type: data.type,
-              category: data.category,
-              startDate: data.startDate,
-              endDate: data.endDate,
-              location: data.location,
-              purpose: data.purpose,
-              content: data.content,
-              members: "", // Handle this based on your data structure
-              proofText: data.proofText,
-              participants: data.participants,
-              proofImages: data.proofImages,
-              feedbackResults: data.feedbackResults,
-            });
+            // Check if the user has permission to access this activity
+            if (!isLoading && data.clubId !== clubId) {
+              navigate(-1);
+              // alert("접근 권한이 없습니다. 해당 동아리원만 접근 가능합니다.");
+            }
+            if (!isLoading && data.clubId == clubId) {
+              setActivity({
+                name: data.name,
+                type: data.type,
+                category: data.category,
+                startDate: data.startDate,
+                endDate: data.endDate,
+                location: data.location,
+                purpose: data.purpose,
+                content: data.content,
+                members: "", // Handle this based on your data structure
+                proofText: data.proofText,
+                participants: data.participants,
+                proofImages: data.proofImages,
+                feedbackResults: data.feedbackResults,
+              });
+            }
           }
         );
       } catch (error) {
         console.error("Error fetching activity data:", error);
+        alert(
+          `활동을 저장하는 도중 오류가 발생했습니다. 입력한 정보를 다시 확인해주세요. ${error}`
+        );
         // Handle errors (e.g., show error message)
       }
     };
@@ -98,7 +108,7 @@ export const EditActivity = (): JSX.Element => {
     if (id) {
       fetchActivityData();
     }
-  }, [id]);
+  }, [id, isLoading]);
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -253,6 +263,39 @@ export const EditActivity = (): JSX.Element => {
   };
 
   const handleSubmit = async () => {
+    const requiredFields = [
+      clubId,
+      activity.name,
+      activity.type,
+      activity.startDate,
+      activity.endDate,
+      activity.location,
+      activity.purpose,
+      activity.participants.length, // Check if there are participants
+    ];
+
+    const isAnyFieldEmpty = requiredFields.some((field) => !field);
+
+    if (isAnyFieldEmpty) {
+      alert("비어 있는 값이 있습니다. 다시 확인해주세요.");
+      return;
+    }
+
+    // Validation for date range and order
+    const startDate = new Date(activity.startDate);
+    const endDate = new Date(activity.endDate);
+    const minDate = new Date("2023-06-17");
+    const maxDate = new Date("2023-12-15");
+
+    if (
+      startDate > endDate ||
+      startDate < minDate ||
+      endDate > maxDate ||
+      endDate < minDate
+    ) {
+      alert("날짜 범위가 올바르지 않습니다. 다시 확인해주세요.");
+      return;
+    }
     // Prepare the data to be sent
     const dataToSend = {
       activityId: id,

@@ -207,19 +207,21 @@ export const ClubManage = (): JSX.Element => {
                         onClick={() => navigate("/add_activity")}
                         style={{ cursor: "pointer" }}
                       />
-                      <div
-                        className="frame-29"
-                        onClick={() => navigate("/add_activity")}
-                        style={{ cursor: "pointer" }}
-                      >
-                        <div className="group-3">
-                          <div className="overlap-group-2">
-                            <div className="ellipse" />
-                            <div className="text-wrapper-13">+</div>
+                      {activities.length < 20 && (
+                        <div
+                          className="frame-29"
+                          onClick={() => navigate("/add_activity")}
+                          style={{ cursor: "pointer" }}
+                        >
+                          <div className="group-3">
+                            <div className="overlap-group-2">
+                              <div className="ellipse" />
+                              <div className="text-wrapper-13">+</div>
+                            </div>
                           </div>
+                          <div className="text-wrapper-14">활동 추가하기</div>
                         </div>
-                        <div className="text-wrapper-14">활동 추가하기</div>
-                      </div>
+                      )}
                     </div>
                   </div>
                   {clubInfo.advisor && (
