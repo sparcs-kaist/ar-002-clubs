@@ -2,12 +2,12 @@ import React, { useEffect, useState } from "react";
 import { ActivityProof } from "components/ActivityProof";
 import { SubTitle } from "components/SubTitle";
 import { UnderBar } from "components/UnderBar";
-import "./AddActivity.css";
+import "./ActivityDetail.css";
 import { UpperBar } from "components/UpperBar";
 import { ActivityFeedback } from "components/ActivityFeedback";
 import { getRequest, postRequest } from "utils/api";
 import { useUserRepresentativeStatus } from "hooks/useUserRepresentativeStatus";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 interface Participant {
   student_id: string;
@@ -40,8 +40,9 @@ interface ActivityState {
   feedbackResults: FeedbackResult[];
 }
 
-export const AddActivity = (): JSX.Element => {
+export const ActivityDetail = (): JSX.Element => {
   const { typeId, clubId, isLoading } = useUserRepresentativeStatus();
+  const { id } = useParams();
   const navigate = useNavigate();
   const [activity, setActivity] = useState<ActivityState>({
     name: "",
@@ -64,6 +65,40 @@ export const AddActivity = (): JSX.Element => {
   const [originalSearchResults, setOriginalSearchResults] = useState<
     Participant[]
   >([]);
+
+  useEffect(() => {
+    const fetchActivityData = async () => {
+      try {
+        const response = await getRequest(
+          `activity/getActivity/${id}`,
+          (data) => {
+            setActivity({
+              name: data.name,
+              type: data.type,
+              category: data.category,
+              startDate: data.startDate,
+              endDate: data.endDate,
+              location: data.location,
+              purpose: data.purpose,
+              content: data.content,
+              members: "", // Handle this based on your data structure
+              proofText: data.proofText,
+              participants: data.participants,
+              proofImages: data.proofImages,
+              feedbackResults: data.feedbackResults,
+            });
+          }
+        );
+      } catch (error) {
+        console.error("Error fetching activity data:", error);
+        // Handle errors (e.g., show error message)
+      }
+    };
+
+    if (id) {
+      fetchActivityData();
+    }
+  }, [id]);
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -152,10 +187,9 @@ export const AddActivity = (): JSX.Element => {
       <span
         key={index}
         className="participant-tag"
-        onClick={() => removeParticipant(index)}
+        style={{ fontSize: "20px", width: "1000px" }}
       >
-        {participant.name}
-        <button>X</button>
+        {participant.name},
       </span>
     ));
   };
@@ -217,40 +251,23 @@ export const AddActivity = (): JSX.Element => {
     postRequest("activity/upload", formData, handleSuccess, handleError);
   };
 
-  const handleSubmit = async () => {
-    // Prepare the data to be sent
-    const dataToSend = {
-      clubId, // Assuming clubId is obtained from useUserRepresentativeStatus or similar context
-      name: activity.name,
-      type: activity.type,
-      category: activity.category,
-      startDate: activity.startDate,
-      endDate: activity.endDate,
-      location: activity.location,
-      purpose: activity.purpose,
-      content: activity.content,
-      proofText: activity.proofText,
-      participants: activity.participants,
-      proofImages: activity.proofImages,
-      feedbackResults: activity.feedbackResults,
-    };
+  const handleDeleteActivity = async () => {
+    const confirmDelete = window.confirm("활동을 삭제하시겠습니까?");
+    if (!confirmDelete) {
+      return; // Stop if the user cancels
+    }
 
-    // Success callback
-    const handleSuccess = (response: any) => {
-      console.log("Activity added successfully:", response);
-      const activityId = response.data.activityId; // Adjust according to your API response structure
-      navigate(`/activity_detail/${activityId}`);
-      // Additional success logic here (e.g., redirecting or showing a success message)
-    };
-
-    // Error callback
-    const handleError = (error: any) => {
-      console.error("Error adding activity:", error);
-      // Additional error handling logic here (e.g., showing an error message)
-    };
-
-    // Send the POST request
-    postRequest("activity/addActivity", dataToSend, handleSuccess, handleError);
+    try {
+      await postRequest(
+        `activity/deleteActivity/${id}`,
+        () => {},
+        () => {}
+      );
+      navigate("/club_manage");
+    } catch (error) {
+      console.error("Error deleting activity:", error);
+      // Optionally, handle the error (e.g., show error message)
+    }
   };
 
   useEffect(() => {
@@ -271,93 +288,41 @@ export const AddActivity = (): JSX.Element => {
   return (
     <div className="add-activity">
       <div className="frame-3">
-        <UpperBar title={"활동 추가하기"} className={"upper-bar"} />
+        <UpperBar title={activity.name} className={"upper-bar"} />
         <div className="frame-wrapper">
           <div className="frame-7">
             <div className="frame-8">
               <SubTitle className="sub-title-instance" text="활동 정보" />
               <div className="frame-9">
-                <p className="div-2">
-                  <span className="span">활동명: </span>
-                  <input
-                    type="text"
-                    name="name"
-                    value={activity.name}
-                    onChange={handleChange}
-                    placeholder="활동명을 입력하세요."
-                    className="text-wrapper-8"
-                    style={{ width: "942px" }}
-                  />
-                </p>
                 <p className="div-3">
-                  <div className="dropdown-container">
-                    <label className="span" htmlFor="activity-type">
-                      활동 분류:
-                    </label>
-                    <select
-                      name="type"
-                      id="activity-type"
-                      value={activity.type}
-                      onChange={handleTypeChange}
-                      className="text-wrapper-8"
-                    >
-                      <option value="0">분류 선택...</option>
-                      <option value="1">
-                        동아리 성격에 합치하지 않는 활동
-                      </option>
-                      <option value="2">
-                        동아리 성격에 합치하는 내부 활동
-                      </option>
-                      <option value="3">
-                        동아리 성격에 합치하는 외부 활동
-                      </option>
-                    </select>
-                  </div>
+                  <span className="span">활동 분류:</span>
+                  <span className="text-wrapper-8">
+                    {activity.type === 1
+                      ? "동아리 성격에 합치하지 않는 활동"
+                      : activity.type === 2
+                      ? "동아리 성격에 합치하는 내부 활동"
+                      : "동아리 성격에 합치하는 외부 활동"}
+                  </span>
                 </p>
                 <p className="div-3">
                   <span className="span">시작 일시:</span>
-                  <input
-                    type="date"
-                    name="startDate"
-                    value={activity.startDate}
-                    onChange={handleChange}
-                    placeholder="시작 일시"
-                    className="text-wrapper-8"
-                  />
+                  <span className="text-wrapper-8">{activity.startDate}</span>
                 </p>
                 <p className="div-3">
                   <span className="span">종료 일시:</span>
-                  <input
-                    type="date"
-                    name="endDate"
-                    value={activity.endDate}
-                    onChange={handleChange}
-                    placeholder="종료 일시"
-                    className="text-wrapper-8"
-                  />
+                  <span className="text-wrapper-8">{activity.endDate}</span>
                 </p>
                 <p className="div-3">
                   <span className="span">장소:</span>
-                  <input
-                    type="text"
-                    name="location"
-                    value={activity.location}
-                    onChange={handleChange}
-                    placeholder="장소를 입력하세요."
-                    className="text-wrapper-8"
-                    style={{ width: "962px" }}
-                  />
+                  <span className="text-wrapper-8" style={{ width: "962px" }}>
+                    {activity.location}
+                  </span>
                 </p>
                 <p className="div-3">
                   <span className="span">활동 목적:</span>
-                  <input
-                    className="text-wrapper-8"
-                    name="purpose"
-                    value={activity.purpose}
-                    onChange={handleChange}
-                    placeholder="활동 목적을 입력하세요."
-                    style={{ width: "922px" }}
-                  />
+                  <span className="text-wrapper-8" style={{ width: "922px" }}>
+                    {activity.purpose}
+                  </span>
                 </p>
               </div>
             </div>
@@ -371,65 +336,23 @@ export const AddActivity = (): JSX.Element => {
                     {activity.participants.length}명
                   </span>
                 </p>
-                <div className="participants-input">
-                  {renderParticipants()}
-                  <div>
-                    <button onClick={addAllParticipants}>전체 선택</button>
-                    <button onClick={removeAllParticipants}>전체 삭제</button>
-                  </div>
-                  <input
-                    type="text"
-                    value={searchTerm}
-                    onChange={handleSearchChange}
-                    placeholder={
-                      activity.participants.length ? "" : "회원 검색..."
-                    }
-                    className="text-wrapper-10"
-                  />
-                </div>
-                {searchResults && searchResults.length > 0 && (
-                  <ul className="search-results">
-                    {searchResults.map((member, index) => (
-                      <li key={index} onClick={() => addParticipant(member)}>
-                        {member.name} {member.student_id}
-                      </li>
-                    ))}
-                  </ul>
-                )}
+                <div className="participants-input">{renderParticipants()}</div>
               </div>
             </div>
             <div className="frame-11">
               <SubTitle className="sub-title-instance" text="활동 내용" />
               <div className="frame-9">
-                <textarea
-                  name="content"
-                  value={activity.content}
-                  onChange={handleChange}
-                  placeholder="활동 내용을 입력하세요."
-                  className="text-wrapper-10"
-                  style={{ height: "300px" }}
-                />
+                <div className="text-wrapper-10" style={{ height: "300px" }}>
+                  {activity.content}
+                </div>
               </div>
             </div>
             <div className="frame-12">
               <SubTitle className="sub-title-instance" text="활동 증빙" />
               <div className="frame-9">
-                <textarea
-                  name="proofText"
-                  value={activity.proofText}
-                  onChange={handleChange}
-                  placeholder="활동 증빙을 입력하세요."
-                  className="text-wrapper-10"
-                  style={{ height: "150px" }}
-                />
-                <input
-                  type="file"
-                  onChange={(e) => {
-                    if (e.target.files?.[0]) {
-                      handleFileUpload(e.target.files[0]);
-                    }
-                  }}
-                />
+                <div className="text-wrapper-10" style={{ height: "150px" }}>
+                  {activity.proofText}
+                </div>
               </div>
               <div className="frame-9">
                 {groupedProofImages.map((pair, pairIndex) => (
@@ -439,22 +362,13 @@ export const AddActivity = (): JSX.Element => {
                         key={index}
                         url={image.imageUrl}
                         className="activity-proof-instance"
-                        property1="default"
+                        property1="variant-2"
                         fileName={image.fileName}
                         onDelete={handleDeleteImage}
                       />
                     ))}
                   </div>
                 ))}
-              </div>
-              <div className="frame-14">
-                <div
-                  className="frame-15"
-                  onClick={handleSubmit}
-                  style={{ cursor: "pointer" }}
-                >
-                  <div className="text-wrapper-11">활동 저장</div>
-                </div>
               </div>
             </div>
             <div className="frame-11">
@@ -470,6 +384,22 @@ export const AddActivity = (): JSX.Element => {
           </div>
         </div>
         <UnderBar />
+        <div className="frame-16">
+          <div
+            className="frame-17"
+            onClick={() => navigate(`/edit_activity/${id}`)}
+            style={{ cursor: "pointer" }}
+          >
+            수정
+          </div>
+          <div
+            className="frame-17"
+            onClick={handleDeleteActivity}
+            style={{ cursor: "pointer" }}
+          >
+            삭제
+          </div>
+        </div>
       </div>
     </div>
   );

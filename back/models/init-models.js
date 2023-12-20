@@ -104,6 +104,8 @@ function initModels(sequelize) {
   DivisionGroup.hasMany(Division, { as: "Divisions", foreignKey: "division_group_id"});
   Meeting.belongsTo(MeetingType, { as: "type", foreignKey: "type_id"});
   MeetingType.hasMany(Meeting, { as: "Meetings", foreignKey: "type_id"});
+  ActivityMember.belongsTo(Member, { as: "member_student", foreignKey: "member_student_id"});
+  Member.hasMany(ActivityMember, { as: "ActivityMembers", foreignKey: "member_student_id"});
   ClubRepresentative.belongsTo(Member, { as: "student", foreignKey: "student_id"});
   Member.hasMany(ClubRepresentative, { as: "ClubRepresentatives", foreignKey: "student_id"});
   ExecutiveMember.belongsTo(Member, { as: "student", foreignKey: "student_id"});

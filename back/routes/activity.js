@@ -6,6 +6,7 @@ const multer = require("multer");
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 const {
+  sequelize,
   MemberClub,
   Member,
   MemberStatus,
@@ -23,6 +24,43 @@ const s3 = new AWS.S3({
   accessKeyId: process.env.S3_ACCESS_KEY,
   secretAccessKey: process.env.S3_SECRET_ACCESS_KEY,
   region: "ap-northeast-2",
+});
+
+router.post("/deleteActivity/:activityId", async (req, res) => {
+  const { activityId } = req.params;
+  console.log(activityId);
+
+  const transaction = await sequelize.transaction();
+
+  try {
+    // Delete from ActivityEvidence
+    await ActivityEvidence.destroy({
+      where: { activity_id: activityId },
+      transaction,
+    });
+
+    // Delete from ActivityMember
+    await ActivityMember.destroy({
+      where: { activity_id: activityId },
+      transaction,
+    });
+
+    // Delete from Activity
+    await Activity.destroy({
+      where: { id: activityId },
+      transaction,
+    });
+
+    await transaction.commit();
+    console.log("terminated");
+    res
+      .status(200)
+      .send({ message: "Activity and related data deleted successfully" });
+  } catch (error) {
+    await transaction.rollback();
+    console.error("Error deleting activity:", error);
+    res.status(500).send("Error deleting activity");
+  }
 });
 
 router.post("/addActivity", async (req, res) => {
@@ -88,6 +126,170 @@ router.post("/addActivity", async (req, res) => {
   } catch (error) {
     console.error("Error adding activity:", error);
     res.status(500).send("Error adding activity");
+  }
+});
+
+router.post("/editActivity", async (req, res) => {
+  const {
+    activityId, // Added this line to handle existing activity ID
+    clubId,
+    name: title,
+    type: activityTypeId,
+    category,
+    startDate,
+    endDate,
+    location,
+    purpose,
+    content,
+    proofText,
+    participants,
+    proofImages,
+    feedbackResults,
+  } = req.body;
+
+  const transaction = await sequelize.transaction();
+
+  try {
+    let activity;
+    if (activityId) {
+      // Update existing activity
+      activity = await Activity.findByPk(activityId);
+      await activity.update(
+        {
+          club_id: clubId,
+          title,
+          activity_type_id: activityTypeId,
+          start_date: startDate,
+          end_date: endDate,
+          location,
+          purpose,
+          content,
+          proof_text: proofText,
+          feedback_type: 1,
+          recent_edit: new Date(),
+        },
+        { transaction }
+      );
+
+      // Delete existing evidence and participants
+      await ActivityEvidence.destroy({
+        where: { activity_id: activityId },
+        transaction,
+      });
+      await ActivityMember.destroy({
+        where: { activity_id: activityId },
+        transaction,
+      });
+    } else {
+      // Create new activity
+      activity = await Activity.create(
+        {
+          club_id: clubId,
+          title,
+          activity_type_id: activityTypeId,
+          start_date: startDate,
+          end_date: endDate,
+          location,
+          purpose,
+          content,
+          proof_text: proofText,
+          feedback_type: 1,
+          recent_edit: new Date(),
+        },
+        { transaction }
+      );
+    }
+
+    // Add new evidence and participants
+    await Promise.all(
+      proofImages.map((image) =>
+        ActivityEvidence.create(
+          {
+            activity_id: activity.id,
+            image_url: image.imageUrl,
+            description: image.fileName,
+          },
+          { transaction }
+        )
+      )
+    );
+    await Promise.all(
+      participants.map((participant) =>
+        ActivityMember.create(
+          {
+            activity_id: activity.id,
+            member_student_id: participant.student_id,
+          },
+          { transaction }
+        )
+      )
+    );
+
+    await transaction.commit();
+    res.status(200).send({
+      message: "Activity updated successfully",
+      activityId: activity.id,
+    });
+  } catch (error) {
+    await transaction.rollback();
+    console.error("Error updating activity:", error);
+    res.status(500).send("Error updating activity");
+  }
+});
+
+router.get("/getActivity/:activityId", async (req, res) => {
+  const { activityId } = req.params;
+
+  try {
+    // Fetch activity details
+    const activity = await Activity.findByPk(activityId);
+    if (!activity) {
+      return res.status(404).send("Activity not found");
+    }
+
+    // Fetch evidence associated with the activity
+    const evidence = await ActivityEvidence.findAll({
+      where: { activity_id: activityId },
+    });
+
+    // Fetch participants associated with the activity
+    const participants = await ActivityMember.findAll({
+      where: { activity_id: activityId },
+      include: [
+        {
+          model: Member, // Assuming Member model is imported and associated
+          attributes: ["name"],
+          as: "member_student",
+        },
+      ],
+    });
+    // Format the response
+    const response = {
+      clubId: activity.club_id,
+      name: activity.title,
+      type: activity.activity_type_id,
+      category: "", // Adjust based on how you store 'category'
+      startDate: activity.start_date,
+      endDate: activity.end_date,
+      location: activity.location,
+      purpose: activity.purpose,
+      content: activity.content,
+      proofText: activity.proof_text,
+      participants: participants.map((p) => ({
+        student_id: p.member_student_id,
+        name: p.member_student.name,
+      })),
+      proofImages: evidence.map((e) => ({
+        imageUrl: e.image_url,
+        fileName: e.description,
+      })),
+      feedbackResults: [], // Adjust based on how you store 'feedbackResults'
+    };
+
+    res.status(200).send(response);
+  } catch (error) {
+    console.error("Error fetching activity:", error);
+    res.status(500).send("Error fetching activity");
   }
 });
 
@@ -255,6 +457,7 @@ router.get("/activity_list", async (req, res) => {
         },
       ],
       attributes: [
+        "id",
         "title",
         "activity_type_id",
         "start_date",
@@ -276,6 +479,7 @@ router.get("/activity_list", async (req, res) => {
     res.json({
       success: true,
       activities: activities.map((activity) => ({
+        id: activity.id,
         title: activity.title,
         activityType: activity.activity_type.type,
         startDate: formatDateString(activity.start_date),

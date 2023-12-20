@@ -208,7 +208,9 @@ export const UpperBar = ({ className, title }: Props): JSX.Element => {
             <div
               className="text-wrapper"
               onClick={handleLogout}
-              style={{ cursor: "pointer" }}
+              style={{
+                cursor: "pointer",
+              }}
             >
               {user.name} 님
             </div> // 로그인한 경우 사용자의 이름 표시

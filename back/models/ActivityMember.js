@@ -9,7 +9,11 @@ module.exports = function(sequelize, DataTypes) {
     member_student_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
-      primaryKey: true
+      primaryKey: true,
+      references: {
+        model: 'Member',
+        key: 'student_id'
+      }
     }
   }, {
     sequelize,
@@ -22,6 +26,13 @@ module.exports = function(sequelize, DataTypes) {
         using: "BTREE",
         fields: [
           { name: "activity_id" },
+          { name: "member_student_id" },
+        ]
+      },
+      {
+        name: "ActivityMember_Member_student_id_fk",
+        using: "BTREE",
+        fields: [
           { name: "member_student_id" },
         ]
       },

@@ -7,8 +7,10 @@ import PropTypes from "prop-types";
 import React from "react";
 import { ActivityState } from "../ActivityState";
 import "./style.css";
+import { useNavigate } from "react-router-dom";
 
 interface Props {
+  id: number;
   property1?: "variant-2" | "default";
   className?: string;
   activityStateProperty1: number;
@@ -28,10 +30,20 @@ export const Activity = ({
   type = "",
   start_date = "",
   end_date = "",
+  id = 0,
 }: Props): JSX.Element => {
+  const navigate = useNavigate();
   return (
     <div className={`activity ${property1} ${className}`}>
-      <div className="frame-31">
+      <div
+        className="frame-31"
+        onClick={() => {
+          {
+            property1 === "default" && navigate(`/activity_detail/${id}`);
+          }
+        }}
+        style={property1 === "default" ? { cursor: "pointer" } : {}}
+      >
         {property1 === "default" && (
           <>
             <div className="frame">

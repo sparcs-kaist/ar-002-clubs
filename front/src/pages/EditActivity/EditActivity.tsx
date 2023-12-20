@@ -2,12 +2,12 @@ import React, { useEffect, useState } from "react";
 import { ActivityProof } from "components/ActivityProof";
 import { SubTitle } from "components/SubTitle";
 import { UnderBar } from "components/UnderBar";
-import "./AddActivity.css";
+import "./EditActivity.css";
 import { UpperBar } from "components/UpperBar";
 import { ActivityFeedback } from "components/ActivityFeedback";
 import { getRequest, postRequest } from "utils/api";
 import { useUserRepresentativeStatus } from "hooks/useUserRepresentativeStatus";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 interface Participant {
   student_id: string;
@@ -40,8 +40,9 @@ interface ActivityState {
   feedbackResults: FeedbackResult[];
 }
 
-export const AddActivity = (): JSX.Element => {
+export const EditActivity = (): JSX.Element => {
   const { typeId, clubId, isLoading } = useUserRepresentativeStatus();
+  const { id } = useParams();
   const navigate = useNavigate();
   const [activity, setActivity] = useState<ActivityState>({
     name: "",
@@ -64,6 +65,40 @@ export const AddActivity = (): JSX.Element => {
   const [originalSearchResults, setOriginalSearchResults] = useState<
     Participant[]
   >([]);
+
+  useEffect(() => {
+    const fetchActivityData = async () => {
+      try {
+        const response = await getRequest(
+          `activity/getActivity/${id}`,
+          (data) => {
+            setActivity({
+              name: data.name,
+              type: data.type,
+              category: data.category,
+              startDate: data.startDate,
+              endDate: data.endDate,
+              location: data.location,
+              purpose: data.purpose,
+              content: data.content,
+              members: "", // Handle this based on your data structure
+              proofText: data.proofText,
+              participants: data.participants,
+              proofImages: data.proofImages,
+              feedbackResults: data.feedbackResults,
+            });
+          }
+        );
+      } catch (error) {
+        console.error("Error fetching activity data:", error);
+        // Handle errors (e.g., show error message)
+      }
+    };
+
+    if (id) {
+      fetchActivityData();
+    }
+  }, [id]);
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -220,6 +255,7 @@ export const AddActivity = (): JSX.Element => {
   const handleSubmit = async () => {
     // Prepare the data to be sent
     const dataToSend = {
+      activityId: id,
       clubId, // Assuming clubId is obtained from useUserRepresentativeStatus or similar context
       name: activity.name,
       type: activity.type,
@@ -250,7 +286,12 @@ export const AddActivity = (): JSX.Element => {
     };
 
     // Send the POST request
-    postRequest("activity/addActivity", dataToSend, handleSuccess, handleError);
+    postRequest(
+      "activity/editActivity",
+      dataToSend,
+      handleSuccess,
+      handleError
+    );
   };
 
   useEffect(() => {
@@ -271,7 +312,7 @@ export const AddActivity = (): JSX.Element => {
   return (
     <div className="add-activity">
       <div className="frame-3">
-        <UpperBar title={"활동 추가하기"} className={"upper-bar"} />
+        <UpperBar title={"활동 수정하기"} className={"upper-bar"} />
         <div className="frame-wrapper">
           <div className="frame-7">
             <div className="frame-8">

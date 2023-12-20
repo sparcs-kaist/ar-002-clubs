@@ -24,6 +24,7 @@ type ClubInfo = {
 };
 
 type ActivityInfo = {
+  id: number;
   title: string;
   activityType: string;
   startDate: string;
@@ -149,6 +150,7 @@ export const ClubManage = (): JSX.Element => {
                       <Activity
                         property1="variant-2"
                         activityStateProperty1={2}
+                        id={0}
                       />
                       {activities.map((activity, index) => (
                         <Activity
@@ -159,6 +161,7 @@ export const ClubManage = (): JSX.Element => {
                           start_date={activity.startDate}
                           end_date={activity.endDate}
                           activityStateProperty1={activity.feedbackType}
+                          id={activity.id}
                         />
                       ))}
                     </div>

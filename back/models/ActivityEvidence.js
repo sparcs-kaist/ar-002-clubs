@@ -7,11 +7,11 @@ module.exports = function(sequelize, DataTypes) {
       primaryKey: true
     },
     image_url: {
-      type: DataTypes.STRING(255),
+      type: DataTypes.TEXT,
       allowNull: false
     },
     description: {
-      type: DataTypes.TEXT,
+      type: DataTypes.STRING(511),
       allowNull: true
     }
   }, {

@@ -33,42 +33,35 @@ export const ActivityProof = ({
   return (
     <div className={`activity-proof ${className}`}>
       <div className="rectangle">
-        <button
-          onClick={handleDelete}
-          className="delete-button"
-          style={{ zIndex: 100 }}
-        >
-          X
-        </button>
-        {property1 === "variant-2" ? (
-          <div className="frame" onClick={onUpload}>
-            <div className="group">
-              <div className="overlap-group">
-                <div className="ellipse" />
-                <div className="text-wrapper-2">+</div>
-              </div>
-            </div>
-            <div className="text-wrapper-3">증빙 추가하기</div>
-          </div>
+        {property1 !== "variant-2" ? (
+          <button
+            onClick={handleDelete}
+            className="delete-button"
+            style={{ zIndex: 100 }}
+          >
+            X
+          </button>
         ) : (
-          <div className="proof-content">
-            {isImage ? (
-              <img
-                style={{
-                  width: "493px",
-                  height: "493px",
-                  objectFit: "contain",
-                }}
-                src={proxyUrl}
-                alt={fileName || "Uploaded Proof"} // Use file name as alt text
-              />
-            ) : (
-              <a href={proxyUrl} download={fileName}>
-                {fileName}
-              </a>
-            )}
-          </div>
+          <></>
         )}
+
+        <div className="proof-content">
+          {isImage ? (
+            <img
+              style={{
+                width: "493px",
+                height: "493px",
+                objectFit: "contain",
+              }}
+              src={proxyUrl}
+              alt={fileName || "Uploaded Proof"} // Use file name as alt text
+            />
+          ) : (
+            <a href={proxyUrl} download={fileName}>
+              {fileName}
+            </a>
+          )}
+        </div>
       </div>
     </div>
   );
