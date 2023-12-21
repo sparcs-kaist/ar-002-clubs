@@ -213,7 +213,7 @@ export const AddActivity = (): JSX.Element => {
     const handleError = (error: any) => {
       console.error("Error uploading file:", error);
       alert(
-        `활동을 저장하는 도중 오류가 발생했습니다. 입력한 정보를 다시 확인해주세요. ${error}`
+        `파일을 업로드하는 도중 오류가 발생했습니다. 파일을 다시 확인해주세요. ${error}`
       );
     };
 
