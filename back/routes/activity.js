@@ -43,6 +43,7 @@ const upload = multer({
     },
     contentType: multerS3.AUTO_CONTENT_TYPE,
   }),
+  limits: { fileSize: 100 * 1024 * 1024 },
 });
 
 router.post("/deleteActivity/:activityId", async (req, res) => {
