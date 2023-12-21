@@ -3,8 +3,9 @@ const router = express.Router();
 const { Op } = require("sequelize");
 const AWS = require("aws-sdk");
 const multer = require("multer");
+const multerS3 = require("multer-s3");
 const storage = multer.memoryStorage();
-const upload = multer({ storage: storage });
+// const upload = multer({ storage: storage });
 const {
   sequelize,
   MemberClub,
@@ -24,6 +25,24 @@ const s3 = new AWS.S3({
   accessKeyId: process.env.S3_ACCESS_KEY,
   secretAccessKey: process.env.S3_SECRET_ACCESS_KEY,
   region: "ap-northeast-2",
+});
+
+// Configure multer-s3
+const upload = multer({
+  storage: multerS3({
+    s3: s3,
+    bucket: "ar-002-clubs",
+    acl: "public-read",
+    metadata: function (req, file, cb) {
+      cb(null, { fieldName: file.fieldname });
+    },
+    key: function (req, file, cb) {
+      const timestamp = new Date().toISOString().replace(/:/g, "-");
+      const encodedFileName = file.originalname;
+      cb(null, `uploads/${timestamp}_${encodedFileName}`);
+    },
+    contentType: multerS3.AUTO_CONTENT_TYPE,
+  }),
 });
 
 router.post("/deleteActivity/:activityId", async (req, res) => {
@@ -314,32 +333,50 @@ router.get("/getActivity/:activityId", async (req, res) => {
   }
 });
 
-router.post("/upload", upload.single("file"), async (req, res) => {
-  try {
-    const file = req.file;
+// router.post("/upload", upload.single("file"), async (req, res) => {
+//   try {
+//     const file = req.file;
 
-    // Check if file is not available
-    if (!file) {
+//     // Check if file is not available
+//     if (!file) {
+//       return res.status(400).send("No file uploaded.");
+//     }
+
+//     // Generate a timestamp
+//     const timestamp = new Date().toISOString().replace(/:/g, "-");
+//     const encodedFileName = file.originalname;
+
+//     // Set S3 parameters with timestamp and original file name
+//     const s3Params = {
+//       Bucket: "ar-002-clubs", // Replace with your S3 bucket name
+//       Key: `uploads/${timestamp}_${encodedFileName}`, // File name you want to save as
+//       Body: file.buffer,
+//       ContentType: file.mimetype,
+//       ACL: "public-read", // Adjust the ACL as per your requirements
+//     };
+
+//     // Upload file to S3
+//     s3.upload(s3Params, (s3Err, data) => {
+//       if (s3Err) throw s3Err;
+//       res.send({ message: "File uploaded successfully", data });
+//     });
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).send("Error in file upload.");
+//   }
+// });
+
+router.post("/upload", upload.single("file"), (req, res) => {
+  try {
+    // Check if file is available
+    if (!req.file) {
       return res.status(400).send("No file uploaded.");
     }
 
-    // Generate a timestamp
-    const timestamp = new Date().toISOString().replace(/:/g, "-");
-    const encodedFileName = file.originalname;
-
-    // Set S3 parameters with timestamp and original file name
-    const s3Params = {
-      Bucket: "ar-002-clubs", // Replace with your S3 bucket name
-      Key: `uploads/${timestamp}_${encodedFileName}`, // File name you want to save as
-      Body: file.buffer,
-      ContentType: file.mimetype,
-      ACL: "public-read", // Adjust the ACL as per your requirements
-    };
-
-    // Upload file to S3
-    s3.upload(s3Params, (s3Err, data) => {
-      if (s3Err) throw s3Err;
-      res.send({ message: "File uploaded successfully", data });
+    // Send a response with file details
+    res.send({
+      message: "File uploaded successfully",
+      fileDetails: req.file,
     });
   } catch (error) {
     console.error(error);

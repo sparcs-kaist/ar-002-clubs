@@ -187,20 +187,18 @@ export const AddActivity = (): JSX.Element => {
     }
   };
 
-  const handleFileUpload = async (file: File) => {
+  const handleFileUpload = async (file: any) => {
     const formData = new FormData();
 
-    // Generate a timestamp
-    const timestamp = new Date().toISOString().replace(/:/g, "-");
+    // Append the file without modifying the name
+    formData.append("file", file);
 
-    // Append the file with a timestamp
-    const newFileName = `${timestamp}_${file.name}`;
-    formData.append("file", file, newFileName);
+    const handleSuccess = (response: {
+      data: { fileDetails: { location: any } };
+    }) => {
+      const uploadedFileUrl = response.data.fileDetails.location; // Ensure this matches the response structure
 
-    const handleSuccess = (response: any) => {
-      const uploadedFileUrl = response.data.data.Location;
-
-      // Save the original file name in the state
+      // Save the uploaded file URL and original file name in the state
       setActivity((prevState) => ({
         ...prevState,
         proofImages: [
