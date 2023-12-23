@@ -65,6 +65,11 @@ export const AddActivity = (): JSX.Element => {
     Participant[]
   >([]);
 
+  // Validation for date range and order
+  //TODO: 서버에서 불러와서 적용
+  const minDate = new Date("2023-06-17");
+  const maxDate = new Date("2023-12-15");
+
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setSearchTerm(value);
@@ -79,7 +84,7 @@ export const AddActivity = (): JSX.Element => {
 
     // 서버에 검색 쿼리를 보내고 결과를 받아옵니다.
     getRequest(
-      `activity/search_members?club_id=${clubId}&query=${query}`, // 클럽 ID와 검색 쿼리를 포함한 URL
+      `activity/search_members?club_id=${clubId}&query=${query}&start_date=${activity.startDate}&end_date=${activity.endDate}`, // 클럽 ID와 검색 쿼리를 포함한 URL
       (data) => {
         const newSearchResults = data.members.filter(
           (member: Participant) =>
@@ -237,12 +242,8 @@ export const AddActivity = (): JSX.Element => {
       return;
     }
 
-    // Validation for date range and order
     const startDate = new Date(activity.startDate);
     const endDate = new Date(activity.endDate);
-    const minDate = new Date("2023-06-17");
-    const maxDate = new Date("2023-12-15");
-
     if (
       startDate > endDate ||
       startDate < minDate ||
@@ -288,8 +289,9 @@ export const AddActivity = (): JSX.Element => {
   };
 
   useEffect(() => {
-    searchMember(""); // Call this with an empty string to fetch all members initially
-  }, [clubId]);
+    searchMember(searchTerm); // Call this with an empty string to fetch all members initially
+    removeAllParticipants();
+  }, [clubId, activity.startDate, activity.endDate]);
 
   const groupProofImagesInPairs = () => {
     const pairs = [];

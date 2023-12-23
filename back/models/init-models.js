@@ -232,7 +232,6 @@ function initModels(sequelize) {
   });
   // Inside MemberClub model definition
   MemberClub.belongsTo(Member, { foreignKey: "student_id" });
-
   // And/or inside Member model definition
   Member.hasMany(MemberClub, { foreignKey: "student_id" });
 

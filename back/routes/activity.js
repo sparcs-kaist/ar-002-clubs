@@ -573,7 +573,12 @@ router.post("/deleteImage", async (req, res) => {
 });
 
 router.get("/search_members", async (req, res) => {
-  const { club_id: clubId, query } = req.query;
+  const {
+    club_id: clubId,
+    query,
+    start_date: startDate,
+    end_date: endDate,
+  } = req.query;
   const currentDate = new Date();
 
   if (!clubId) {
@@ -592,57 +597,63 @@ router.get("/search_members", async (req, res) => {
       },
     });
 
-    console.log(currentDate);
-    console.log(typeof currentSemester.id);
-    console.log(typeof clubId);
-
     if (!currentSemester) {
       return res.status(404).json({ message: "현재 학기를 찾을 수 없습니다." });
     }
+
+    // startDate가 주어진 경우, 해당 날짜를 기준으로 추가 조건 설정
+    let semesterConditions;
+    if (
+      startDate &&
+      new Date(startDate) < new Date(currentSemester.start_date)
+    ) {
+      if (endDate && new Date(endDate) < new Date(currentSemester.start_date)) {
+        semesterConditions = {
+          [Op.or]: [{ semester_id: currentSemester.id - 1 }],
+        };
+      } else {
+        // startDate가 currentSemester.start_date보다 빠른 경우, 이전 학기도 포함
+        semesterConditions = {
+          [Op.or]: [
+            { semester_id: currentSemester.id },
+            { semester_id: currentSemester.id - 1 },
+          ],
+        };
+      }
+    } else {
+      // 그렇지 않은 경우, 현재 학기만 고려
+      semesterConditions = { semester_id: currentSemester.id };
+    }
+
+    console.log(semesterConditions);
 
     // 해당 동아리에 속한 회원들 조회
     const members = await MemberClub.findAll({
       where: {
         club_id: clubId,
-        semester_id: currentSemester.id,
+        ...semesterConditions,
       },
-      include: [
-        {
-          model: MemberStatus,
-          as: "student",
-          include: [
-            {
-              model: Member,
-              as: "student",
-              attributes: ["name"],
-            },
-          ],
-        },
-      ],
+      attributes: ["student_id"],
     });
 
-    const seenIds = new Set();
-    const filteredMembers = members
-      .map((member) => ({
-        student_id: member.student_id,
-        name: member.student.student.name,
-      }))
-      .filter((member) => {
-        const duplicate = seenIds.has(member.student_id);
-        seenIds.add(member.student_id);
-        return (
-          !duplicate && member.name.toLowerCase().includes(query.toLowerCase())
-        );
-      });
+    const memberNames = await Promise.all(
+      members.map(async (memberClub) => {
+        const member = await Member.findOne({
+          where: { student_id: memberClub.student_id },
+          attributes: ["name"],
+        });
+        return { student_id: memberClub.student_id, name: member.name };
+      })
+    );
 
-    // const filteredMembers = members
-    //   .map((member) => ({
-    //     student_id: member.student_id,
-    //     name: member.student.student.name,
-    //   }))
-    //   .filter((member) =>
-    //     member.name.toLowerCase().includes(query.toLowerCase())
-    //   );
+    const seenIds = new Set();
+    const filteredMembers = memberNames.filter((member) => {
+      const duplicate = seenIds.has(member.student_id);
+      seenIds.add(member.student_id);
+      return (
+        !duplicate && member.name.toLowerCase().includes(query.toLowerCase())
+      );
+    });
 
     res.json({
       success: true,
