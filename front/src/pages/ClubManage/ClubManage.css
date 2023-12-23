@@ -85,7 +85,7 @@
   padding: 4px 3px;
   position: absolute;
   top: 0;
-  width: 211px;
+  width: 211px !important;
 }
 
 .club-manage .text-wrapper-8 {

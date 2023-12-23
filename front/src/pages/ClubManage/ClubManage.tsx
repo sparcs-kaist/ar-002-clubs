@@ -44,6 +44,64 @@ export const ClubManage = (): JSX.Element => {
     advisor: "",
   });
   const [activities, setActivities] = useState<ActivityInfo[]>([]);
+  const [memberList, setMemberList] = useState([]);
+
+  useEffect(() => {
+    getRequest(
+      `club/club_members/${clubId}`,
+      (data) => {
+        setMemberList(
+          data.map(
+            (member: { student_id: any; name: any }) =>
+              `${member.student_id} ${member.name}`
+          )
+        );
+      },
+      (error) => {
+        console.error("Error fetching club members:", error);
+        setMemberList([]);
+      }
+    );
+  }, [clubId, clubInfo.representatives]);
+
+  const handleDropdownChange = async (
+    event: React.ChangeEvent<HTMLSelectElement>,
+    index: number
+  ) => {
+    const selectedMemberInfo = event.target.value.split(" ");
+    const next_student_id = selectedMemberInfo[0];
+    const prev_student_id = clubInfo.representatives[index].student_id;
+    const rep_id = index + 1;
+
+    if (
+      window.confirm(
+        `${
+          index == 0 ? "대표자를" : "대의원을"
+        } ${event.target.value.trim()}(으)로 변경하시겠습니까?`
+      )
+    ) {
+      try {
+        await postRequest(
+          "club/update_representatives",
+          {
+            prev_student_id,
+            next_student_id,
+            rep_id,
+            club_id: clubInfo.clubId,
+          },
+          () => {
+            window.location.reload(); // 페이지 새로고침
+          },
+          (error) => {
+            alert("대표자/대의워 변경에 실패했습니다. 다시 시도해주세요.");
+            console.error("Error updating representative:", error);
+          }
+        );
+      } catch (error) {
+        console.error("Error sending update request:", error);
+      }
+    }
+  };
 
   const handleDescriptionChange = (
     event: React.ChangeEvent<HTMLTextAreaElement>
@@ -61,7 +119,6 @@ export const ClubManage = (): JSX.Element => {
         "club/updateDescription",
         dataToSend,
         () => {
-          console.log("Description updated successfully");
           alert("설명이 저장되었습니다.");
           // Optionally, show a success message
         },
@@ -121,42 +178,50 @@ export const ClubManage = (): JSX.Element => {
         />
         <div className="frame-wrapper">
           <div className="frame-12">
-            {/* {typeId === 1 && ( */}
-            <div className="frame-13">
-              <SubTitle
-                className="sub-title-instance"
-                divClassName="design-component-instance-node"
-                text="동아리 대표자"
-              />
-              <div className="frame-14">
-                {Array.isArray(clubInfo.representatives) &&
-                  clubInfo.representatives.map((rep, index) => (
+            {typeId === 1 && (
+              <div className="frame-13">
+                <SubTitle
+                  className="sub-title-instance"
+                  divClassName="design-component-instance-node"
+                  text="동아리 대의원 변경"
+                />
+                <div className="frame-14">
+                  {clubInfo.representatives.map((rep, index) => (
                     <div key={index} className="overlap-group-wrapper">
                       <div className="overlap-group">
-                        <div className="frame-15">
-                          <div className="text-wrapper-8">
-                            {rep.student_id > 0
-                              ? `${rep.student_id} ${rep.name}`
-                              : "없음"}
-                          </div>
-                        </div>
                         <p className="p">
                           <span className="span">
                             {index === 0 ? "대표자 :" : "대의원 :"}
                           </span>
                           <span className="text-wrapper-9">&nbsp;</span>
                         </p>
+                        <select
+                          className="frame-15 text-wrapper-8"
+                          value=""
+                          onChange={(e) => handleDropdownChange(e, index)}
+                        >
+                          <option value="">
+                            {rep.student_id > 0
+                              ? `${rep.student_id} ${rep.name}`
+                              : "없음"}
+                          </option>
+                          {memberList.map((member, idx) => (
+                            <option key={idx} value={member}>
+                              {member}
+                            </option>
+                          ))}
+                        </select>
                       </div>
                     </div>
                   ))}
+                </div>
               </div>
-            </div>
-            {/* )} */}
+            )}
             <div className="frame-16">
               <SubTitle
                 className="sub-title-instance"
                 divClassName="design-component-instance-node"
-                text="동아리 설명"
+                text="동아리 설명 변경"
               />
               <div className="frame-17">
                 <textarea
@@ -180,7 +245,7 @@ export const ClubManage = (): JSX.Element => {
                     <SubTitle
                       className="sub-title-instance"
                       divClassName="design-component-instance-node"
-                      text="활동 보고서"
+                      text="활동 보고서 작성"
                     />
                     <div className="frame-22">
                       <Activity

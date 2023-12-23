@@ -173,7 +173,7 @@ router.post("/updateDescription", async (req, res) => {
   }
 });
 
-router.get("/clubMembers/:clubId", async (req, res) => {
+router.get("/club_members/:clubId", async (req, res) => {
   const { clubId } = req.params;
   const today = new Date();
 
@@ -193,9 +193,8 @@ router.get("/clubMembers/:clubId", async (req, res) => {
     // Fetch club representatives for the current semester
     const representatives = await ClubRepresentative.findAll({
       where: {
-        club_id: clubId,
         start_term: { [Op.lte]: today },
-        end_term: { [Op.gte]: today },
+        [Op.or]: [{ end_term: { [Op.gte]: today } }, { end_term: null }],
       },
     });
 
@@ -229,6 +228,52 @@ router.get("/clubMembers/:clubId", async (req, res) => {
   }
 });
 
+router.post("/update_representatives", async (req, res) => {
+  const { prev_student_id, next_student_id, rep_id, club_id } = req.body; // POST 요청이므로 req.body를 사용합니다
+
+  try {
+    // 현재 날짜와 어제 날짜 계산
+    const today = new Date();
+    const yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1);
+
+    // 기존 대표자의 end_term 업데이트
+    await ClubRepresentative.update(
+      { end_term: yesterday },
+      {
+        where: {
+          club_id: club_id,
+          student_id: prev_student_id,
+          type_id: rep_id,
+        },
+      }
+    );
+
+    // 새 대표자 확인 및 추가
+    const [newRep, created] = await ClubRepresentative.findOrCreate({
+      where: {
+        club_id: club_id,
+        student_id: next_student_id,
+        type_id: rep_id,
+      },
+      defaults: {
+        start_term: today,
+        end_term: null,
+      },
+    });
+
+    if (!created) {
+      // 이미 존재하는 경우, end_term만 업데이트
+      await newRep.update({ end_term: null });
+    }
+
+    res.send({ message: "Representatives updated successfully" });
+  } catch (error) {
+    console.error("Error updating representatives:", error);
+    res.status(500).send({ message: "Error updating representatives" });
+  }
+});
+
 router.get("/club_manage", async (req, res) => {
   const { student_id } = req.session.user;
   const currentDate = new Date();
@@ -242,7 +287,7 @@ router.get("/club_manage", async (req, res) => {
       [Op.or]: [{ end_term: null }, { end_term: { [Op.gte]: currentDate } }],
     },
   });
-  if (!clubRep.club_id) {
+  if (!clubRep) {
     return res.status(400).json({
       success: false,
       message: "club_id query parameter is required",
