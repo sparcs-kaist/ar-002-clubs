@@ -289,8 +289,9 @@ export const AddActivity = (): JSX.Element => {
   };
 
   useEffect(() => {
-    searchMember(searchTerm); // Call this with an empty string to fetch all members initially
     removeAllParticipants();
+    activity.participants = [];
+    searchMember(""); // Call this with an empty string to fetch all members initially
   }, [clubId, activity.startDate, activity.endDate]);
 
   const groupProofImagesInPairs = () => {
