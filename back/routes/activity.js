@@ -592,6 +592,10 @@ router.get("/search_members", async (req, res) => {
       },
     });
 
+    console.log(currentDate);
+    console.log(typeof currentSemester.id);
+    console.log(typeof clubId);
+
     if (!currentSemester) {
       return res.status(404).json({ message: "현재 학기를 찾을 수 없습니다." });
     }
@@ -617,14 +621,28 @@ router.get("/search_members", async (req, res) => {
       ],
     });
 
+    const seenIds = new Set();
     const filteredMembers = members
       .map((member) => ({
         student_id: member.student_id,
         name: member.student.student.name,
       }))
-      .filter((member) =>
-        member.name.toLowerCase().includes(query.toLowerCase())
-      );
+      .filter((member) => {
+        const duplicate = seenIds.has(member.student_id);
+        seenIds.add(member.student_id);
+        return (
+          !duplicate && member.name.toLowerCase().includes(query.toLowerCase())
+        );
+      });
+
+    // const filteredMembers = members
+    //   .map((member) => ({
+    //     student_id: member.student_id,
+    //     name: member.student.student.name,
+    //   }))
+    //   .filter((member) =>
+    //     member.name.toLowerCase().includes(query.toLowerCase())
+    //   );
 
     res.json({
       success: true,
