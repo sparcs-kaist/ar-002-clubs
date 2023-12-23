@@ -124,7 +124,7 @@ export const EditActivity = (): JSX.Element => {
 
     // 서버에 검색 쿼리를 보내고 결과를 받아옵니다.
     getRequest(
-      `activity/search_members?club_id=${clubId}&query=${query}`, // 클럽 ID와 검색 쿼리를 포함한 URL
+      `activity/search_members?club_id=${clubId}&query=${query}&start_date=${activity.startDate}&end_date=${activity.endDate}`, // 클럽 ID와 검색 쿼리를 포함한 URL
       (data) => {
         const newSearchResults = data.members.filter(
           (member: Participant) =>
@@ -339,8 +339,9 @@ export const EditActivity = (): JSX.Element => {
   };
 
   useEffect(() => {
-    searchMember(""); // Call this with an empty string to fetch all members initially
-  }, [clubId]);
+    searchMember(searchTerm); // Call this with an empty string to fetch all members initially
+    removeAllParticipants();
+  }, [clubId, activity.startDate, activity.endDate]);
 
   const groupProofImagesInPairs = () => {
     const pairs = [];
