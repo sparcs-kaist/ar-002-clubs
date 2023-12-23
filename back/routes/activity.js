@@ -289,8 +289,23 @@ router.get("/getActivity/:activityId", async (req, res) => {
     }
 
     // Fetch evidence associated with the activity
-    const evidence = await ActivityEvidence.findAll({
+    let evidence = await ActivityEvidence.findAll({
       where: { activity_id: activityId },
+    });
+
+    // Function to extract the timestamp from the S3 URL
+    const extractTimestamp = (url) => {
+      const matches = url.match(
+        /uploads\/(\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2})/
+      );
+      return matches ? new Date(matches[1].replace(/-/g, ":")) : new Date();
+    };
+
+    // Sort evidence by the extracted timestamp
+    evidence.sort((a, b) => {
+      const timestampA = extractTimestamp(a.image_url);
+      const timestampB = extractTimestamp(b.image_url);
+      return timestampA - timestampB;
     });
 
     // Fetch participants associated with the activity
