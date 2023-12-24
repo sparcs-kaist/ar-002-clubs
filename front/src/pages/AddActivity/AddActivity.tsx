@@ -6,7 +6,7 @@ import "./AddActivity.css";
 import { UpperBar } from "components/UpperBar";
 import { ActivityFeedback } from "components/ActivityFeedback";
 import { getRequest, postRequest } from "utils/api";
-import { useUserRepresentativeStatus } from "hooks/useUserRepresentativeStatus";
+import { useUserRepresentativeStatus } from "hooks/useUserPermission";
 import { useNavigate } from "react-router-dom";
 
 interface Participant {

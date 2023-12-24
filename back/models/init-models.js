@@ -17,7 +17,9 @@ var _Division = require("./Division");
 var _DivisionGroup = require("./DivisionGroup");
 var _DivisionPresident = require("./DivisionPresident");
 var _Duration = require("./Duration");
+var _ExecutiveBureau = require("./ExecutiveBureau");
 var _ExecutiveMember = require("./ExecutiveMember");
+var _ExecutiveType = require("./ExecutiveType");
 var _Fixture = require("./Fixture");
 var _Funding = require("./Funding");
 var _Meeting = require("./Meeting");
@@ -52,7 +54,9 @@ function initModels(sequelize) {
   var DivisionGroup = _DivisionGroup(sequelize, DataTypes);
   var DivisionPresident = _DivisionPresident(sequelize, DataTypes);
   var Duration = _Duration(sequelize, DataTypes);
+  var ExecutiveBureau = _ExecutiveBureau(sequelize, DataTypes);
   var ExecutiveMember = _ExecutiveMember(sequelize, DataTypes);
+  var ExecutiveType = _ExecutiveType(sequelize, DataTypes);
   var Fixture = _Fixture(sequelize, DataTypes);
   var Funding = _Funding(sequelize, DataTypes);
   var Meeting = _Meeting(sequelize, DataTypes);
@@ -155,6 +159,30 @@ function initModels(sequelize) {
     as: "Divisions",
     foreignKey: "division_group_id",
   });
+  ExecutiveMember.belongsTo(ExecutiveBureau, {
+    as: "main_bureau_ExecutiveBureau",
+    foreignKey: "main_bureau",
+  });
+  ExecutiveBureau.hasMany(ExecutiveMember, {
+    as: "ExecutiveMembers",
+    foreignKey: "main_bureau",
+  });
+  ExecutiveMember.belongsTo(ExecutiveBureau, {
+    as: "sub_bureau_ExecutiveBureau",
+    foreignKey: "sub_bureau",
+  });
+  ExecutiveBureau.hasMany(ExecutiveMember, {
+    as: "sub_bureau_ExecutiveMembers",
+    foreignKey: "sub_bureau",
+  });
+  ExecutiveMember.belongsTo(ExecutiveType, {
+    as: "type",
+    foreignKey: "type_id",
+  });
+  ExecutiveType.hasMany(ExecutiveMember, {
+    as: "ExecutiveMembers",
+    foreignKey: "type_id",
+  });
   Meeting.belongsTo(MeetingType, { as: "type", foreignKey: "type_id" });
   MeetingType.hasMany(Meeting, { as: "Meetings", foreignKey: "type_id" });
   ActivityMember.belongsTo(Member, {
@@ -177,8 +205,8 @@ function initModels(sequelize) {
     as: "student",
     foreignKey: "student_id",
   });
-  Member.hasOne(ExecutiveMember, {
-    as: "ExecutiveMember",
+  Member.hasMany(ExecutiveMember, {
+    as: "ExecutiveMembers",
     foreignKey: "student_id",
   });
   Meeting.belongsTo(Member, { as: "editor", foreignKey: "editorId" });
@@ -254,7 +282,9 @@ function initModels(sequelize) {
     DivisionGroup,
     DivisionPresident,
     Duration,
+    ExecutiveBureau,
     ExecutiveMember,
+    ExecutiveType,
     Fixture,
     Funding,
     Meeting,

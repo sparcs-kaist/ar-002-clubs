@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useUserRepresentativeStatus } from "hooks/useUserRepresentativeStatus";
+import { useUserRepresentativeStatus } from "hooks/useUserPermission";
 import { Activity } from "components/Activity";
 import { ActivityState } from "components/ActivityState";
 import { SubTitle } from "components/SubTitle";
@@ -33,7 +33,7 @@ type ActivityInfo = {
 };
 
 export const ClubManage = (): JSX.Element => {
-  const { typeId, clubId, isLoading } = useUserRepresentativeStatus();
+  const { typeId, clubId } = useUserRepresentativeStatus();
   const { durationStatus } = useReportDurationStatus();
   const navigate = useNavigate();
   const [clubInfo, setClubInfo] = useState<ClubInfo>({

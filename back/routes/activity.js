@@ -349,39 +349,6 @@ router.get("/getActivity/:activityId", async (req, res) => {
   }
 });
 
-// router.post("/upload", upload.single("file"), async (req, res) => {
-//   try {
-//     const file = req.file;
-
-//     // Check if file is not available
-//     if (!file) {
-//       return res.status(400).send("No file uploaded.");
-//     }
-
-//     // Generate a timestamp
-//     const timestamp = new Date().toISOString().replace(/:/g, "-");
-//     const encodedFileName = file.originalname;
-
-//     // Set S3 parameters with timestamp and original file name
-//     const s3Params = {
-//       Bucket: "ar-002-clubs", // Replace with your S3 bucket name
-//       Key: `uploads/${timestamp}_${encodedFileName}`, // File name you want to save as
-//       Body: file.buffer,
-//       ContentType: file.mimetype,
-//       ACL: "public-read", // Adjust the ACL as per your requirements
-//     };
-
-//     // Upload file to S3
-//     s3.upload(s3Params, (s3Err, data) => {
-//       if (s3Err) throw s3Err;
-//       res.send({ message: "File uploaded successfully", data });
-//     });
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).send("Error in file upload.");
-//   }
-// });
-
 router.post("/upload", upload.single("file"), (req, res) => {
   try {
     // Check if file is available

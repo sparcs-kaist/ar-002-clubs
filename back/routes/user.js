@@ -2,6 +2,8 @@ const express = require("express");
 const router = express.Router();
 const { Member, sequelize, ClubRepresentative } = require("../models");
 const { Op } = require("sequelize");
+const checkPermission = require("../utils/permission");
+const searchPermission = require("../utils/permission");
 
 router.post("/", async (req, res) => {
   const { uid, kaist_info, sid } = req.body;
@@ -57,31 +59,53 @@ router.get("/", async (req, res) => {
   }
 });
 
+// 사용 예시
+router.get("/permission_test", async (req, res) => {
+  // 권한 확인
+  const authorized = await checkPermission(req, res, [
+    { club_rep: 3, club_id: 42 },
+    { executive: 1 },
+    { advisor: 87 },
+  ]);
+  if (!authorized) {
+    return;
+  }
+  console.log(authorized);
+  res.json(authorized);
+  // 여기에 권한이 있는 경우의 로직 처리
+});
+
+router.post("/permission", async (req, res) => {
+  const { permissions } = req.body;
+  const authorized = await checkPermission(req, res, permissions);
+  if (!authorized) {
+    return;
+  }
+  res.json({ authorized });
+});
+
 router.get("/is_representitive", async (req, res) => {
-  const { student_id } = req.session.user;
-  const currentDate = new Date();
+  const permissionConditions = [{ club_rep: 3 }, { advisor: 0 }];
 
   try {
-    const clubRep = await ClubRepresentative.findOne({
-      where: {
-        student_id,
-        start_term: {
-          [Op.lte]: currentDate,
-        },
-        [Op.or]: [{ end_term: null }, { end_term: { [Op.gte]: currentDate } }],
-      },
-    });
-
-    if (!clubRep) {
-      res.status(200).json({ typeId: 0, clubId: 0 });
+    const authorized = await checkPermission(req, permissionConditions);
+    if (!authorized) {
+      return;
+    }
+    const clubRepPermission = authorized.find(
+      (permission) => permission.club_rep !== undefined
+    );
+    if (clubRepPermission) {
+      res.status(200).json({
+        typeId: clubRepPermission.club_rep,
+        clubId: clubRepPermission.club_id,
+      });
     } else {
-      res
-        .status(200)
-        .json({ typeId: clubRep.type_id, clubId: clubRep.club_id });
+      res.status(200).json({ typeId: 0, clubId: 0 });
     }
   } catch (error) {
     console.error(error);
-    res.status(200).json({ typeId: 0, clubId: 0 });
+    res.status(500).json({ error: "서버 오류" });
   }
 });
 
