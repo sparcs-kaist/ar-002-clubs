@@ -93,17 +93,25 @@ router.get("/is_representitive", async (req, res) => {
     if (!authorized) {
       return;
     }
-    const clubRepPermission = authorized.find(
-      (permission) => permission.club_rep !== undefined
-    );
-    if (clubRepPermission) {
-      res.status(200).json({
-        typeId: clubRepPermission.club_rep,
-        clubId: clubRepPermission.club_id,
-      });
-    } else {
-      res.status(200).json({ typeId: 0, clubId: 0 });
-    }
+    const result = [];
+
+    // club_rep 권한 확인
+    authorized.forEach((permission) => {
+      if (permission.club_rep !== undefined) {
+        result.push({
+          typeId: permission.club_rep,
+          clubId: permission.club_id,
+        });
+      }
+      if (permission.advisor !== undefined) {
+        result.push({
+          typeId: 4,
+          clubId: permission.advisor,
+        });
+      }
+    });
+
+    res.status(200).json(result);
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "서버 오류" });

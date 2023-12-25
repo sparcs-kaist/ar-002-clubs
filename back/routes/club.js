@@ -275,27 +275,27 @@ router.post("/update_representatives", async (req, res) => {
 });
 
 router.get("/club_manage", async (req, res) => {
-  const { student_id } = req.session.user;
-  const currentDate = new Date();
+  const { club_id: clubId } = req.query;
 
-  const clubRep = await ClubRepresentative.findOne({
-    where: {
-      student_id,
-      start_term: {
-        [Op.lte]: currentDate,
-      },
-      [Op.or]: [{ end_term: null }, { end_term: { [Op.gte]: currentDate } }],
-    },
-  });
-  if (!clubRep) {
+  // const clubRep = await ClubRepresentative.findOne({
+  //   where: {
+  //     student_id,
+  //     start_term: {
+  //       [Op.lte]: currentDate,
+  //     },
+  //     [Op.or]: [{ end_term: null }, { end_term: { [Op.gte]: currentDate } }],
+  //   },
+  // });
+  if (!clubId) {
     return res.status(400).json({
       success: false,
       message: "club_id query parameter is required",
     });
   }
+  console.log(clubId);
 
   try {
-    const club = await Club.findByPk(clubRep.club_id, {
+    const club = await Club.findByPk(clubId, {
       attributes: ["id", "name", "description"],
     });
     if (!club) {
@@ -326,7 +326,7 @@ router.get("/club_manage", async (req, res) => {
       [1, 2, 3].map(async (typeId) => {
         const rep = await ClubRepresentative.findOne({
           where: {
-            club_id: clubRep.club_id,
+            club_id: clubId,
             type_id: typeId,
             start_term: { [Op.lte]: currentDate },
             [Op.or]: [

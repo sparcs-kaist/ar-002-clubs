@@ -41,7 +41,7 @@ interface ActivityState {
 }
 
 export const AddActivity = (): JSX.Element => {
-  const { typeId, clubId, isLoading } = useUserRepresentativeStatus();
+  const { userStatuses, isLoading } = useUserRepresentativeStatus();
   const navigate = useNavigate();
   const [activity, setActivity] = useState<ActivityState>({
     name: "",
@@ -64,6 +64,7 @@ export const AddActivity = (): JSX.Element => {
   const [originalSearchResults, setOriginalSearchResults] = useState<
     Participant[]
   >([]);
+  const clubId = userStatuses.length > 0 ? userStatuses[0].clubId : null;
 
   // Validation for date range and order
   //TODO: 서버에서 불러와서 적용

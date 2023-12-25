@@ -3,6 +3,7 @@ var _Activity = require("./Activity");
 var _ActivityEvidence = require("./ActivityEvidence");
 var _ActivityFeedbackType = require("./ActivityFeedbackType");
 var _ActivityMember = require("./ActivityMember");
+var _ActivitySign = require("./ActivitySign");
 var _ActivityType = require("./ActivityType");
 var _Agenda = require("./Agenda");
 var _AgendaType = require("./AgendaType");
@@ -40,6 +41,7 @@ function initModels(sequelize) {
   var ActivityEvidence = _ActivityEvidence(sequelize, DataTypes);
   var ActivityFeedbackType = _ActivityFeedbackType(sequelize, DataTypes);
   var ActivityMember = _ActivityMember(sequelize, DataTypes);
+  var ActivitySign = _ActivitySign(sequelize, DataTypes);
   var ActivityType = _ActivityType(sequelize, DataTypes);
   var Agenda = _Agenda(sequelize, DataTypes);
   var AgendaType = _AgendaType(sequelize, DataTypes);
@@ -73,19 +75,31 @@ function initModels(sequelize) {
   var sessions = _sessions(sequelize, DataTypes);
 
   Club.belongsToMany(Semester, {
+    as: "semester_id_Semesters",
+    through: ActivitySign,
+    foreignKey: "club_id",
+    otherKey: "semester_id",
+  });
+  Club.belongsToMany(Semester, {
     as: "semester_id_Semester_SemesterClubs",
     through: SemesterClub,
     foreignKey: "club_id",
     otherKey: "semester_id",
   });
   Member.belongsToMany(Semester, {
-    as: "semester_id_Semesters",
+    as: "semester_id_Semester_MemberStatuses",
     through: MemberStatus,
     foreignKey: "student_id",
     otherKey: "semester_id",
   });
   Semester.belongsToMany(Club, {
     as: "club_id_Clubs",
+    through: ActivitySign,
+    foreignKey: "semester_id",
+    otherKey: "club_id",
+  });
+  Semester.belongsToMany(Club, {
+    as: "club_id_Club_SemesterClubs",
     through: SemesterClub,
     foreignKey: "semester_id",
     otherKey: "club_id",
@@ -112,6 +126,8 @@ function initModels(sequelize) {
     as: "Activities",
     foreignKey: "activity_type_id",
   });
+  ActivitySign.belongsTo(Club, { as: "club", foreignKey: "club_id" });
+  Club.hasMany(ActivitySign, { as: "ActivitySigns", foreignKey: "club_id" });
   Attendance.belongsTo(Club, { as: "fromClub", foreignKey: "fromClubId" });
   Club.hasMany(Attendance, { as: "Attendances", foreignKey: "fromClubId" });
   ClubRepresentative.belongsTo(Club, { as: "club", foreignKey: "club_id" });
@@ -232,6 +248,14 @@ function initModels(sequelize) {
     as: "semester_MemberClubs",
     foreignKey: "semester_id",
   });
+  ActivitySign.belongsTo(Semester, {
+    as: "semester",
+    foreignKey: "semester_id",
+  });
+  Semester.hasMany(ActivitySign, {
+    as: "ActivitySigns",
+    foreignKey: "semester_id",
+  });
   Duration.belongsTo(Semester, { as: "semester", foreignKey: "semester_id" });
   Semester.hasMany(Duration, { as: "Durations", foreignKey: "semester_id" });
   MemberStatus.belongsTo(Semester, {
@@ -268,6 +292,7 @@ function initModels(sequelize) {
     ActivityEvidence,
     ActivityFeedbackType,
     ActivityMember,
+    ActivitySign,
     ActivityType,
     Agenda,
     AgendaType,

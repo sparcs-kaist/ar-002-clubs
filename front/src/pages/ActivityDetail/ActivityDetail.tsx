@@ -41,7 +41,7 @@ interface ActivityState {
 }
 
 export const ActivityDetail = (): JSX.Element => {
-  const { typeId, clubId, isLoading } = useUserRepresentativeStatus();
+  const { userStatuses, isLoading } = useUserRepresentativeStatus();
   const { id } = useParams();
   const navigate = useNavigate();
   const [activity, setActivity] = useState<ActivityState>({
@@ -66,18 +66,25 @@ export const ActivityDetail = (): JSX.Element => {
     Participant[]
   >([]);
 
+  const clubId = userStatuses.length > 0 ? userStatuses[0].clubId : null;
+  const typeId = userStatuses.length > 0 ? userStatuses[0].typeId : 0;
+
   useEffect(() => {
     const fetchActivityData = async () => {
-      try {
-        const response = await getRequest(
-          `activity/getActivity/${id}`,
-          (data) => {
-            // Check if the user has permission to access this activity
-            if (!isLoading && data.clubId !== clubId) {
-              navigate(-1);
-              // alert("접근 권한이 없습니다. 해당 동아리원만 접근 가능합니다.");
-            }
-            if (!isLoading && data.clubId == clubId) {
+      if (!isLoading) {
+        try {
+          const response = await getRequest(
+            `activity/getActivity/${id}`,
+            (data) => {
+              // 사용자가 해당 활동의 클럽에 속해 있는지 확인
+              const userClubIds = userStatuses.map((status) => status.clubId);
+              if (!userClubIds.includes(data.clubId)) {
+                alert("접근 권한이 없습니다. 해당 동아리원만 접근 가능합니다.");
+                navigate(-1);
+                return;
+              }
+
+              // 활동 데이터 설정
               setActivity({
                 name: data.name,
                 type: data.type,
@@ -94,11 +101,11 @@ export const ActivityDetail = (): JSX.Element => {
                 feedbackResults: data.feedbackResults,
               });
             }
-          }
-        );
-      } catch (error) {
-        console.error("Error fetching activity data:", error);
-        // Handle errors (e.g., show error message)
+          );
+        } catch (error) {
+          console.error("Error fetching activity data:", error);
+          // 에러 처리 로직
+        }
       }
     };
 
@@ -391,22 +398,24 @@ export const ActivityDetail = (): JSX.Element => {
           </div>
         </div>
         <UnderBar />
-        <div className="frame-16">
-          <div
-            className="frame-17"
-            onClick={() => navigate(`/edit_activity/${id}`)}
-            style={{ cursor: "pointer" }}
-          >
-            수정
+        {typeId < 4 && (
+          <div className="frame-16">
+            <div
+              className="frame-17"
+              onClick={() => navigate(`/edit_activity/${id}`)}
+              style={{ cursor: "pointer" }}
+            >
+              수정
+            </div>
+            <div
+              className="frame-17"
+              onClick={handleDeleteActivity}
+              style={{ cursor: "pointer" }}
+            >
+              삭제
+            </div>
           </div>
-          <div
-            className="frame-17"
-            onClick={handleDeleteActivity}
-            style={{ cursor: "pointer" }}
-          >
-            삭제
-          </div>
-        </div>
+        )}
       </div>
     </div>
   );

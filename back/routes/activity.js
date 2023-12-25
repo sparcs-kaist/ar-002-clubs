@@ -10,13 +10,13 @@ const {
   sequelize,
   MemberClub,
   Member,
-  MemberStatus,
   Semester,
   Duration,
   Activity,
   ActivityType,
   ActivityEvidence,
   ActivityMember,
+  ActivitySign,
 } = require("../models");
 
 // Configure AWS with your access and secret key.
@@ -44,6 +44,87 @@ const upload = multer({
     contentType: multerS3.AUTO_CONTENT_TYPE,
   }),
   limits: { fileSize: 100 * 1024 * 1024 },
+});
+
+router.post("/advisor_sign", async (req, res) => {
+  const { clubId: club_id } = req.body;
+
+  try {
+    const currentDate = new Date();
+    const currentSemester = await Semester.findOne({
+      where: {
+        start_date: { [Op.lte]: currentDate },
+        end_date: { [Op.gte]: currentDate },
+      },
+    });
+
+    if (!currentSemester) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Current semester not found" });
+    }
+
+    const signTime = new Date();
+    signTime.setHours(signTime.getHours() + 9); // UTC+9로 조정
+
+    await ActivitySign.create({
+      semester_id: currentSemester.id,
+      club_id: club_id,
+      sign_time: signTime,
+    });
+
+    res.json({ success: true, message: "Advisor sign recorded successfully" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, message: "Internal Server Error" });
+  }
+});
+
+router.get("/advisor_sign", async (req, res) => {
+  const { club_id } = req.query;
+
+  try {
+    const currentDate = new Date();
+    const currentSemester = await Semester.findOne({
+      where: {
+        start_date: { [Op.lte]: currentDate },
+        end_date: { [Op.gte]: currentDate },
+      },
+    });
+
+    if (!currentSemester) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Current semester not found" });
+    }
+
+    const latestSign = await ActivitySign.findOne({
+      where: {
+        club_id,
+        semester_id: currentSemester.id,
+      },
+      order: [["sign_time", "DESC"]],
+    });
+
+    const latestEdit = await Activity.findOne({
+      where: {
+        club_id,
+        recent_edit: { [Op.ne]: null },
+        start_date: { [Op.lte]: currentDate },
+        end_date: { [Op.gte]: currentDate },
+      },
+      order: [["recent_edit", "DESC"]],
+    });
+
+    const signed =
+      latestSign &&
+      (!latestEdit || latestSign.sign_time > latestEdit.recent_edit);
+
+    res.json({ signed });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, message: "Internal Server Error" });
+  }
 });
 
 router.post("/deleteActivity/:activityId", async (req, res) => {

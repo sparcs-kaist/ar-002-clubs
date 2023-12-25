@@ -41,7 +41,7 @@ interface ActivityState {
 }
 
 export const EditActivity = (): JSX.Element => {
-  const { typeId, clubId, isLoading } = useUserRepresentativeStatus();
+  const { userStatuses, isLoading } = useUserRepresentativeStatus();
   const { id } = useParams();
   const navigate = useNavigate();
   const [activity, setActivity] = useState<ActivityState>({
@@ -65,6 +65,7 @@ export const EditActivity = (): JSX.Element => {
   const [originalSearchResults, setOriginalSearchResults] = useState<
     Participant[]
   >([]);
+  const clubId = userStatuses.length > 0 ? userStatuses[0].clubId : null;
 
   useEffect(() => {
     const fetchActivityData = async () => {
