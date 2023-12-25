@@ -65,7 +65,7 @@ router.get("/permission_test", async (req, res) => {
   const authorized = await checkPermission(req, res, [
     { club_rep: 3, club_id: 42 },
     { executive: 1 },
-    { advisor: 87 },
+    { advisor: 0 },
   ]);
   if (!authorized) {
     return;
@@ -85,10 +85,11 @@ router.post("/permission", async (req, res) => {
 });
 
 router.get("/is_representitive", async (req, res) => {
-  const permissionConditions = [{ club_rep: 3 }, { advisor: 0 }];
-
   try {
-    const authorized = await checkPermission(req, permissionConditions);
+    const authorized = await checkPermission(req, res, [
+      { club_rep: 3 },
+      { advisor: 0 },
+    ]);
     if (!authorized) {
       return;
     }

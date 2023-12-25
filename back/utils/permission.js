@@ -75,7 +75,7 @@ async function searchPermission(userData) {
   }
 }
 
-async function checkPermission(req, permissionsArray) {
+async function checkPermission(req, res, permissionsArray) {
   const userPermissions = await searchPermission(req.session.user);
 
   const isAdmin = userPermissions.some(
@@ -109,6 +109,14 @@ async function checkPermission(req, permissionsArray) {
         return userPermissions.some(
           (up) => up.executive !== undefined && up.executive <= value
         );
+      } else if (key === "advisor") {
+        // Special check for advisor permissions
+        if (value === 0) {
+          return userPermissions.some((up) => up.hasOwnProperty("advisor"));
+        } else {
+          // If value is not 0, it must match exactly
+          return userPermissions.some((up) => up.advisor === value);
+        }
       } else {
         // General check for other permissions
         return userPermissions.some((up) => up[key] === value);
