@@ -109,9 +109,9 @@ router.get("/advisor_sign", async (req, res) => {
     const latestEdit = await Activity.findOne({
       where: {
         club_id,
-        recent_edit: { [Op.ne]: null },
-        start_date: { [Op.lte]: currentDate },
-        end_date: { [Op.gte]: currentDate },
+        recent_edit: {
+          [Op.between]: [currentSemester.start_date, currentSemester.end_date],
+        },
       },
       order: [["recent_edit", "DESC"]],
     });
