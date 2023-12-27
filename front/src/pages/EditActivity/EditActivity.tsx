@@ -33,7 +33,6 @@ interface ActivityState {
   location: string;
   purpose: string;
   content: string;
-  members: string;
   proofText: string;
   participants: Participant[];
   proofImages: ProofImage[];
@@ -53,7 +52,6 @@ export const EditActivity = (): JSX.Element => {
     location: "",
     purpose: "",
     content: "",
-    members: "",
     proofText: "",
     participants: [],
     proofImages: [],
@@ -66,6 +64,7 @@ export const EditActivity = (): JSX.Element => {
     Participant[]
   >([]);
   const clubId = userStatuses.length > 0 ? userStatuses[0].clubId : null;
+  const [initialLoad, setInitialLoad] = useState(3);
 
   useEffect(() => {
     const fetchActivityData = async () => {
@@ -88,7 +87,6 @@ export const EditActivity = (): JSX.Element => {
                 location: data.location,
                 purpose: data.purpose,
                 content: data.content,
-                members: "", // Handle this based on your data structure
                 proofText: data.proofText,
                 participants: data.participants,
                 proofImages: data.proofImages,
@@ -340,6 +338,12 @@ export const EditActivity = (): JSX.Element => {
   };
 
   useEffect(() => {
+    console.log("useEffect");
+    if (initialLoad > 0) {
+      setInitialLoad(initialLoad - 1); // 첫 로딩 후에는 false로 설정
+      return; // 첫 로딩에서는 나머지 로직을 실행하지 않음
+    }
+
     removeAllParticipants();
     activity.participants = [];
     searchMember(""); // Call this with an empty string to fetch all members initially
