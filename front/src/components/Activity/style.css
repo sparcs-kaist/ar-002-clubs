@@ -25,7 +25,7 @@
 
 .activity .text-wrapper-2 {
   color: #000000;
-  font-family: "Inter", Helvetica;
+  font-family: "NanumBarunGothic-Regular", Helvetica;
   font-size: 20px;
   font-weight: 400;
   letter-spacing: 0;
@@ -53,7 +53,7 @@
 .activity .text-wrapper-3 {
   color: #000000;
   flex: 1;
-  font-family: "Inter", Helvetica;
+  font-family: "NanumBarunGothic-Regular", Helvetica;
   font-size: 20px;
   font-weight: 400;
   letter-spacing: 0;

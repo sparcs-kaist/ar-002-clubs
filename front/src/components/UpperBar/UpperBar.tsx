@@ -11,7 +11,7 @@ import { UpperbarMenu } from "../UpperbarMenu";
 import { useAuth } from "contexts/authContext";
 
 import Logo from "assets/Images/Logo.png";
-import BackImg from "assets/Images/BackImg.png";
+import BackImg from "assets/Images/BackImage.png";
 import "./UpperBar.css";
 import Profile from "assets/Images/profile.png";
 import { getRequest } from "utils/api";
@@ -48,21 +48,27 @@ export const UpperBar = ({ className, title }: Props): JSX.Element => {
   const handleLogout = async (e: FormEvent) => {
     e.preventDefault();
 
-    try {
-      console.log(user);
-      if (user) {
-        getRequest(`auth/logout?userId=${user.sid}`, (data) => {
-          const logoutUrl = data.logoutUrl;
-          console.log(logoutUrl);
-          logout();
-          window.location.href = logoutUrl;
-        });
-      } else {
-        alert("Invalid user information!"); // 유효하지 않은 사용자 정보에 대한 경고 메시지
+    // Confirmation dialog
+    const isConfirmed = window.confirm("정말 로그아웃 하시겠습니까?");
+
+    // Proceed with logout only if user confirms
+    if (isConfirmed) {
+      try {
+        console.log(user);
+        if (user) {
+          getRequest(`auth/logout?userId=${user.sid}`, (data) => {
+            const logoutUrl = data.logoutUrl;
+            console.log(logoutUrl);
+            logout(); // Assuming 'logout' is a function that handles the client-side logout process
+            window.location.href = logoutUrl;
+          });
+        } else {
+          alert("Invalid user information!"); // 유효하지 않은 사용자 정보에 대한 경고 메시지
+        }
+      } catch (error) {
+        console.error("Logout Error:", error);
+        alert("Logout failed!");
       }
-    } catch (error) {
-      console.error("Logout Error:", error);
-      alert("Logout failed!");
     }
   };
 
@@ -184,7 +190,7 @@ export const UpperBar = ({ className, title }: Props): JSX.Element => {
         </div>
       </div>
       {!title ? (
-        <p className="clubs">
+        <p className="clubs" style={{ fontFamily: "NanumBarunGothic-Regular" }}>
           <span className="span">동아리</span>
           <span className="text-wrapper-2">
             의 모든 것을 한번에

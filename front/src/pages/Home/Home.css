@@ -1,15 +1,14 @@
 .home {
   background-color: #f6feff;
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  width: 100%;
+  width: 1728px;
+  height: 1096px;
+  overflow: hidden; /* Hide overflowed content */
+  position: relative; /* Set position to relative */
 }
 
 .home .div-2 {
   background-color: #f6feff;
   height: 1046px;
-  position: relative;
   width: 1728px;
 }
 
@@ -27,9 +26,10 @@
   top: 1015px;
   width: 1728px;
 }
+
 .home .frame-8 {
   align-items: flex-start;
-  display: inline-flex;
+  display: flex;
   gap: 45px;
   left: 154px;
   position: absolute;
