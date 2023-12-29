@@ -472,6 +472,7 @@ router.get("/image-proxy", async (req, res) => {
 router.get("/is_report_duration", async (req, res) => {
   try {
     const currentDate = new Date();
+    currentDate.setHours(currentDate.getHours() + 9);
 
     // 현재 날짜를 포함하는 학기 찾기
     const currentSemester = await Semester.findOne({

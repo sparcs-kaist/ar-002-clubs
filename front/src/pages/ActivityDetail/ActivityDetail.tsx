@@ -33,7 +33,6 @@ interface ActivityState {
   location: string;
   purpose: string;
   content: string;
-  members: string;
   proofText: string;
   participants: Participant[];
   proofImages: ProofImage[];
@@ -53,7 +52,6 @@ export const ActivityDetail = (): JSX.Element => {
     location: "",
     purpose: "",
     content: "",
-    members: "",
     proofText: "",
     participants: [],
     proofImages: [],
@@ -94,7 +92,6 @@ export const ActivityDetail = (): JSX.Element => {
                 location: data.location,
                 purpose: data.purpose,
                 content: data.content,
-                members: "", // Handle this based on your data structure
                 proofText: data.proofText,
                 participants: data.participants,
                 proofImages: data.proofImages,

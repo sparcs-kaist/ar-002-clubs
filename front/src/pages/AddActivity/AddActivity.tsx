@@ -33,7 +33,6 @@ interface ActivityState {
   location: string;
   purpose: string;
   content: string;
-  members: string;
   proofText: string;
   participants: Participant[];
   proofImages: ProofImage[];
@@ -52,7 +51,6 @@ export const AddActivity = (): JSX.Element => {
     location: "",
     purpose: "",
     content: "",
-    members: "",
     proofText: "",
     participants: [],
     proofImages: [],
