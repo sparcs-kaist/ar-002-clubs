@@ -17,6 +17,9 @@ const {
   ActivityEvidence,
   ActivityMember,
   ActivitySign,
+  ActivityEvidence_init,
+  Activity_init,
+  ActivityMember_init,
 } = require("../models");
 const checkPermission = require("../utils/permission");
 const checkReportDuration = require("../utils/duration");
@@ -108,7 +111,7 @@ router.get("/advisor_sign", async (req, res) => {
       order: [["sign_time", "DESC"]],
     });
 
-    const latestEdit = await Activity.findOne({
+    const latestEdit = await Activity_init.findOne({
       where: {
         club_id,
         recent_edit: {
@@ -136,15 +139,12 @@ router.post("/deleteActivity/:activityId", async (req, res) => {
   }
 
   const { activityId } = req.params;
-  console.log(activityId);
-
   const transaction = await sequelize.transaction();
 
   try {
     const activity = await Activity.findByPk(activityId);
     const authorized = await checkPermission(req, res, [
       { club_rep: 4, club_id: activity.club_id },
-      { advisor: activity.club_id },
     ]);
     if (!authorized) {
       return;
@@ -169,7 +169,6 @@ router.post("/deleteActivity/:activityId", async (req, res) => {
     });
 
     await transaction.commit();
-    console.log("terminated");
     res
       .status(200)
       .send({ message: "Activity and related data deleted successfully" });
@@ -204,7 +203,6 @@ router.post("/addActivity", async (req, res) => {
 
   const authorized = await checkPermission(req, res, [
     { club_rep: 4, club_id: clubId },
-    { advisor: clubId },
   ]);
   if (!authorized) {
     return;
@@ -307,8 +305,6 @@ router.post("/editActivity", async (req, res) => {
       activity = await Activity.findByPk(activityId);
       const authorized = await checkPermission(req, res, [
         { club_rep: 4, club_id: activity.club_id },
-        { advisor: activity.club_id },
-        // { executive: 4 },
       ]);
       if (!authorized) {
         return;
@@ -397,16 +393,24 @@ router.post("/editActivity", async (req, res) => {
 });
 
 router.get("/getActivity/:activityId", async (req, res) => {
+  const durationCheck = await checkReportDuration();
+  // if (!durationCheck.found || durationCheck.reportStatus !== 1) {
+  //   return res.status(400).send({ message: "활동 추가 기한이 지났습니다." });
+  // }
   const { activityId } = req.params;
 
   try {
+    let activity;
+    let evidence;
+    let participants;
+
     // Fetch activity details
-    const activity = await Activity.findByPk(activityId);
+    activity = await Activity.findByPk(activityId);
     if (!activity) {
       return res.status(404).send("Activity not found");
     }
 
-    const authorized = await checkPermission(req, res, [
+    let authorized = await checkPermission(req, res, [
       { club_rep: 4, club_id: activity.club_id },
       { advisor: activity.club_id },
       { executive: 4 },
@@ -415,10 +419,41 @@ router.get("/getActivity/:activityId", async (req, res) => {
       return;
     }
 
-    // Fetch evidence associated with the activity
-    let evidence = await ActivityEvidence.findAll({
-      where: { activity_id: activityId },
-    });
+    authorized = await checkPermission(req, res, [
+      { advisor: activity.club_id },
+    ]);
+
+    if (durationCheck.reportStatus === 2 && authorized) {
+      activity = await Activity_init.findByPk(activityId);
+      evidence = await ActivityEvidence_init.findAll({
+        where: { activity_id: activityId },
+      });
+      participants = await ActivityMember_init.findAll({
+        where: { activity_id: activityId },
+        include: [
+          {
+            model: Member,
+            attributes: ["name"],
+            as: "member_student",
+          },
+        ],
+      });
+    } else {
+      activity = await Activity.findByPk(activityId);
+      evidence = await ActivityEvidence.findAll({
+        where: { activity_id: activityId },
+      });
+      participants = await ActivityMember.findAll({
+        where: { activity_id: activityId },
+        include: [
+          {
+            model: Member,
+            attributes: ["name"],
+            as: "member_student",
+          },
+        ],
+      });
+    }
 
     // Function to extract the timestamp from the S3 URL
     const extractTimestamp = (url) => {
@@ -435,23 +470,11 @@ router.get("/getActivity/:activityId", async (req, res) => {
       return timestampA - timestampB;
     });
 
-    // Fetch participants associated with the activity
-    const participants = await ActivityMember.findAll({
-      where: { activity_id: activityId },
-      include: [
-        {
-          model: Member, // Assuming Member model is imported and associated
-          attributes: ["name"],
-          as: "member_student",
-        },
-      ],
-    });
     // Format the response
     const response = {
       clubId: activity.club_id,
       name: activity.title,
       type: activity.activity_type_id,
-      category: "", // Adjust based on how you store 'category'
       startDate: activity.start_date,
       endDate: activity.end_date,
       location: activity.location,
@@ -696,8 +719,6 @@ router.get("/search_members", async (req, res) => {
       // 그렇지 않은 경우, 현재 학기만 고려
       semesterConditions = { semester_id: currentSemester.id };
     }
-
-    console.log(semesterConditions);
 
     // 해당 동아리에 속한 회원들 조회
     const members = await MemberClub.findAll({

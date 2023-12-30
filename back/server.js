@@ -62,17 +62,19 @@ sequelize
   });
 
 const auth = require("./routes/auth");
-const userRouter = require("./routes/user");
-const clubRouter = require("./routes/club");
-const meetingRouter = require("./routes/meeting");
-const cafenotice = require("./routes/cafenotice");
-const activity = require("./routes/activity");
 app.use("/api/auth", auth);
-app.use("/api/cafenotice", cafenotice);
+const userRouter = require("./routes/user");
 app.use("/api/user", userRouter);
+const clubRouter = require("./routes/club");
 app.use("/api/club", clubRouter);
+const meetingRouter = require("./routes/meeting");
 app.use("/api/meeting", meetingRouter);
+const cafenotice = require("./routes/cafenotice");
+app.use("/api/cafenotice", cafenotice);
+const activity = require("./routes/activity");
 app.use("/api/activity", activity);
+const feedback = require("./routes/feedback");
+app.use("/api/feedback", feedback);
 
 const httpServer = http.createServer(app);
 httpServer.listen(80, () => {
