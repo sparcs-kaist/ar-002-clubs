@@ -51,14 +51,15 @@ export const useUserRepresentativeStatus = () => {
 
 export const useExecutiveStatus = () => {
   const navigate = useNavigate();
-  const [executiveStatuses, setExecutiveStatuses] = useState(0);
+  const [executiveStatuses, setExecutiveStatuses] = useState<number>(0);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchUserStatus = () => {
       getRequest(
-        "user/is_representitive",
+        "user/is_executive",
         (data) => {
+          console.log(data);
           setExecutiveStatuses(data.result);
           setIsLoading(false);
         },

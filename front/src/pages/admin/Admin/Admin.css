@@ -1,0 +1,70 @@
+.admin {
+  background-color: #f6feff;
+  width: 1728px;
+  height: 1096px;
+  overflow: hidden; /* Hide overflowed content */
+  position: relative; /* Set position to relative */
+}
+
+.admin .div-2 {
+  background-color: #f6feff;
+  height: 1046px;
+  width: 1728px;
+}
+
+.admin .upper-bar-instance {
+  left: 0 !important;
+  position: absolute !important;
+  top: 0 !important;
+}
+
+.admin .under-bar {
+  background-color: #f6feff;
+  height: 81px;
+  left: 0;
+  position: absolute;
+  top: 1015px;
+  width: 1728px;
+}
+
+.admin .frame-8 {
+  align-items: flex-start;
+  display: flex;
+  gap: 45px;
+  left: 154px;
+  position: absolute;
+  top: 285px;
+}
+
+.admin .center-card-instance {
+  margin-right: -45px !important;
+}
+
+.admin .design-component-instance-node {
+  margin-right: unset !important;
+}
+
+.admin .frame-9 {
+  align-items: flex-start;
+  display: flex;
+  gap: 45px;
+  left: 154px;
+  position: absolute;
+  top: 641px;
+}
+
+.admin .sub-title-instance {
+  left: 155px !important;
+  position: absolute !important;
+  top: 966px !important;
+}
+
+.admin .sub-title-2 {
+  margin-right: -82px !important;
+}
+
+.admin .sub-title-3 {
+  left: 155px !important;
+  position: absolute !important;
+  top: 680px !important;
+}

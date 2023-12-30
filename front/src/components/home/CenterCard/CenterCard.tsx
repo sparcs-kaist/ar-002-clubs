@@ -85,6 +85,51 @@ export const CenterCard = ({ SubTitleText }: Props): JSX.Element => {
           console.error("Unexpected data format:", data);
         }
       });
+    } else if (SubTitleText === "회장단" && user && user.student_id) {
+      setPosts([
+        {
+          id: "1",
+          title: "상근 관리",
+          subtitle: "전체",
+          url: "",
+        },
+        {
+          id: "1",
+          title: "집행부원 상태 관리",
+          subtitle: "회장단",
+          url: "",
+        },
+      ]);
+    } else if (SubTitleText === "사무국" && user && user.student_id) {
+      setPosts([
+        {
+          id: "1",
+          title: "활동보고서 검토",
+          subtitle: "전체",
+          url: `${process.env.REACT_APP_FRONTEND_URL}/admin/activity_feedback`,
+        },
+        {
+          id: "1",
+          title: "활동보고서 검토 지정",
+          subtitle: "사무국장",
+          url: `${process.env.REACT_APP_FRONTEND_URL}/admin/activity_feedback`,
+        },
+      ]);
+    } else if (SubTitleText === "관리국" && user && user.student_id) {
+      setPosts([
+        {
+          id: "1",
+          title: "정기 공용공간 사용신청 관리",
+          subtitle: "관리국원",
+          url: "",
+        },
+        {
+          id: "1",
+          title: "안전점검 관리",
+          subtitle: "사무국장",
+          url: "",
+        },
+      ]);
     } else {
       setPosts([]); // 다른 경우에는 비워둡니다.
     }

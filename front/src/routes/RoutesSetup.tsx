@@ -12,6 +12,8 @@ import { ClubManage } from "pages/club/ClubManage";
 import { AddActivity } from "pages/activity/AddActivity";
 import { ActivityDetail } from "pages/activity/ActivityDetail";
 import { EditActivity } from "pages/activity/EditActivity";
+import { Admin } from "pages/admin/Admin";
+import { ActivityFeedback } from "pages/admin/ActivityFeedback";
 
 export default function RouteSetup() {
   return (
@@ -33,6 +35,9 @@ export default function RouteSetup() {
       <Route path="/add_activity" element={<AddActivity />} />
       <Route path="/activity_detail/:id" element={<ActivityDetail />} />
       <Route path="/edit_activity/:id" element={<EditActivity />} />
+
+      <Route path="/admin" element={<Admin />} />
+      <Route path="/admin/activity_feedback" element={<ActivityFeedback />} />
     </Routes>
   );
 }
