@@ -5,7 +5,7 @@ import { UpperBar } from "components/home/UpperBar";
 import "./RecentMeeting.css";
 import { UnderBar } from "components/home/UnderBar";
 import { getRequest } from "utils/api";
-import { Button } from "components/Button";
+import { Button } from "components/meeting/Button";
 import { useNavigate, useParams } from "react-router-dom";
 import { MeetingList } from "components/meeting/MeetingList";
 

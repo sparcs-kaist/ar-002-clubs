@@ -1,6 +1,6 @@
 import { Routes, Route } from "react-router-dom";
 import Home from "./Home";
-import { CafeNotice } from "pages/CafeNotice";
+import { CafeNotice } from "pages/home/CafeNotice";
 import { ClubList } from "pages/club/ClubList";
 import { MyClub } from "pages/club/MyClub";
 import { RecentMeeting } from "pages/meeting/RecentMeeting";

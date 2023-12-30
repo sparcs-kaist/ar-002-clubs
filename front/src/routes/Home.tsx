@@ -1,16 +1,16 @@
-import {FC} from 'react'
-import {Home} from 'pages/Home'
+import { FC } from "react";
+import { Home } from "pages/home/Home";
 
 type HomeProps = {
-    title? : string
-}
+  title?: string;
+};
 
-const home: FC<HomeProps> = ({title}) => {
-    return (
-        <div>
-            <Home/>
-        </div>
-    )
+const home: FC<HomeProps> = ({ title }) => {
+  return (
+    <div>
+      <Home />
+    </div>
+  );
 };
 
 export default home;
