@@ -44,9 +44,43 @@ export const useUserRepresentativeStatus = () => {
       alert("접근 권한이 없습니다. 대표자/대의원만 접근 가능합니다.");
       navigate(-1);
     }
-  }, [isLoading, userStatuses, navigate]);
+  }, [isLoading]);
 
   return { userStatuses, isLoading };
+};
+
+export const useExecutiveStatus = () => {
+  const navigate = useNavigate();
+  const [executiveStatuses, setExecutiveStatuses] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchUserStatus = () => {
+      getRequest(
+        "user/is_representitive",
+        (data) => {
+          setExecutiveStatuses(data.result);
+          setIsLoading(false);
+        },
+        (error) => {
+          console.error("Failed to fetch user status:", error);
+          setExecutiveStatuses(0);
+          setIsLoading(false);
+        }
+      );
+    };
+
+    fetchUserStatus();
+  }, []);
+
+  useEffect(() => {
+    if (!isLoading && executiveStatuses === 0) {
+      alert("접근 권한이 없습니다. 집행부원만 접근 가능합니다.");
+      navigate(-1);
+    }
+  }, [isLoading]);
+
+  return { executiveStatuses, isLoading };
 };
 
 export const useUserPermission = (permissions: any[]) => {

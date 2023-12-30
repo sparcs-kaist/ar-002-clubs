@@ -118,4 +118,23 @@ router.get("/is_representitive", async (req, res) => {
   }
 });
 
+router.get("/is_executive", async (req, res) => {
+  try {
+    const authorized = await checkPermission(req, res, [{ executive: 4 }]);
+    if (!authorized) {
+      return;
+    }
+
+    // club_rep 권한 확인
+    authorized.forEach((permission) => {
+      if (permission.executive !== undefined) {
+        return res.status(200).json({ result: permission.executive });
+      }
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "서버 오류" });
+  }
+});
+
 module.exports = router;

@@ -1,17 +1,17 @@
 import { Routes, Route } from "react-router-dom";
 import Home from "./Home";
 import { CafeNotice } from "pages/CafeNotice";
-import { ClubList } from "pages/ClubList";
-import { MyClub } from "pages/MyClub";
-import { RecentMeeting } from "pages/RecentMeeting";
-import { AddMeeting } from "pages/AddMeeting";
-import { MeetingDetail } from "pages/MeetingDetail";
-import { EditMeeting } from "pages/EditMeeting";
-import { ClubDetail } from "pages/ClubDetail";
-import { ClubManage } from "pages/ClubManage";
-import { AddActivity } from "pages/AddActivity";
-import { ActivityDetail } from "pages/ActivityDetail";
-import { EditActivity } from "pages/EditActivity";
+import { ClubList } from "pages/club/ClubList";
+import { MyClub } from "pages/club/MyClub";
+import { RecentMeeting } from "pages/meeting/RecentMeeting";
+import { AddMeeting } from "pages/meeting/AddMeeting";
+import { MeetingDetail } from "pages/meeting/MeetingDetail";
+import { EditMeeting } from "pages/meeting/EditMeeting";
+import { ClubDetail } from "pages/club/ClubDetail";
+import { ClubManage } from "pages/club/ClubManage";
+import { AddActivity } from "pages/activity/AddActivity";
+import { ActivityDetail } from "pages/activity/ActivityDetail";
+import { EditActivity } from "pages/activity/EditActivity";
 
 export default function RouteSetup() {
   return (
