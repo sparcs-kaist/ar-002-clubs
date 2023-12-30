@@ -410,7 +410,7 @@ router.get("/getActivity/:activityId", async (req, res) => {
       return res.status(404).send("Activity not found");
     }
 
-    let authorized = await checkPermission(req, res, [
+    const authorized = await checkPermission(req, res, [
       { club_rep: 4, club_id: activity.club_id },
       { advisor: activity.club_id },
       { executive: 4 },
@@ -419,11 +419,9 @@ router.get("/getActivity/:activityId", async (req, res) => {
       return;
     }
 
-    authorized = await checkPermission(req, res, [
-      { advisor: activity.club_id },
-    ]);
+    const isAdvisor = authorized.some((auth) => auth.hasOwnProperty("advisor"));
 
-    if (durationCheck.reportStatus === 2 && authorized) {
+    if (durationCheck.reportStatus === 2 && isAdvisor) {
       activity = await Activity_init.findByPk(activityId);
       evidence = await ActivityEvidence_init.findAll({
         where: { activity_id: activityId },
