@@ -40,7 +40,7 @@ interface ActivityState {
 }
 
 export const EditActivity = (): JSX.Element => {
-  const { userStatuses, isLoading } = useUserRepresentativeStatus();
+  const { userStatuses } = useUserRepresentativeStatus();
   const { id } = useParams();
   const navigate = useNavigate();
   const [activity, setActivity] = useState<ActivityState>({
@@ -69,37 +69,33 @@ export const EditActivity = (): JSX.Element => {
   useEffect(() => {
     const fetchActivityData = async () => {
       try {
-        const response = await getRequest(
+        await getRequest(
           `activity/getActivity/${id}`,
           (data) => {
-            // Check if the user has permission to access this activity
-            if (!isLoading && data.clubId !== clubId) {
-              navigate(-1);
-              // alert("접근 권한이 없습니다. 해당 동아리원만 접근 가능합니다.");
-            }
-            if (!isLoading && data.clubId == clubId) {
-              setActivity({
-                name: data.name,
-                type: data.type,
-                category: data.category,
-                startDate: data.startDate,
-                endDate: data.endDate,
-                location: data.location,
-                purpose: data.purpose,
-                content: data.content,
-                proofText: data.proofText,
-                participants: data.participants,
-                proofImages: data.proofImages,
-                feedbackResults: data.feedbackResults,
-              });
-            }
+            setActivity({
+              name: data.name,
+              type: data.type,
+              category: data.category,
+              startDate: data.startDate,
+              endDate: data.endDate,
+              location: data.location,
+              purpose: data.purpose,
+              content: data.content,
+              proofText: data.proofText,
+              participants: data.participants,
+              proofImages: data.proofImages,
+              feedbackResults: data.feedbackResults,
+            });
+          },
+          (error) => {
+            console.error(error);
+            alert("권한이 없습니다.");
+            navigate(-1);
           }
         );
       } catch (error) {
         console.error("Error fetching activity data:", error);
-        alert(
-          `활동을 저장하는 도중 오류가 발생했습니다. 입력한 정보를 다시 확인해주세요. ${error}`
-        );
+        navigate(-1);
         // Handle errors (e.g., show error message)
       }
     };
@@ -107,7 +103,7 @@ export const EditActivity = (): JSX.Element => {
     if (id) {
       fetchActivityData();
     }
-  }, [id, isLoading]);
+  }, [id]);
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -338,7 +334,6 @@ export const EditActivity = (): JSX.Element => {
   };
 
   useEffect(() => {
-    console.log("useEffect");
     if (initialLoad > 0) {
       setInitialLoad(initialLoad - 1); // 첫 로딩 후에는 false로 설정
       return; // 첫 로딩에서는 나머지 로직을 실행하지 않음

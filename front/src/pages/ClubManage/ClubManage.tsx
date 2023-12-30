@@ -34,7 +34,7 @@ type ActivityInfo = {
 
 export const ClubManage = (): JSX.Element => {
   const userRepresentativeStatuses = useUserRepresentativeStatus(); // 배열을 반환한다고 가정
-  // const { durationStatus } = useReportDurationStatus();
+  const { durationStatus } = useReportDurationStatus();
   const navigate = useNavigate();
   const [clubInfos, setClubInfos] = useState<{ [key: number]: ClubInfo }>({});
   const [advisorSignedStatus, setAdvisorSignedStatus] = useState<{
@@ -343,115 +343,116 @@ export const ClubManage = (): JSX.Element => {
                   </div>
                 )}
                 <div className="frame-16">
-                  {/* {durationStatus > 0 && ( */}
-                  <div className="frame-21" style={{ marginBottom: "80px" }}>
-                    <div className="frame-13">
-                      <SubTitle
-                        className="sub-title-instance"
-                        divClassName="design-component-instance-node"
-                        text={`${currentClubInfo.clubName} 활동 보고서`}
-                      />
-                      <div className="frame-22">
-                        <Activity
-                          property1="variant-2"
-                          activityStateProperty1={2}
-                          id={0}
-                        />
-                        {activitiesLists[status.clubId]?.map(
-                          (activity, index) => (
-                            <Activity
-                              key={index}
-                              index={index + 1}
-                              name={activity.title}
-                              type={activity.activityType}
-                              start_date={activity.startDate}
-                              end_date={activity.endDate}
-                              activityStateProperty1={activity.feedbackType}
-                              id={activity.id}
-                            />
-                          )
-                        )}
-                      </div>
-                      <div className="frame-28">
-                        {activitiesLists[status.clubId]?.length < 20 &&
-                          status.typeId < 4 && (
-                            <>
-                              <div
-                                className="rectangle"
-                                onClick={() => navigate("/add_activity")}
-                                style={{ cursor: "pointer" }}
-                              />
-
-                              <div
-                                className="frame-29"
-                                onClick={() => navigate("/add_activity")}
-                                style={{ cursor: "pointer" }}
-                              >
-                                <div className="group-3">
-                                  <div className="overlap-group-2">
-                                    <div className="ellipse" />
-                                    <div className="text-wrapper-13">+</div>
-                                  </div>
-                                </div>
-                                <div className="text-wrapper-14">
-                                  활동 추가하기
-                                </div>
-                              </div>
-                            </>
-                          )}
-                      </div>
-                    </div>
-                    {currentClubInfo.advisor && (
+                  {durationStatus > 0 && (
+                    <div className="frame-21" style={{ marginBottom: "80px" }}>
                       <div className="frame-13">
                         <SubTitle
                           className="sub-title-instance"
                           divClassName="design-component-instance-node"
-                          text={`${currentClubInfo.clubName} 지도교수 확인`}
+                          text={`${currentClubInfo.clubName} 활동 보고서`}
                         />
-                        <div className="frame-14">
-                          <p className="text-wrapper-15">
-                            2023.06.17. ~ 2023.12.15. 기간 중 <br />
-                            {clubInfos[status.clubId].clubName}의 동아리
-                            활동이 위 활동보고서와 일치함을 확인하고 이에
-                            서명합니다.
-                          </p>
+                        <div className="frame-22">
+                          <Activity
+                            property1="variant-2"
+                            activityStateProperty1={2}
+                            id={0}
+                          />
+                          {activitiesLists[status.clubId]?.map(
+                            (activity, index) => (
+                              <Activity
+                                key={index}
+                                index={index + 1}
+                                name={activity.title}
+                                type={activity.activityType}
+                                start_date={activity.startDate}
+                                end_date={activity.endDate}
+                                activityStateProperty1={activity.feedbackType}
+                                id={activity.id}
+                              />
+                            )
+                          )}
                         </div>
-                        <div className="frame-14">
-                          <div className="frame-30">
-                            <div className="text-wrapper-16">
-                              지도교수: {clubInfos[status.clubId].advisor}
-                            </div>
+                        <div className="frame-28">
+                          {activitiesLists[status.clubId]?.length < 20 &&
+                            status.typeId < 4 &&
+                            durationStatus == 1 && (
+                              <>
+                                <div
+                                  className="rectangle"
+                                  onClick={() => navigate("/add_activity")}
+                                  style={{ cursor: "pointer" }}
+                                />
+
+                                <div
+                                  className="frame-29"
+                                  onClick={() => navigate("/add_activity")}
+                                  style={{ cursor: "pointer" }}
+                                >
+                                  <div className="group-3">
+                                    <div className="overlap-group-2">
+                                      <div className="ellipse" />
+                                      <div className="text-wrapper-13">+</div>
+                                    </div>
+                                  </div>
+                                  <div className="text-wrapper-14">
+                                    활동 추가하기
+                                  </div>
+                                </div>
+                              </>
+                            )}
+                        </div>
+                      </div>
+                      {currentClubInfo.advisor && (
+                        <div className="frame-13">
+                          <SubTitle
+                            className="sub-title-instance"
+                            divClassName="design-component-instance-node"
+                            text={`${currentClubInfo.clubName} 지도교수 확인`}
+                          />
+                          <div className="frame-14">
+                            <p className="text-wrapper-15">
+                              2023.06.17. ~ 2023.12.15. 기간 중 <br />
+                              {clubInfos[status.clubId].clubName}의 동아리
+                              활동이 위 활동보고서와 일치함을 확인하고 이에
+                              서명합니다.
+                            </p>
                           </div>
-                          <div
-                            className="group-4"
-                            onClick={
-                              advisorSignedStatus[status.clubId]
-                                ? () => {
-                                    alert("이미 서명을 완료하였습니다.");
-                                  }
-                                : () => {
-                                    handleAdvisorSign(
-                                      status.clubId,
-                                      status.typeId,
-                                      clubInfos[status.clubId].clubName
-                                    );
-                                  }
-                            }
-                            style={{ cursor: "pointer" }}
-                          >
-                            <div className="frame-20">
-                              <div className="text-wrapper-11">
-                                {advisorSignedStatus[status.clubId]
-                                  ? "확인완료"
-                                  : "확인하기"}
+                          <div className="frame-14">
+                            <div className="frame-30">
+                              <div className="text-wrapper-16">
+                                지도교수: {clubInfos[status.clubId].advisor}
+                              </div>
+                            </div>
+                            <div
+                              className="group-4"
+                              onClick={
+                                advisorSignedStatus[status.clubId]
+                                  ? () => {
+                                      alert("이미 서명을 완료하였습니다.");
+                                    }
+                                  : () => {
+                                      handleAdvisorSign(
+                                        status.clubId,
+                                        status.typeId,
+                                        clubInfos[status.clubId].clubName
+                                      );
+                                    }
+                              }
+                              style={{ cursor: "pointer" }}
+                            >
+                              <div className="frame-20">
+                                <div className="text-wrapper-11">
+                                  {advisorSignedStatus[status.clubId]
+                                    ? "확인완료"
+                                    : "확인하기"}
+                                </div>
                               </div>
                             </div>
                           </div>
                         </div>
-                      </div>
-                    )}
-                  </div>
-                  {/* )} */}
+                      )}
+                    </div>
+                  )}
                 </div>
               </div>
             );

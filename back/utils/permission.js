@@ -1,9 +1,11 @@
 const Sequelize = require("sequelize");
+const { Op } = require("sequelize");
 const {
   ClubRepresentative,
   SemesterClub,
   ExecutiveMember,
   Semester,
+  Duration,
 } = require("../models");
 
 async function searchPermission(userData) {
@@ -78,12 +80,12 @@ async function searchPermission(userData) {
 async function checkPermission(req, res, permissionsArray) {
   const userPermissions = await searchPermission(req.session.user);
 
-  const isAdmin = userPermissions.some(
-    (permission) => permission.admin === true
-  );
-  if (isAdmin) {
-    return userPermissions; // Always return true if user is an admin
-  }
+  // const isAdmin = userPermissions.some(
+  //   (permission) => permission.admin === true
+  // );
+  // if (isAdmin) {
+  //   return userPermissions; // Always return true if user is an admin
+  // }
 
   // 사용자 권한이 permissionsArray 내 하나 이상의 항목을 포함하는지 확인
   const isAuthorized = permissionsArray.some((permission) => {

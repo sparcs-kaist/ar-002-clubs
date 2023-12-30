@@ -18,6 +18,8 @@ const {
   ActivityMember,
   ActivitySign,
 } = require("../models");
+const checkPermission = require("../utils/permission");
+const checkReportDuration = require("../utils/duration");
 
 // Configure AWS with your access and secret key.
 // These should be stored in environment variables for security.
@@ -128,12 +130,26 @@ router.get("/advisor_sign", async (req, res) => {
 });
 
 router.post("/deleteActivity/:activityId", async (req, res) => {
+  const durationCheck = await checkReportDuration();
+  if (!durationCheck.found || durationCheck.reportStatus !== 1) {
+    return res.status(400).send({ message: "활동 추가 기한이 지났습니다." });
+  }
+
   const { activityId } = req.params;
   console.log(activityId);
 
   const transaction = await sequelize.transaction();
 
   try {
+    const activity = await Activity.findByPk(activityId);
+    const authorized = await checkPermission(req, res, [
+      { club_rep: 4, club_id: activity.club_id },
+      { advisor: activity.club_id },
+    ]);
+    if (!authorized) {
+      return;
+    }
+
     // Delete from ActivityEvidence
     await ActivityEvidence.destroy({
       where: { activity_id: activityId },
@@ -165,6 +181,11 @@ router.post("/deleteActivity/:activityId", async (req, res) => {
 });
 
 router.post("/addActivity", async (req, res) => {
+  const durationCheck = await checkReportDuration();
+  if (!durationCheck.found || durationCheck.reportStatus !== 1) {
+    return res.status(400).send({ message: "활동 추가 기한이 지났습니다." });
+  }
+
   const {
     clubId,
     name: title,
@@ -180,6 +201,14 @@ router.post("/addActivity", async (req, res) => {
     proofImages,
     feedbackResults,
   } = req.body;
+
+  const authorized = await checkPermission(req, res, [
+    { club_rep: 4, club_id: clubId },
+    { advisor: clubId },
+  ]);
+  if (!authorized) {
+    return;
+  }
 
   try {
     const existingActivitiesCount = await Activity.count({
@@ -276,6 +305,14 @@ router.post("/editActivity", async (req, res) => {
     if (activityId) {
       // Update existing activity
       activity = await Activity.findByPk(activityId);
+      const authorized = await checkPermission(req, res, [
+        { club_rep: 4, club_id: activity.club_id },
+        { advisor: activity.club_id },
+        // { executive: 4 },
+      ]);
+      if (!authorized) {
+        return;
+      }
       await activity.update(
         {
           club_id: clubId,
@@ -367,6 +404,15 @@ router.get("/getActivity/:activityId", async (req, res) => {
     const activity = await Activity.findByPk(activityId);
     if (!activity) {
       return res.status(404).send("Activity not found");
+    }
+
+    const authorized = await checkPermission(req, res, [
+      { club_rep: 4, club_id: activity.club_id },
+      { advisor: activity.club_id },
+      { executive: 4 },
+    ]);
+    if (!authorized) {
+      return;
     }
 
     // Fetch evidence associated with the activity
@@ -471,53 +517,15 @@ router.get("/image-proxy", async (req, res) => {
 
 router.get("/is_report_duration", async (req, res) => {
   try {
-    const currentDate = new Date();
-    currentDate.setHours(currentDate.getHours() + 9);
+    const durationCheck = await checkReportDuration();
 
-    // 현재 날짜를 포함하는 학기 찾기
-    const currentSemester = await Semester.findOne({
-      where: {
-        start_date: { [Op.lte]: currentDate },
-        end_date: { [Op.gte]: currentDate },
-      },
-    });
-
-    if (!currentSemester) {
-      return res.status(404).json({ message: "현재 학기를 찾을 수 없습니다." });
+    if (!durationCheck.found) {
+      return res.status(404).json({ message: durationCheck.message });
     }
 
-    // 'Report' 및 'ReportModify' 기간 찾기
-    const durations = await Duration.findAll({
-      where: {
-        semester_id: currentSemester.id,
-        duration_name: { [Op.or]: ["Report", "ReportModify"] },
-      },
-      attributes: ["duration_name", "start_date", "end_date", "semester_id"], // 'id' 열 제외
-    });
-
-    // 기간 확인
-    let responseCode = 0;
-    durations.forEach((duration) => {
-      const startDate = new Date(duration.start_date);
-      const endDate = new Date(duration.end_date);
-
-      if (
-        duration.duration_name === "Report" &&
-        currentDate >= startDate &&
-        currentDate <= endDate
-      ) {
-        responseCode = 1;
-      } else if (
-        duration.duration_name === "ReportModify" &&
-        currentDate >= startDate &&
-        currentDate <= endDate
-      ) {
-        responseCode = 2;
-      }
-    });
-    res.json({ reportStatus: responseCode });
+    res.json({ reportStatus: durationCheck.reportStatus });
   } catch (error) {
-    console.error(error);
+    console.error("Error checking report duration:", error);
     res.status(500).json({ message: "서버 오류가 발생했습니다." });
   }
 });

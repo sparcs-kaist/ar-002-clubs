@@ -75,7 +75,7 @@ async function scrapeAndSave() {
 }
 
 // scrapeAndSave();
-const scrapeInterval = 600000;
+const scrapeInterval = 3600000;
 setInterval(() => scrapeAndSave(), scrapeInterval); // Set up periodic scraping
 
 router.get("/", async (req, res) => {

@@ -1,8 +1,7 @@
 const Sequelize = require('sequelize');
 module.exports = function(sequelize, DataTypes) {
-  return sequelize.define('Activity', {
+  return sequelize.define('Activity_init', {
     id: {
-      autoIncrement: true,
       type: DataTypes.INTEGER,
       allowNull: false,
       primaryKey: true
@@ -65,7 +64,7 @@ module.exports = function(sequelize, DataTypes) {
     }
   }, {
     sequelize,
-    tableName: 'Activity',
+    tableName: 'Activity_init',
     timestamps: false,
     indexes: [
       {
@@ -77,14 +76,14 @@ module.exports = function(sequelize, DataTypes) {
         ]
       },
       {
-        name: "Activity_ActivityFeedbackType_id_fk",
+        name: "ActivityInit_ActivityFeedbackType_id_fk",
         using: "BTREE",
         fields: [
           { name: "feedback_type" },
         ]
       },
       {
-        name: "Activity_ActivityType_id_fk",
+        name: "ActivityInit_ActivityType_id_fk",
         using: "BTREE",
         fields: [
           { name: "activity_type_id" },

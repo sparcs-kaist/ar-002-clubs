@@ -8,6 +8,7 @@ import { ActivityFeedback } from "components/ActivityFeedback";
 import { getRequest, postRequest } from "utils/api";
 import { useUserRepresentativeStatus } from "hooks/useUserPermission";
 import { useNavigate, useParams } from "react-router-dom";
+import { useReportDurationStatus } from "hooks/useReportDurationStatus";
 
 interface Participant {
   student_id: string;
@@ -41,6 +42,7 @@ interface ActivityState {
 
 export const ActivityDetail = (): JSX.Element => {
   const { userStatuses, isLoading } = useUserRepresentativeStatus();
+  const { durationStatus } = useReportDurationStatus();
   const { id } = useParams();
   const navigate = useNavigate();
   const [activity, setActivity] = useState<ActivityState>({
@@ -71,18 +73,9 @@ export const ActivityDetail = (): JSX.Element => {
     const fetchActivityData = async () => {
       if (!isLoading) {
         try {
-          const response = await getRequest(
+          await getRequest(
             `activity/getActivity/${id}`,
             (data) => {
-              // 사용자가 해당 활동의 클럽에 속해 있는지 확인
-              const userClubIds = userStatuses.map((status) => status.clubId);
-              if (!userClubIds.includes(data.clubId)) {
-                alert("접근 권한이 없습니다. 해당 동아리원만 접근 가능합니다.");
-                navigate(-1);
-                return;
-              }
-
-              // 활동 데이터 설정
               setActivity({
                 name: data.name,
                 type: data.type,
@@ -97,6 +90,11 @@ export const ActivityDetail = (): JSX.Element => {
                 proofImages: data.proofImages,
                 feedbackResults: data.feedbackResults,
               });
+            },
+            (error) => {
+              console.error(error);
+              alert("권한이 없습니다.");
+              navigate(-1);
             }
           );
         } catch (error) {
@@ -272,7 +270,10 @@ export const ActivityDetail = (): JSX.Element => {
       await postRequest(
         `activity/deleteActivity/${id}`,
         () => {},
-        () => {}
+        (error) => {
+          console.error(error);
+          alert("활동을 삭제하는 중 에러가 발생했습니다. 다시 시도해주세요.");
+        }
       );
       navigate("/club_manage");
     } catch (error) {
@@ -404,13 +405,15 @@ export const ActivityDetail = (): JSX.Element => {
             >
               수정
             </div>
-            <div
-              className="frame-17"
-              onClick={handleDeleteActivity}
-              style={{ cursor: "pointer" }}
-            >
-              삭제
-            </div>
+            {durationStatus == 1 && (
+              <div
+                className="frame-17"
+                onClick={handleDeleteActivity}
+                style={{ cursor: "pointer" }}
+              >
+                삭제
+              </div>
+            )}
           </div>
         )}
       </div>

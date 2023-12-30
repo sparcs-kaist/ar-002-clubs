@@ -8,6 +8,7 @@ import { ActivityFeedback } from "components/ActivityFeedback";
 import { getRequest, postRequest } from "utils/api";
 import { useUserRepresentativeStatus } from "hooks/useUserPermission";
 import { useNavigate } from "react-router-dom";
+import { useReportDurationStatus } from "hooks/useReportDurationStatus";
 
 interface Participant {
   student_id: string;
@@ -40,7 +41,8 @@ interface ActivityState {
 }
 
 export const AddActivity = (): JSX.Element => {
-  const { userStatuses, isLoading } = useUserRepresentativeStatus();
+  const { userStatuses } = useUserRepresentativeStatus();
+  const { durationStatus, isLoading } = useReportDurationStatus();
   const navigate = useNavigate();
   const [activity, setActivity] = useState<ActivityState>({
     name: "",
@@ -292,6 +294,13 @@ export const AddActivity = (): JSX.Element => {
     activity.participants = [];
     searchMember(""); // Call this with an empty string to fetch all members initially
   }, [clubId, activity.startDate, activity.endDate]);
+
+  useEffect(() => {
+    if (!isLoading && durationStatus != 1) {
+      alert("활동 추가 기간이 아닙니다. 기간을 확인해주세요.");
+      navigate(-1);
+    }
+  }, [isLoading]);
 
   const groupProofImagesInPairs = () => {
     const pairs = [];
