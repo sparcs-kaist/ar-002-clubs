@@ -1,6 +1,9 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useUserRepresentativeStatus } from "hooks/useUserPermission";
+import {
+  useExecutiveStatus,
+  useUserRepresentativeStatus,
+} from "hooks/useUserPermission";
 import { Activity } from "components/activity/Activity";
 import { ActivityState } from "components/activity/ActivityState";
 import { SubTitle } from "components/home/SubTitle";
@@ -34,8 +37,8 @@ type ActivityInfo = {
 
 export const ActivityFeedback = (): JSX.Element => {
   const userRepresentativeStatuses = useUserRepresentativeStatus(); // 배열을 반환한다고 가정
+  const { executiveStatuses } = useExecutiveStatus();
   const { durationStatus } = useReportDurationStatus();
-  const navigate = useNavigate();
   const [clubInfos, setClubInfos] = useState<{ [key: number]: ClubInfo }>({});
   const [advisorSignedStatus, setAdvisorSignedStatus] = useState<{
     [key: number]: boolean;
@@ -117,117 +120,6 @@ export const ActivityFeedback = (): JSX.Element => {
       setLoadedClubIds((prevIds) => [...prevIds, clubId]);
     });
   }, [userRepresentativeStatuses, clubInfos, loadedClubIds]);
-
-  const handleDropdownChange = async (
-    event: React.ChangeEvent<HTMLSelectElement>,
-    index: number,
-    clubId: number
-  ) => {
-    const selectedMemberInfo = event.target.value.split(" ");
-    const next_student_id = selectedMemberInfo[0];
-    const prev_student_id = clubInfos[clubId].representatives[index].student_id;
-    const rep_id = index + 1;
-
-    if (
-      window.confirm(
-        `${
-          index == 0 ? "대표자를" : "대의원을"
-        } ${event.target.value.trim()}(으)로 변경하시겠습니까?`
-      )
-    ) {
-      try {
-        await postRequest(
-          "club/update_representatives",
-          {
-            prev_student_id,
-            next_student_id,
-            rep_id,
-            club_id: clubInfos[clubId].clubId,
-          },
-          () => {
-            window.location.reload(); // 페이지 새로고침
-          },
-          (error) => {
-            alert("대표자/대의원 변경에 실패했습니다. 다시 시도해주세요.");
-            console.error("Error updating representative:", error);
-          }
-        );
-      } catch (error) {
-        console.error("Error sending update request:", error);
-      }
-    }
-  };
-
-  const handleDescriptionChange = (
-    event: React.ChangeEvent<HTMLTextAreaElement>,
-    clubId: number
-  ) => {
-    setClubInfos({
-      ...clubInfos,
-      [clubId]: {
-        ...clubInfos[clubId],
-        description: event.target.value,
-      },
-    });
-  };
-
-  const handleSaveDescription = async (clubId: number) => {
-    try {
-      const dataToSend = {
-        clubId: clubId,
-        description: clubInfos[clubId].description,
-      };
-      await postRequest(
-        "club/updateDescription",
-        dataToSend,
-        () => {
-          alert("설명이 저장되었습니다.");
-          // Optionally, show a success message
-        },
-        (error) => {
-          console.error("Error updating description:", error);
-          // Optionally, handle the error (e.g., show error message)
-        }
-      );
-    } catch (error) {
-      console.error("Error sending update request:", error);
-    }
-  };
-
-  const handleAdvisorSign = async (
-    clubId: number,
-    typeId: number,
-    clubName: string
-  ) => {
-    if (typeId !== 4) {
-      alert("접근 권한이 없습니다. 지도교수만 접근 가능합니다.");
-      return;
-    }
-
-    const confirmSign = window.confirm(
-      `지도교수로서 해당 기간 중 ${clubName}의 동아리 활동이 활동보고서와 일치함을 확인하고 이에 서명합니다.`
-    );
-    if (!confirmSign) {
-      return; // If not confirmed, exit the function
-    }
-
-    try {
-      // Sign request
-      await postRequest(
-        "activity/advisor_sign",
-        { clubId },
-        () => {
-          checkAdvisorSignStatus(clubId); // Update sign status after signing
-          alert("서명이 완료되었습니다.");
-        },
-        (error) => {
-          console.error("Error signing:", error);
-        }
-      );
-    } catch (error) {
-      console.error("Error sending sign request:", error);
-    }
-  };
 
   const checkAdvisorSignStatus = async (clubId: number) => {
     await getRequest(
