@@ -16,6 +16,7 @@ import "./UpperBar.css";
 import Profile from "assets/Images/profile.png";
 import { getRequest } from "utils/api";
 import { Unavailable } from "utils/util";
+import { useExecutiveStatus } from "hooks/useUserPermission";
 
 interface Props {
   className: any;
@@ -24,12 +25,14 @@ interface Props {
 
 export const UpperBar = ({ className, title }: Props): JSX.Element => {
   const { user, logout } = useAuth(); // authContext에서 user 정보 가져오기
+  const { executiveStatuses } = useExecutiveStatus(true);
   const navigate = useNavigate();
 
   const [showSubMenu1, setShowSubMenu1] = useState(false);
   const [showSubMenu2, setShowSubMenu2] = useState(false);
   const [showSubMenu3, setShowSubMenu3] = useState(false);
   const [showSubMenu4, setShowSubMenu4] = useState(false);
+  const [showSubMenu5, setShowSubMenu5] = useState(false);
 
   const handleLogin = async (e: FormEvent) => {
     e.preventDefault();
@@ -188,6 +191,28 @@ export const UpperBar = ({ className, title }: Props): JSX.Element => {
             </div>
           )}
         </div>
+        {executiveStatuses !== 0 && (
+          <div
+            className="upper-menu-group"
+            onMouseEnter={() => setShowSubMenu5(true)}
+            onMouseLeave={() => setShowSubMenu5(false)}
+            style={{ position: "relative", cursor: "pointer" }}
+            onClick={() => navigate("/admin")}
+          >
+            <UpperbarMenu
+              className="upperbar-menu-instance"
+              text="집행부"
+              active={showSubMenu5}
+            />
+            {/* {showSubMenu4 && (
+              <div className="sub-menu">
+                <button onClick={Unavailable}>공용공간 임시사용</button>
+                <button onClick={Unavailable}>활동확인서 발급</button>
+                <button onClick={Unavailable}>서비스 신청</button>
+              </div>
+            )} */}
+          </div>
+        )}
       </div>
       {!title ? (
         <p className="clubs" style={{ fontFamily: "NanumBarunGothic-Regular" }}>

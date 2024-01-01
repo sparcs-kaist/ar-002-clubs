@@ -49,7 +49,7 @@ export const useUserRepresentativeStatus = () => {
   return { userStatuses, isLoading };
 };
 
-export const useExecutiveStatus = () => {
+export const useExecutiveStatus = (disabled?: boolean) => {
   const navigate = useNavigate();
   const [executiveStatuses, setExecutiveStatuses] = useState<number>(0);
   const [isLoading, setIsLoading] = useState(true);
@@ -75,7 +75,7 @@ export const useExecutiveStatus = () => {
   }, []);
 
   useEffect(() => {
-    if (!isLoading && executiveStatuses === 0) {
+    if (!isLoading && executiveStatuses === 0 && !disabled) {
       alert("접근 권한이 없습니다. 집행부원만 접근 가능합니다.");
       navigate(-1);
     }

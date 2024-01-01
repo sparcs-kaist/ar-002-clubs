@@ -110,9 +110,9 @@ export const CenterCard = ({ SubTitleText }: Props): JSX.Element => {
         },
         {
           id: "1",
-          title: "활동보고서 검토 지정",
+          title: "활동보고서 대시보드",
           subtitle: "사무국장",
-          url: `${process.env.REACT_APP_FRONTEND_URL}/admin/activity_feedback`,
+          url: `${process.env.REACT_APP_FRONTEND_URL}/admin/activity_dashboard`,
         },
       ]);
     } else if (SubTitleText === "관리국" && user && user.student_id) {
