@@ -9,7 +9,11 @@ module.exports = function(sequelize, DataTypes) {
     },
     club_id: {
       type: DataTypes.INTEGER,
-      allowNull: false
+      allowNull: false,
+      references: {
+        model: 'Club',
+        key: 'id'
+      }
     },
     title: {
       type: DataTypes.STRING(255),
@@ -88,6 +92,13 @@ module.exports = function(sequelize, DataTypes) {
         using: "BTREE",
         fields: [
           { name: "activity_type_id" },
+        ]
+      },
+      {
+        name: "Activity_Club_id_fk",
+        using: "BTREE",
+        fields: [
+          { name: "club_id" },
         ]
       },
     ]

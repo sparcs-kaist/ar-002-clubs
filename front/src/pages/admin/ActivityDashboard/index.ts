@@ -1,1 +1,1 @@
-export * from "./ActivityDashboard";
+export { ActivityDashboard } from "./ActivityDashboard";

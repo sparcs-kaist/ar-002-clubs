@@ -2,6 +2,8 @@ var DataTypes = require("sequelize").DataTypes;
 var _Activity = require("./Activity");
 var _ActivityEvidence = require("./ActivityEvidence");
 var _ActivityEvidence_init = require("./ActivityEvidence_init");
+var _ActivityFeedback = require("./ActivityFeedback");
+var _ActivityFeedbackExecutive = require("./ActivityFeedbackExecutive");
 var _ActivityFeedbackType = require("./ActivityFeedbackType");
 var _ActivityMember = require("./ActivityMember");
 var _ActivityMember_init = require("./ActivityMember_init");
@@ -43,6 +45,11 @@ function initModels(sequelize) {
   var Activity = _Activity(sequelize, DataTypes);
   var ActivityEvidence = _ActivityEvidence(sequelize, DataTypes);
   var ActivityEvidence_init = _ActivityEvidence_init(sequelize, DataTypes);
+  var ActivityFeedback = _ActivityFeedback(sequelize, DataTypes);
+  var ActivityFeedbackExecutive = _ActivityFeedbackExecutive(
+    sequelize,
+    DataTypes
+  );
   var ActivityFeedbackType = _ActivityFeedbackType(sequelize, DataTypes);
   var ActivityMember = _ActivityMember(sequelize, DataTypes);
   var ActivityMember_init = _ActivityMember_init(sequelize, DataTypes);
@@ -116,6 +123,22 @@ function initModels(sequelize) {
     foreignKey: "semester_id",
     otherKey: "student_id",
   });
+  ActivityFeedback.belongsTo(Activity, {
+    as: "activity_Activity",
+    foreignKey: "activity",
+  });
+  Activity.hasMany(ActivityFeedback, {
+    as: "ActivityFeedbacks",
+    foreignKey: "activity",
+  });
+  ActivityFeedbackExecutive.belongsTo(Activity, {
+    as: "activity_Activity",
+    foreignKey: "activity",
+  });
+  Activity.hasOne(ActivityFeedbackExecutive, {
+    as: "ActivityFeedbackExecutive",
+    foreignKey: "activity",
+  });
   Activity.belongsTo(ActivityFeedbackType, {
     as: "feedback_type_ActivityFeedbackType",
     foreignKey: "feedback_type",
@@ -148,6 +171,8 @@ function initModels(sequelize) {
     as: "Activity_inits",
     foreignKey: "activity_type_id",
   });
+  Activity.belongsTo(Club, { as: "club", foreignKey: "club_id" });
+  Club.hasMany(Activity, { as: "Activities", foreignKey: "club_id" });
   ActivitySign.belongsTo(Club, { as: "club", foreignKey: "club_id" });
   Club.hasMany(ActivitySign, { as: "ActivitySigns", foreignKey: "club_id" });
   Attendance.belongsTo(Club, { as: "fromClub", foreignKey: "fromClubId" });
@@ -213,6 +238,14 @@ function initModels(sequelize) {
     as: "sub_bureau_ExecutiveMembers",
     foreignKey: "sub_bureau",
   });
+  ActivityFeedbackExecutive.belongsTo(ExecutiveMember, {
+    as: "student",
+    foreignKey: "student_id",
+  });
+  ExecutiveMember.hasMany(ActivityFeedbackExecutive, {
+    as: "ActivityFeedbackExecutives",
+    foreignKey: "student_id",
+  });
   ExecutiveMember.belongsTo(ExecutiveType, {
     as: "type",
     foreignKey: "type_id",
@@ -223,6 +256,14 @@ function initModels(sequelize) {
   });
   Meeting.belongsTo(MeetingType, { as: "type", foreignKey: "type_id" });
   MeetingType.hasMany(Meeting, { as: "Meetings", foreignKey: "type_id" });
+  ActivityFeedback.belongsTo(Member, {
+    as: "student",
+    foreignKey: "student_id",
+  });
+  Member.hasMany(ActivityFeedback, {
+    as: "ActivityFeedbacks",
+    foreignKey: "student_id",
+  });
   ActivityMember.belongsTo(Member, {
     as: "member_student",
     foreignKey: "member_student_id",
@@ -321,6 +362,8 @@ function initModels(sequelize) {
     Activity,
     ActivityEvidence,
     ActivityEvidence_init,
+    ActivityFeedback,
+    ActivityFeedbackExecutive,
     ActivityFeedbackType,
     ActivityMember,
     ActivityMember_init,

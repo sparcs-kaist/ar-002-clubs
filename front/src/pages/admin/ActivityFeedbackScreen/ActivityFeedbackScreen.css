@@ -1,27 +1,27 @@
-.activity-dashboard {
+.activity-feedback-screen {
   background-color: #f6feff;
-  height: 1173px;
+  height: 1721px;
   width: 1728px;
 }
 
-.activity-dashboard .frame-7 {
+.activity-feedback-screen .frame-6 {
   align-items: flex-start;
   background-color: #f6feff;
   display: inline-flex;
   flex-direction: column;
   gap: 23px;
-  height: 1173px;
+  height: 1721px;
   position: relative;
 }
 
-.activity-dashboard .upper-bar {
+.activity-feedback-screen .upper-bar {
   background-size: 100% 100%;
   height: 245px;
   position: relative;
   width: 1728px;
 }
 
-.activity-dashboard .group-2 {
+.activity-feedback-screen .group-2 {
   height: 68px;
   left: 21px;
   position: absolute;
@@ -29,7 +29,7 @@
   width: 152px;
 }
 
-.activity-dashboard .img {
+.activity-feedback-screen .img {
   height: 60px;
   left: 0;
   object-fit: cover;
@@ -38,7 +38,7 @@
   width: 65px;
 }
 
-.activity-dashboard .text-wrapper-7 {
+.activity-feedback-screen .text-wrapper-6 {
   color: #7cd2d8;
   font-family: "Noto Sans Arabic", Helvetica;
   font-size: 31px;
@@ -51,7 +51,7 @@
   top: 3px;
 }
 
-.activity-dashboard .clubs {
+.activity-feedback-screen .clubs {
   color: #ffffff;
   font-family: "NanumBarunGothic-Bold", Helvetica;
   font-size: 48px;
@@ -64,13 +64,13 @@
   white-space: nowrap;
 }
 
-.activity-dashboard .loading-bar-instance {
+.activity-feedback-screen .loading-bar-instance {
   left: 0 !important;
   position: absolute !important;
   top: 0 !important;
 }
 
-.activity-dashboard .frame-8 {
+.activity-feedback-screen .frame-7 {
   align-items: flex-start;
   display: inline-flex;
   gap: 902px;
@@ -79,7 +79,7 @@
   top: 39px;
 }
 
-.activity-dashboard .frame-9 {
+.activity-feedback-screen .frame-8 {
   align-items: flex-start;
   display: flex;
   gap: 60px;
@@ -88,11 +88,11 @@
   width: 422px;
 }
 
-.activity-dashboard .design-component-instance-node {
+.activity-feedback-screen .design-component-instance-node {
   flex: 0 0 auto !important;
 }
 
-.activity-dashboard .frame-10 {
+.activity-feedback-screen .frame-9 {
   align-items: center;
   display: inline-flex;
   flex: 0 0 auto;
@@ -101,14 +101,14 @@
   position: relative;
 }
 
-.activity-dashboard .image-2 {
+.activity-feedback-screen .image-2 {
   height: 18px;
   object-fit: cover;
   position: relative;
   width: 18px;
 }
 
-.activity-dashboard .frame-wrapper {
+.activity-feedback-screen .frame-wrapper {
   align-items: flex-start;
   display: flex;
   flex: 0 0 auto;
@@ -119,7 +119,7 @@
   width: 1728px;
 }
 
-.activity-dashboard .frame-11 {
+.activity-feedback-screen .frame-10 {
   align-items: flex-start;
   display: inline-flex;
   flex: 0 0 auto;
@@ -128,7 +128,7 @@
   position: relative;
 }
 
-.activity-dashboard .frame-12 {
+.activity-feedback-screen .frame-11 {
   align-items: flex-start;
   display: flex;
   flex: 0 0 auto;
@@ -138,7 +138,7 @@
   width: 1399px;
 }
 
-.activity-dashboard .frame-13 {
+.activity-feedback-screen .frame-12 {
   align-items: flex-start;
   display: inline-flex;
   flex: 0 0 auto;
@@ -148,7 +148,7 @@
   position: relative;
 }
 
-.activity-dashboard .frame-14 {
+.activity-feedback-screen .frame-13 {
   align-items: flex-start;
   display: inline-flex;
   flex: 0 0 auto;
@@ -157,94 +157,11 @@
   position: relative;
 }
 
-.activity-dashboard .sub-title-instance {
-  margin-right: -85px !important;
+.activity-feedback-screen .sub-title-instance {
+  margin-right: -37px !important;
 }
 
-.activity-dashboard .frame-15 {
-  align-items: flex-start;
-  display: inline-flex;
-  flex: 0 0 auto;
-  flex-direction: column;
-  gap: 15px;
-  padding: 0px 20px;
-  position: relative;
-}
-
-.activity-dashboard .group-3 {
-  height: 24px;
-  margin-right: -2px;
-  position: relative;
-  width: 226px;
-}
-
-.activity-dashboard .p {
-  color: #000000;
-  font-family: "Inter", Helvetica;
-  font-size: 20px;
-  font-weight: 400;
-  left: 0;
-  letter-spacing: 0;
-  line-height: normal;
-  position: absolute;
-  top: 0;
-  white-space: nowrap;
-  width: 224px;
-}
-
-.activity-dashboard .span {
-  font-weight: 700;
-}
-
-.activity-dashboard .text-wrapper-8 {
-  color: #000000;
-  font-family: "Inter", Helvetica;
-  font-size: 20px;
-  font-weight: 400;
-  letter-spacing: 0;
-}
-
-.activity-dashboard .group-4 {
-  height: 24px;
-  position: relative;
-  width: 206.13px;
-}
-
-.activity-dashboard .element-3 {
-  color: #000000;
-  font-family: "Inter", Helvetica;
-  font-size: 20px;
-  font-weight: 400;
-  left: 0;
-  letter-spacing: 0;
-  line-height: normal;
-  position: absolute;
-  top: 0;
-  white-space: nowrap;
-  width: 204px;
-}
-
-.activity-dashboard .group-5 {
-  height: 24px;
-  position: relative;
-  width: 147.99px;
-}
-
-.activity-dashboard .element-4 {
-  color: #000000;
-  font-family: "Inter", Helvetica;
-  font-size: 20px;
-  font-weight: 400;
-  left: 0;
-  letter-spacing: 0;
-  line-height: normal;
-  position: absolute;
-  top: 0;
-  white-space: nowrap;
-  width: 146px;
-}
-
-.activity-dashboard .frame-16 {
+.activity-feedback-screen .frame-14 {
   align-items: flex-start;
   display: inline-flex;
   flex: 0 0 auto;
