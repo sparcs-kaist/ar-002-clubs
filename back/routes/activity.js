@@ -413,7 +413,7 @@ router.get("/getActivity/:activityId", async (req, res) => {
     const authorized = await checkPermission(req, res, [
       { club_rep: 4, club_id: activity.club_id },
       { advisor: activity.club_id },
-      { executive: 4 },
+      // { executive: 4 },
     ]);
     if (!authorized) {
       return;
@@ -468,6 +468,28 @@ router.get("/getActivity/:activityId", async (req, res) => {
       return timestampA - timestampB;
     });
 
+    const feedbacks = await ActivityFeedback.findAll({
+      where: { activity: activityId },
+      include: [
+        {
+          model: Member,
+          attributes: ["name"],
+          as: "student",
+        },
+      ],
+    });
+
+    // Filter and format feedback results
+    const feedbackResults = feedbacks
+      .filter((feedback) => feedback.feedback.trim() !== "") // Exclude empty feedback
+      .map((feedback) => {
+        return {
+          addedTime: feedback.added_time,
+          text: feedback.feedback,
+          reviewerName: feedback.student.name, // assuming you want to include the name of the reviewer
+        };
+      });
+
     // Format the response
     const response = {
       clubId: activity.club_id,
@@ -487,7 +509,7 @@ router.get("/getActivity/:activityId", async (req, res) => {
         imageUrl: e.image_url,
         fileName: e.description,
       })),
-      feedbackResults: [], // Adjust based on how you store 'feedbackResults'
+      feedbackResults, // Adjust based on how you store 'feedbackResults'
     };
 
     res.status(200).send(response);

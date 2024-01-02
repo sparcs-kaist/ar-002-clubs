@@ -33,9 +33,9 @@ export const ActivityFeedbackList = ({
   const navigate = useNavigate();
   return (
     <div
-      className={`activity-feedback ${title} "design-component-instance-node"`}
+      className={`activity-feedback-list ${title} "design-component-instance-node"`}
       onClick={() =>
-        title === "one" && navigate(`/activity_detail/${activity_id}`)
+        title === "one" && navigate(`/admin/activity/${activity_id}`)
       }
       style={{ cursor: "pointer" }}
     >

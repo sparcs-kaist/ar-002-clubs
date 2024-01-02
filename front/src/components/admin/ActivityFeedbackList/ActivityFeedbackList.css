@@ -1,4 +1,4 @@
-.activity-feedback {
+.activity-feedback-list {
   align-items: flex-start;
   border-bottom-style: solid;
   border-bottom-width: 1px;
@@ -7,7 +7,7 @@
   position: relative;
 }
 
-.activity-feedback .frame {
+.activity-feedback-list .frame {
   align-items: center;
   background-color: #7cd2d8;
   border-color: #000000;
@@ -26,7 +26,7 @@
   height: 100%;
 }
 
-.activity-feedback .element {
+.activity-feedback-list .element {
   color: #000000;
   font-family: "Inter", Helvetica;
   font-size: 20px;
@@ -40,7 +40,7 @@
   width: fit-content;
 }
 
-.activity-feedback .div-wrapper {
+.activity-feedback-list .div-wrapper {
   align-items: center;
   border-color: #000000;
   border-right-style: solid;
@@ -54,7 +54,7 @@
   height: 100%;
 }
 
-.activity-feedback .text-wrapper-2 {
+.activity-feedback-list .text-wrapper-2 {
   color: #000000;
   flex: 1;
   font-family: "NanumBarunGothic-Regular", Helvetica;
@@ -66,7 +66,7 @@
   position: relative;
 }
 
-.activity-feedback .frame-2 {
+.activity-feedback-list .frame-2 {
   align-items: center;
   border-color: #000000;
   border-right-style: solid;
@@ -80,7 +80,7 @@
   height: 100%;
 }
 
-.activity-feedback .frame-3 {
+.activity-feedback-list .frame-3 {
   align-items: center;
   border-color: #000000;
   border-right-style: solid;
@@ -94,7 +94,7 @@
   height: 100%;
 }
 
-.activity-feedback .frame-4 {
+.activity-feedback-list .frame-4 {
   align-items: center;
   border-color: #000000;
   border-right-style: solid;
@@ -106,24 +106,24 @@
   height: 100%;
 }
 
-.activity-feedback.zero {
+.activity-feedback-list.zero {
   background-color: #7dd2d9;
   border-top-style: solid;
   border-top-width: 1px;
 }
 /* 
-.activity-feedback.zero .frame {
+.activity-feedback-list.zero .frame {
   border-top-style: solid;
   border-top-width: 1px;
 } */
 
-.activity-feedback.zero .frame-4 {
+.activity-feedback-list.zero .frame-4 {
   display: flex;
   padding: 10px;
   width: 136px;
 }
 
-.activity-feedback.one .frame-4 {
+.activity-feedback-list.one .frame-4 {
   display: inline-flex;
   flex: 0 0 auto;
   padding: 6px 10px;

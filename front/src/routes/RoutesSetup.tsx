@@ -16,6 +16,7 @@ import { Admin } from "pages/admin/Admin";
 import { ActivityFeedbackScreen } from "pages/admin/ActivityFeedbackScreen";
 import { ActivityDashboard } from "pages/admin/ActivityDashboard";
 import { ClubActivityList } from "pages/admin/ClubActivityList";
+import { ActivityAdminDetail } from "pages/admin/ActivityAdminDetail";
 
 export default function RouteSetup() {
   return (
@@ -45,6 +46,7 @@ export default function RouteSetup() {
       />
       <Route path="/admin/activity_dashboard" element={<ActivityDashboard />} />
       <Route path="/admin/club_activity" element={<ClubActivityList />} />
+      <Route path="/admin/activity/:id" element={<ActivityAdminDetail />} />
     </Routes>
   );
 }

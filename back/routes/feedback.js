@@ -21,12 +21,172 @@ const {
   MemberClub,
 } = require("../models");
 const schedule = require("node-schedule");
+const checkPermission = require("../utils/permission");
+const checkReportDuration = require("../utils/duration");
 
 const BATCH_SIZE = 100; // 한 번에 처리할 데이터의 양
 
 router.get("/migrate", async (req, res) => {
   await migrateDataInBatches();
   res.send("finish");
+});
+
+router.post("/feedback", async (req, res) => {
+  try {
+    const { activity_id, reviewResult } = req.body;
+    const studentId = req.session.user.student_id;
+    const currentTimePlusNineHours = new Date(
+      new Date().getTime() + 9 * 60 * 60 * 1000
+    );
+
+    // Update feedback_type in Activity based on reviewResult
+    const feedbackType = reviewResult === "" ? 2 : 3;
+    await Activity.update(
+      {
+        feedback_type: feedbackType,
+        recent_feedback: currentTimePlusNineHours,
+      },
+      { where: { id: activity_id } }
+    );
+
+    // Save a new record in ActivityFeedback
+    await ActivityFeedback.create({
+      activity: activity_id,
+      student_id: studentId,
+      added_time: currentTimePlusNineHours,
+      feedback: reviewResult,
+    });
+
+    res.status(200).send("Feedback processed successfully.");
+  } catch (error) {
+    console.error("Error in /feedback route:", error);
+    res.status(500).send("Internal Server Error");
+  }
+});
+
+router.get("/getActivity/:activityId", async (req, res) => {
+  const durationCheck = await checkReportDuration();
+  // if (!durationCheck.found || durationCheck.reportStatus !== 1) {
+  //   return res.status(400).send({ message: "활동 추가 기한이 지났습니다." });
+  // }
+  const { activityId } = req.params;
+
+  try {
+    let activity;
+    let evidence;
+    let participants;
+
+    // Fetch activity details
+    activity = await Activity.findByPk(activityId);
+    if (!activity) {
+      return res.status(404).send("Activity not found");
+    }
+
+    const authorized = await checkPermission(req, res, [{ executive: 4 }]);
+    if (!authorized) {
+      return;
+    }
+
+    const isAdvisor = authorized.some((auth) => auth.hasOwnProperty("advisor"));
+
+    if (durationCheck.reportStatus === 2 && isAdvisor) {
+      activity = await Activity_init.findByPk(activityId);
+      evidence = await ActivityEvidence_init.findAll({
+        where: { activity_id: activityId },
+      });
+      participants = await ActivityMember_init.findAll({
+        where: { activity_id: activityId },
+        include: [
+          {
+            model: Member,
+            attributes: ["name"],
+            as: "member_student",
+          },
+        ],
+      });
+    } else {
+      activity = await Activity.findByPk(activityId);
+      evidence = await ActivityEvidence.findAll({
+        where: { activity_id: activityId },
+      });
+      participants = await ActivityMember.findAll({
+        where: { activity_id: activityId },
+        include: [
+          {
+            model: Member,
+            attributes: ["name"],
+            as: "member_student",
+          },
+        ],
+      });
+    }
+
+    // Function to extract the timestamp from the S3 URL
+    const extractTimestamp = (url) => {
+      const matches = url.match(
+        /uploads\/(\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2})/
+      );
+      return matches ? new Date(matches[1].replace(/-/g, ":")) : new Date();
+    };
+
+    // Sort evidence by the extracted timestamp
+    evidence.sort((a, b) => {
+      const timestampA = extractTimestamp(a.image_url);
+      const timestampB = extractTimestamp(b.image_url);
+      return timestampA - timestampB;
+    });
+
+    console.log(105);
+
+    const feedbacks = await ActivityFeedback.findAll({
+      where: { activity: activityId },
+      include: [
+        {
+          model: Member,
+          attributes: ["name"],
+          as: "student",
+        },
+      ],
+    });
+
+    // Filter and format feedback results
+    const feedbackResults = feedbacks
+      .filter((feedback) => feedback.feedback.trim() !== "") // Exclude empty feedback
+      .map((feedback) => {
+        return {
+          addedTime: feedback.added_time,
+          text: feedback.feedback,
+          reviewerName: feedback.student.name, // assuming you want to include the name of the reviewer
+        };
+      });
+
+    // Format the response
+    const response = {
+      clubId: activity.club_id,
+      name: activity.title,
+      type: activity.activity_type_id,
+      startDate: activity.start_date,
+      endDate: activity.end_date,
+      location: activity.location,
+      purpose: activity.purpose,
+      content: activity.content,
+      proofText: activity.proof_text,
+      participants: participants.map((p) => ({
+        student_id: p.member_student_id,
+        name: p.member_student.name,
+      })),
+      proofImages: evidence.map((e) => ({
+        imageUrl: e.image_url,
+        fileName: e.description,
+      })),
+      feedbackResults, // Adjust based on how you store 'feedbackResults'
+    };
+
+    res.status(200).send(response);
+  } catch (error) {
+    console.error("Error fetching activity:", error);
+    res.status(500).send("Error fetching activity");
+  }
 });
 
 router.get("/my_feedback_activity", async (req, res) => {
@@ -54,13 +214,16 @@ router.get("/my_feedback_activity", async (req, res) => {
     const responseArray = await Promise.all(
       feedbackExecutives.map(async (feedbackExecutive) => {
         const activity = feedbackExecutive.activity_Activity;
-        const clubName = activity.club.name;
-        const activityName = activity.title;
-        const feedbackTypeId = activity.feedback_type;
+
+        // Check if activity and club are defined
+        const clubName =
+          activity && activity.club ? activity.club.name : "Unknown Club";
+        const activityName = activity ? activity.title : "Unknown Activity";
+        const feedbackTypeId = activity ? activity.feedback_type : null;
 
         // Fetch feedback details
         const feedbackDetail = await ActivityFeedback.findOne({
-          where: { activity: activity.id },
+          where: { activity: activity ? activity.id : null },
           include: [
             {
               model: Member,
@@ -70,23 +233,38 @@ router.get("/my_feedback_activity", async (req, res) => {
           ],
         });
 
-        const feedbackMemberName = feedbackDetail
-          ? feedbackDetail.Member.name
-          : null;
+        console.log(feedbackDetail);
+        // Check if feedbackDetail and Member are defined
+        const feedbackMemberName =
+          feedbackDetail && feedbackDetail.student
+            ? feedbackDetail.student.name
+            : null;
 
         // Fetch executive details
         const executiveMember = await Member.findByPk(studentId);
 
         return {
-          activityId: activity.id,
+          activityId: activity ? activity.id : null,
           clubName,
           activityName,
           feedbackMemberName,
-          executiveMemberName: executiveMember ? executiveMember.name : null,
+          executiveMemberName: executiveMember
+            ? executiveMember.name
+            : "Unknown Executive",
           feedbackType: feedbackTypeId,
         };
       })
     );
+
+    responseArray.sort((a, b) => {
+      if (a.feedbackType < b.feedbackType) {
+        return -1;
+      }
+      if (a.feedbackType > b.feedbackType) {
+        return 1;
+      }
+      return 0;
+    });
 
     res.json(responseArray);
   } catch (error) {

@@ -297,6 +297,16 @@ export const ActivityDetail = (): JSX.Element => {
   // Grouped proof images
   const groupedProofImages = groupProofImagesInPairs();
 
+  const renderActivityFeedback = () => {
+    return activity.feedbackResults.map((feedback, index) => (
+      <ActivityFeedback
+        key={index}
+        text={feedback.feedback_time}
+        text1={feedback.text}
+      />
+    ));
+  };
+
   return (
     <div className="add-activity">
       <div className="frame-3">
@@ -385,13 +395,7 @@ export const ActivityDetail = (): JSX.Element => {
             </div>
             <div className="frame-11">
               <SubTitle className="sub-title-instance" text="검토 결과" />
-              <div className="frame-9">
-                {/* <ActivityFeedback
-                  className="design-component-instance-node"
-                  text="2023.12.31. 19:58:00"
-                  text1="증빙 사진1의 인원이 맞지 않습니다."
-                /> */}
-              </div>
+              <div className="frame-9">{renderActivityFeedback()}</div>
             </div>
           </div>
         </div>
