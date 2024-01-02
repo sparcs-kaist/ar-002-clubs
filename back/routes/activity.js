@@ -20,6 +20,7 @@ const {
   ActivityEvidence_init,
   Activity_init,
   ActivityMember_init,
+  ActivityFeedback,
 } = require("../models");
 const checkPermission = require("../utils/permission");
 const checkReportDuration = require("../utils/duration");
