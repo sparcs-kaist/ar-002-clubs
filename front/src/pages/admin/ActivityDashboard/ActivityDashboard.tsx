@@ -87,7 +87,7 @@ export const ActivityDashboard = (): JSX.Element => {
                         <span className="span">검토율 :</span>
                         <span className="text-wrapper-8">
                           {" "}
-                          {dashboardData.ratio}%
+                          {dashboardData.ratio.toFixed(2)}%
                         </span>
                       </p>
                     </div>

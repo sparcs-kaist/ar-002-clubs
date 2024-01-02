@@ -191,6 +191,11 @@ router.get("/getActivity/:activityId", async (req, res) => {
 
 router.get("/my_feedback_activity", async (req, res) => {
   try {
+    const authorized = await checkPermission(req, res, [{ executive: 4 }]);
+    if (!authorized) {
+      return;
+    }
+
     const studentId = req.session.user.student_id;
 
     // Find activities associated with the current user
@@ -277,6 +282,11 @@ router.post("/update_executive", async (req, res) => {
   const { student_id, club_id } = req.body;
 
   try {
+    const authorized = await checkPermission(req, res, [{ executive: 3 }]);
+    if (!authorized) {
+      return;
+    }
+
     const today = new Date();
 
     // Find current semester

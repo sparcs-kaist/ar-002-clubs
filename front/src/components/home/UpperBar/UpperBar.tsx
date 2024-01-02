@@ -233,7 +233,7 @@ export const UpperBar = ({ className, title }: Props): JSX.Element => {
 
       <LoadingBar className="loading-bar-instance" />
       <div className="frame-200">
-        <img className="img" alt="Image" src={Profile} />
+        <img className="img-100" alt="Image" src={Profile} />
         <div className="login">
           {user ? (
             <div
