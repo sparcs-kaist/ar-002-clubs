@@ -492,6 +492,8 @@ router.get("/activity_submit_list", async (req, res) => {
       })
     );
 
+    clubData.sort((a, b) => b.feedbackTypeOne - a.feedbackTypeOne);
+
     res.json({
       totalActivities,
       nonFeedbackTypeOneActivities,

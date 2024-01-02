@@ -120,7 +120,7 @@ export const DashboardClubList = ({
         <select
           value={selectedExecutive}
           onChange={handleSelectChange}
-          className={"frame-2"}
+          className={"frame-2 text-wrapper-2"}
         >
           <option key="0" value="0">
             선택안함
