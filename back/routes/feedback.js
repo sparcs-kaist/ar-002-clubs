@@ -26,10 +26,10 @@ const checkReportDuration = require("../utils/duration");
 
 const BATCH_SIZE = 100; // 한 번에 처리할 데이터의 양
 
-router.get("/migrate", async (req, res) => {
-  await migrateDataInBatches();
-  res.send("finish");
-});
+// router.get("/migrate", async (req, res) => {
+//   await migrateDataInBatches();
+//   res.send("finish");
+// });
 
 router.post("/feedback", async (req, res) => {
   try {
@@ -475,11 +475,31 @@ router.get("/activity_submit_list", async (req, res) => {
         // Advisor signature check
         let advisorStatus = sc.advisor ? "서명 미완료" : "선택적 지도교수";
         const latestSign = await ActivitySign.findOne({
-          where: { club_id: sc.club_id },
+          where: {
+            club_id: sc.club_id,
+            semester_id: currentSemester.id,
+          },
           order: [["sign_time", "DESC"]],
         });
 
-        if (latestSign) {
+        const latestEdit = await Activity_init.findOne({
+          where: {
+            club_id: sc.club_id,
+            recent_edit: {
+              [Op.between]: [
+                currentSemester.start_date,
+                currentSemester.end_date,
+              ],
+            },
+          },
+          order: [["recent_edit", "DESC"]],
+        });
+
+        // Determine the advisor status
+        const signed =
+          latestSign &&
+          (!latestEdit || latestSign.sign_time > latestEdit.recent_edit);
+        if (signed) {
           advisorStatus = formatSignTime(latestSign.sign_time);
         }
 
