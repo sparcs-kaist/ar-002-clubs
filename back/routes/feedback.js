@@ -225,6 +225,7 @@ router.get("/my_feedback_activity", async (req, res) => {
           activity && activity.club ? activity.club.name : "Unknown Club";
         const activityName = activity ? activity.title : "Unknown Activity";
         const feedbackTypeId = activity ? activity.feedback_type : null;
+        const activityType = activity ? activity.activity_type_id : null;
 
         // Fetch feedback details
         const feedbackDetail = await ActivityFeedback.findOne({
@@ -246,20 +247,28 @@ router.get("/my_feedback_activity", async (req, res) => {
             : null;
 
         // Fetch executive details
-        const executiveMember = await Member.findByPk(studentId);
+        // const executiveMember = await Member.findByPk(studentId);
 
         return {
           activityId: activity ? activity.id : null,
           clubName,
           activityName,
           feedbackMemberName,
-          executiveMemberName: executiveMember
-            ? executiveMember.name
-            : "Unknown Executive",
+          activityType,
           feedbackType: feedbackTypeId,
         };
       })
     );
+
+    responseArray.sort((a, b) => {
+      if (a.clubName < b.clubName) {
+        return -1;
+      }
+      if (a.clubName > b.clubName) {
+        return 1;
+      }
+      return 0;
+    });
 
     responseArray.sort((a, b) => {
       if (a.feedbackType < b.feedbackType) {

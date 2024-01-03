@@ -16,7 +16,7 @@ interface Props {
   club?: string;
   activity?: string;
   doneby?: string;
-  chargeof?: string;
+  activityType?: string;
   state?: number;
 }
 
@@ -26,8 +26,8 @@ export const ActivityFeedbackList = ({
   index = "#",
   club = "동아리명",
   activity = "활동명",
+  activityType = "활동분류",
   doneby = "검토자",
-  chargeof = "담당자",
   state = 1,
 }: Props): JSX.Element => {
   const navigate = useNavigate();
@@ -49,10 +49,10 @@ export const ActivityFeedbackList = ({
         <div className="text-wrapper-2">{activity}</div>
       </div>
       <div className="frame-3">
-        <div className="text-wrapper-2">{doneby}</div>
+        <div className="text-wrapper-2">{activityType}</div>
       </div>
       <div className="frame-3">
-        <div className="text-wrapper-2">{chargeof}</div>
+        <div className="text-wrapper-2">{doneby}</div>
       </div>
       <div className="frame-4">
         {title === "zero" && <div className="text-wrapper-2">검토 상태</div>}

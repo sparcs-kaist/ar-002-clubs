@@ -267,26 +267,6 @@ export const ActivityAdminDetail = (): JSX.Element => {
           </div>
         </div>
         <UnderBar />
-        {/* {typeId < 4 && (
-          <div className="frame-16">
-            <div
-              className="frame-17"
-              onClick={() => navigate(`/edit_activity/${id}`)}
-              style={{ cursor: "pointer" }}
-            >
-              수정
-            </div>
-            {durationStatus == 1 && (
-              <div
-                className="frame-17"
-                onClick={handleDeleteActivity}
-                style={{ cursor: "pointer" }}
-              >
-                삭제
-              </div>
-            )}
-          </div>
-        )} */}
       </div>
     </div>
   );

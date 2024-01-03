@@ -71,15 +71,13 @@ export const DashboardClubList = ({
     );
 
     if (confirmation) {
-      setSelectedExecutive(newValue);
-
       // Call POST API here
       postRequest(
         "feedback/update_executive",
         { student_id: newValue, club_id: clubId },
         (response) => {
           console.log("Post request successful", response.data);
-          alert("검토 담당자 변경이 완료되었습니다.");
+          setSelectedExecutive(newValue);
         },
         (error) => {
           console.error("Post request failed", error);

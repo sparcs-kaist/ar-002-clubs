@@ -5,17 +5,19 @@ import { UnderBar } from "components/home/UnderBar";
 import "./ActivityFeedbackScreen.css";
 import { UpperBar } from "components/home/UpperBar";
 import { getRequest } from "utils/api";
+import { useExecutiveStatus } from "hooks/useUserPermission";
 
 interface ActivityFeedbackData {
   activityId: number;
   clubName: string;
   activityName: string;
   feedbackMemberName: string;
-  executiveMemberName: string;
+  activityType: number;
   feedbackType: number;
 }
 
 export const ActivityFeedbackScreen = (): JSX.Element => {
+  const { executiveStatuses } = useExecutiveStatus();
   const [feedbackActivities, setFeedbackActivities] = useState<
     ActivityFeedbackData[]
   >([]);
@@ -51,8 +53,14 @@ export const ActivityFeedbackScreen = (): JSX.Element => {
                           index={String(index + 1)}
                           club={activity.clubName}
                           activity={activity.activityName}
+                          activityType={
+                            activity.activityType === 1
+                              ? "내부"
+                              : activity.activityType === 2
+                              ? "외부"
+                              : "비합치"
+                          }
                           doneby={activity.feedbackMemberName}
-                          chargeof={activity.executiveMemberName}
                           state={activity.feedbackType}
                           activity_id={activity.activityId}
                         />

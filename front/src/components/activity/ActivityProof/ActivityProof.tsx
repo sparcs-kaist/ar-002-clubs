@@ -19,7 +19,7 @@ export const ActivityProof = ({
   fileName,
   onDelete,
 }: Props): JSX.Element => {
-  const isImage = url?.match(/\.(jpeg|jpg|gif|png)$/) != null;
+  const isImage = url?.match(/\.(jpeg|jpg|gif|png|PNG|JPG|JPE|GIF)$/) != null;
   const proxyUrl = url
     ? `${process.env.REACT_APP_BACKEND_URL}/activity/image-proxy?url=${url}`
     : "";

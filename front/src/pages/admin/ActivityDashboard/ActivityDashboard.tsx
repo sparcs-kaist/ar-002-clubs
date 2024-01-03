@@ -6,6 +6,7 @@ import { UpperBar } from "components/home/UpperBar";
 import "./ActivityDashboard.css";
 import { SubTitle } from "components/home/SubTitle";
 import { getRequest } from "utils/api";
+import { useExecutiveStatus } from "hooks/useUserPermission";
 
 interface ClubData {
   clubName: string;
@@ -27,6 +28,7 @@ interface DashboardData {
 }
 
 export const ActivityDashboard = (): JSX.Element => {
+  const { executiveStatuses } = useExecutiveStatus();
   const [dashboardData, setDashboardData] = useState<DashboardData>({
     totalActivities: 0,
     nonFeedbackTypeOneActivities: 0,
@@ -53,7 +55,7 @@ export const ActivityDashboard = (): JSX.Element => {
   return (
     <div className="activity-dashboard">
       <div className="frame-7">
-        <UpperBar className={"UpperBar"} title={"활동보고서 제출 현황"} />
+        <UpperBar className={"UpperBar"} title={"활동보고서 대시보드"} />
         <div className="frame-wrapper">
           <div className="frame-11">
             <div className="frame-12">
