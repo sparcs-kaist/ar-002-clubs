@@ -55,10 +55,10 @@ export const ActivityFeedbackScreen = (): JSX.Element => {
                           activity={activity.activityName}
                           activityType={
                             activity.activityType === 1
-                              ? "내부"
+                              ? "비합치"
                               : activity.activityType === 2
-                              ? "외부"
-                              : "비합치"
+                              ? "내부"
+                              : "외부"
                           }
                           doneby={activity.feedbackMemberName}
                           state={activity.feedbackType}
