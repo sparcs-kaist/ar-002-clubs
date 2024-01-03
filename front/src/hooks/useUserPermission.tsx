@@ -49,40 +49,40 @@ export const useUserRepresentativeStatus = () => {
   return { userStatuses, isLoading };
 };
 
-export const useExecutiveStatus = (disabled?: boolean) => {
-  const navigate = useNavigate();
-  const [executiveStatuses, setExecutiveStatuses] = useState<number>(0);
-  const [isLoading, setIsLoading] = useState(true);
+// export const useExecutiveStatus = (disabled?: boolean) => {
+//   const navigate = useNavigate();
+//   const [executiveStatuses, setExecutiveStatuses] = useState<number>(0);
+//   const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchUserStatus = () => {
-      getRequest(
-        "user/is_executive",
-        (data) => {
-          console.log(data);
-          setExecutiveStatuses(data.result);
-          setIsLoading(false);
-        },
-        (error) => {
-          console.error("Failed to fetch user status:", error);
-          setExecutiveStatuses(0);
-          setIsLoading(false);
-        }
-      );
-    };
+//   useEffect(() => {
+//     const fetchUserStatus = () => {
+//       getRequest(
+//         "user/is_executive",
+//         (data) => {
+//           console.log(data);
+//           setExecutiveStatuses(data.result);
+//           setIsLoading(false);
+//         },
+//         (error) => {
+//           console.error("Failed to fetch user status:", error);
+//           setExecutiveStatuses(0);
+//           setIsLoading(false);
+//         }
+//       );
+//     };
 
-    fetchUserStatus();
-  }, []);
+//     fetchUserStatus();
+//   }, []);
 
-  useEffect(() => {
-    if (!isLoading && executiveStatuses === 0 && !disabled) {
-      alert("접근 권한이 없습니다. 집행부원만 접근 가능합니다.");
-      navigate(-1);
-    }
-  }, [isLoading]);
+//   useEffect(() => {
+//     if (!isLoading && executiveStatuses === 0 && !disabled) {
+//       alert("접근 권한이 없습니다. 집행부원만 접근 가능합니다.");
+//       navigate(-1);
+//     }
+//   }, [isLoading]);
 
-  return { executiveStatuses, isLoading };
-};
+//   return { executiveStatuses, isLoading };
+// };
 
 export const useUserPermission = (permissions: any[]) => {
   const navigate = useNavigate();

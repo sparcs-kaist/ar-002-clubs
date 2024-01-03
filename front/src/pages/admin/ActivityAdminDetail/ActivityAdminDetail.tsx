@@ -6,10 +6,7 @@ import "./ActivityAdminDetail.css";
 import { UpperBar } from "components/home/UpperBar";
 import { ActivityFeedback } from "components/activity/ActivityFeedback";
 import { getRequest, postRequest } from "utils/api";
-import {
-  useExecutiveStatus,
-  useUserRepresentativeStatus,
-} from "hooks/useUserPermission";
+import { useExecutiveStatus } from "contexts/ExecutiveStatusContext";
 import { useNavigate, useParams } from "react-router-dom";
 import { useReportDurationStatus } from "hooks/useReportDurationStatus";
 

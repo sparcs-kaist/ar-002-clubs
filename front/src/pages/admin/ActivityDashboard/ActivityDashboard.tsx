@@ -6,7 +6,7 @@ import { UpperBar } from "components/home/UpperBar";
 import "./ActivityDashboard.css";
 import { SubTitle } from "components/home/SubTitle";
 import { getRequest } from "utils/api";
-import { useExecutiveStatus } from "hooks/useUserPermission";
+import { useExecutiveStatus } from "contexts/ExecutiveStatusContext";
 
 interface ClubData {
   clubName: string;

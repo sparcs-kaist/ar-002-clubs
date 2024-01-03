@@ -133,7 +133,7 @@ router.get("/is_executive", async (req, res) => {
     });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "서버 오류" });
+    return res.status(500).json({ result: 0 });
   }
 });
 

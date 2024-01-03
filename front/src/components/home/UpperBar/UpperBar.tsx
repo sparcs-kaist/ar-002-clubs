@@ -16,7 +16,10 @@ import "./UpperBar.css";
 import Profile from "assets/Images/profile.png";
 import { getRequest } from "utils/api";
 import { Unavailable } from "utils/util";
-import { useExecutiveStatus } from "hooks/useUserPermission";
+import {
+  useDeleteExecutive,
+  useExecutiveStatus,
+} from "contexts/ExecutiveStatusContext";
 
 interface Props {
   className: any;
@@ -26,6 +29,7 @@ interface Props {
 export const UpperBar = ({ className, title }: Props): JSX.Element => {
   const { user, logout } = useAuth(); // authContext에서 user 정보 가져오기
   const { executiveStatuses } = useExecutiveStatus(true);
+  const deleteExecutive = useDeleteExecutive();
   const navigate = useNavigate();
 
   const [showSubMenu1, setShowSubMenu1] = useState(false);
@@ -63,6 +67,7 @@ export const UpperBar = ({ className, title }: Props): JSX.Element => {
             const logoutUrl = data.logoutUrl;
             console.log(logoutUrl);
             logout(); // Assuming 'logout' is a function that handles the client-side logout process
+            deleteExecutive();
             window.location.href = logoutUrl;
           });
         } else {

@@ -10,7 +10,7 @@ import { useAuth } from "contexts/authContext";
 import "./Admin.css";
 import { UnderBar } from "components/home/UnderBar";
 import { getRequest, postRequest } from "utils/api";
-import { useExecutiveStatus } from "hooks/useUserPermission";
+import { useExecutiveStatus } from "contexts/ExecutiveStatusContext";
 
 export const Admin = (): JSX.Element => {
   const { executiveStatuses } = useExecutiveStatus();

@@ -33,6 +33,11 @@ const BATCH_SIZE = 100; // 한 번에 처리할 데이터의 양
 
 router.post("/feedback", async (req, res) => {
   try {
+    const authorized = await checkPermission(req, res, [{ executive: 4 }]);
+    if (!authorized) {
+      return;
+    }
+
     const { activity_id, reviewResult } = req.body;
     const studentId = req.session.user.student_id;
     const currentTimePlusNineHours = new Date(
@@ -354,6 +359,11 @@ router.post("/update_executive", async (req, res) => {
 
 router.get("/activity_submit_list", async (req, res) => {
   try {
+    const authorized = await checkPermission(req, res, [{ executive: 4 }]);
+    if (!authorized) {
+      return;
+    }
+
     const today = new Date();
 
     // 현재 날짜를 포함하는 학기 찾기
@@ -537,6 +547,11 @@ router.get("/activity_submit_list", async (req, res) => {
 
 router.get("/club_executive", async (req, res) => {
   try {
+    const authorized = await checkPermission(req, res, [{ executive: 3 }]);
+    if (!authorized) {
+      return;
+    }
+
     const clubId = req.query.club_id;
     const today = new Date();
 

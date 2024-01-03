@@ -5,7 +5,7 @@ import { UnderBar } from "components/home/UnderBar";
 import "./ActivityFeedbackScreen.css";
 import { UpperBar } from "components/home/UpperBar";
 import { getRequest } from "utils/api";
-import { useExecutiveStatus } from "hooks/useUserPermission";
+import { useExecutiveStatus } from "contexts/ExecutiveStatusContext";
 
 interface ActivityFeedbackData {
   activityId: number;
