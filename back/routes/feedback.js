@@ -50,7 +50,7 @@ router.get("/club_activity_list", async (req, res) => {
   try {
     const club_id = req.query.club_id; // or req.body.club_id, depending on how you're sending the data
 
-    const authorized = await checkPermission(req, res, [{ executive: 3 }]);
+    const authorized = await checkPermission(req, res, [{ executive: 4 }]);
     if (!authorized) {
       return;
     }
