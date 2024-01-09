@@ -7,6 +7,7 @@ import PropTypes from "prop-types";
 import React, { useEffect, useState } from "react";
 import "./style.css";
 import { getRequest, postRequest } from "utils/api";
+import { useNavigate } from "react-router-dom";
 
 interface Props {
   title: "zero" | "one";
@@ -46,6 +47,7 @@ export const DashboardClubList = ({
   const [selectedExecutive, setSelectedExecutive] = useState(
     executive_id ? executive_id.toString() : "0"
   );
+  const navigate = useNavigate();
 
   useEffect(() => {
     getRequest(`feedback/club_executive?club_id=${clubId}`, (data) => {
@@ -87,27 +89,34 @@ export const DashboardClubList = ({
     }
   };
 
+  const handleClick = () => {
+    navigate(clubId > 0 ? `/admin/club_activity/${clubId}` : "");
+  };
+
   return (
-    <div className={`dashboard-club-list ${title} ${className}`}>
-      <div className="frame">
+    <div
+      className={`dashboard-club-list ${title} ${className}`}
+      style={clubId > 0 ? { cursor: "pointer" } : {}}
+    >
+      <div className="frame" onClick={handleClick}>
         <div className="element">{text}</div>
       </div>
-      <div className="div-wrapper">
+      <div className="div-wrapper" onClick={handleClick}>
         <div className="text-wrapper-2">{text1}</div>
       </div>
-      <div className="frame-2">
+      <div className="frame-2" onClick={handleClick}>
         <div className="text-wrapper-2">{text2}</div>
       </div>
-      <div className="frame-2">
+      <div className="frame-2" onClick={handleClick}>
         <div className="text-wrapper-2">{text3}</div>
       </div>
-      <div className="frame-2">
+      <div className="frame-2" onClick={handleClick}>
         <div className="text-wrapper-2">{text4}</div>
       </div>
-      <div className="frame-2">
+      <div className="frame-2" onClick={handleClick}>
         <div className="text-wrapper-2">{text5}</div>
       </div>
-      <div className="frame-3">
+      <div className="frame-3" onClick={handleClick}>
         <div className="text-wrapper-2">{text6}</div>
       </div>
       {title === "zero" ? (

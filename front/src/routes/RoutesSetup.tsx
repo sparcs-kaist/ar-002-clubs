@@ -45,7 +45,7 @@ export default function RouteSetup() {
         element={<ActivityFeedbackScreen />}
       />
       <Route path="/admin/activity_dashboard" element={<ActivityDashboard />} />
-      <Route path="/admin/club_activity" element={<ClubActivityList />} />
+      <Route path="/admin/club_activity/:id" element={<ClubActivityList />} />
       <Route path="/admin/activity/:id" element={<ActivityAdminDetail />} />
     </Routes>
   );

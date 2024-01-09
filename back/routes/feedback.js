@@ -30,6 +30,147 @@ const BATCH_SIZE = 100; // 한 번에 처리할 데이터의 양
 //   await migrateDataInBatches();
 //   res.send("finish");
 // });
+const formatSignTime = (signTime) => {
+  if (!signTime) return null;
+  const date = new Date(signTime);
+  const year = date.getFullYear();
+  const month = date.getMonth() + 1; // 0-11 -> 1-12
+  const day = date.getDate();
+  const hours = date.getHours();
+  const minutes = date.getMinutes();
+  const seconds = date.getSeconds();
+  return `${year}.${month.toString().padStart(2, "0")}.${day
+    .toString()
+    .padStart(2, "0")}. ${hours.toString().padStart(2, "0")}:${minutes
+    .toString()
+    .padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
+};
+
+router.get("/club_activity_list", async (req, res) => {
+  try {
+    const club_id = req.query.club_id; // or req.body.club_id, depending on how you're sending the data
+
+    const authorized = await checkPermission(req, res, [{ executive: 3 }]);
+    if (!authorized) {
+      return;
+    }
+
+    const today = new Date();
+
+    // Find current semester
+    const currentSemester = await Semester.findOne({
+      where: {
+        start_date: { [Sequelize.Op.lte]: today },
+        end_date: { [Sequelize.Op.gte]: today },
+      },
+    });
+
+    if (!currentSemester) {
+      return res.status(404).send("Current semester not found.");
+    }
+
+    // Fetch the activity duration
+    const activityDuration = await Duration.findOne({
+      where: {
+        semester_id: currentSemester.id,
+        duration_name: "Activity",
+      },
+      attributes: ["start_date", "end_date"],
+    });
+
+    if (!activityDuration) {
+      return res
+        .status(404)
+        .send("Activity duration not found for the current semester.");
+    }
+
+    // Fetch filtered activities
+    const filteredActivities = await Activity.findAll({
+      where: {
+        club_id: club_id,
+        [Sequelize.Op.and]: [
+          { start_date: { [Sequelize.Op.gte]: activityDuration.start_date } },
+          { end_date: { [Sequelize.Op.lte]: activityDuration.end_date } },
+        ],
+      },
+      include: [
+        {
+          model: ActivityFeedback,
+          as: "ActivityFeedbacks", // Alias defined in your associations
+          include: [
+            {
+              model: Member,
+              as: "student",
+              attributes: ["name"],
+            },
+          ],
+          order: [["added_time", "DESC"]],
+          limit: 1,
+        },
+        {
+          model: ActivityFeedbackExecutive,
+          as: "ActivityFeedbackExecutive",
+          include: [
+            {
+              model: ExecutiveMember,
+              as: "student", // Alias for ExecutiveMember association
+              include: [
+                {
+                  model: Member,
+                  as: "student", // Alias for Member association in ExecutiveMember
+                  attributes: ["name"],
+                },
+              ],
+            },
+          ],
+        },
+      ],
+      order: [["feedback_type", "ASC"]],
+      attributes: [
+        "id",
+        "title",
+        "recent_edit",
+        "recent_feedback",
+        "feedback_type",
+      ],
+    });
+
+    console.log(
+      filteredActivities[0].ActivityFeedbackExecutive.student.student.name
+    );
+
+    // Process and return the response
+    const responseArray = filteredActivities.map((activity) => {
+      const recentFeedback = activity.ActivityFeedbacks[0];
+      const executiveFeedback = activity.ActivityFeedbackExecutive;
+
+      return {
+        title: activity.title,
+        activityId: activity.id,
+        recent_edit: formatSignTime(activity.recent_edit),
+        recent_feedback: formatSignTime(activity.recent_feedback),
+        feedbackMemberName: recentFeedback ? recentFeedback.student.name : null,
+        executive_id: executiveFeedback ? executiveFeedback.student_id : null,
+        executiveName: executiveFeedback
+          ? executiveFeedback.student.student.name
+          : null,
+        feedbackType: activity.feedback_type,
+      };
+    });
+
+    // Fetch the club name
+    const club = await Club.findByPk(club_id);
+    if (!club) {
+      return res.status(404).send("Club not found.");
+    }
+    const clubName = club.name;
+
+    res.json({ clubName, activities: responseArray });
+  } catch (error) {
+    console.error("Error in /club_activity_list:", error);
+    res.status(500).send("Internal Server Error");
+  }
+});
 
 router.post("/feedback", async (req, res) => {
   try {
@@ -293,7 +434,8 @@ router.get("/my_feedback_activity", async (req, res) => {
 });
 
 router.post("/update_executive", async (req, res) => {
-  const { student_id, club_id } = req.body;
+  const { student_id, club_id, activity_id } = req.body;
+  console.log(activity_id);
 
   try {
     const authorized = await checkPermission(req, res, [{ executive: 3 }]);
@@ -315,42 +457,53 @@ router.post("/update_executive", async (req, res) => {
       return res.status(404).send("Current semester not found.");
     }
 
-    // Fetch the activity duration for the current semester
-    const activityDuration = await Duration.findOne({
-      where: {
-        semester_id: currentSemester.id,
-        duration_name: "Activity",
-      },
-      attributes: ["start_date", "end_date"],
-    });
-
-    if (!activityDuration) {
-      return res
-        .status(404)
-        .send("Activity duration not found for the current semester.");
-    }
-
-    // Fetch filtered activities
-    const filteredActivities = await Activity.findAll({
-      where: {
-        club_id: club_id,
-        [Sequelize.Op.and]: [
-          { start_date: { [Sequelize.Op.gte]: activityDuration.start_date } },
-          { end_date: { [Sequelize.Op.lte]: activityDuration.end_date } },
-        ],
-      },
-      attributes: ["id"],
-    });
-
-    // Update ActivityFeedbackExecutive for each activity
-    for (const activity of filteredActivities) {
+    if (activity_id) {
+      // Update ActivityFeedbackExecutive for a specific activity
       await ActivityFeedbackExecutive.upsert({
-        activity: activity.id,
+        activity: activity_id,
         student_id: student_id,
       });
-    }
+      res.send("Executive updated successfully for the specific activity.");
+    } else if (club_id) {
+      // Fetch the activity duration for the current semester
+      const activityDuration = await Duration.findOne({
+        where: {
+          semester_id: currentSemester.id,
+          duration_name: "Activity",
+        },
+        attributes: ["start_date", "end_date"],
+      });
 
-    res.send("Executive updated successfully.");
+      if (!activityDuration) {
+        return res
+          .status(404)
+          .send("Activity duration not found for the current semester.");
+      }
+
+      // Fetch filtered activities
+      const filteredActivities = await Activity.findAll({
+        where: {
+          club_id: club_id,
+          [Sequelize.Op.and]: [
+            { start_date: { [Sequelize.Op.gte]: activityDuration.start_date } },
+            { end_date: { [Sequelize.Op.lte]: activityDuration.end_date } },
+          ],
+        },
+        attributes: ["id"],
+      });
+
+      // Update ActivityFeedbackExecutive for each activity
+      for (const activity of filteredActivities) {
+        await ActivityFeedbackExecutive.upsert({
+          activity: activity.id,
+          student_id: student_id,
+        });
+      }
+
+      res.send("Executive updated successfully for all activities.");
+    } else {
+      res.status(400).send("Invalid request parameters.");
+    }
   } catch (error) {
     console.error("Error in /update_executive:", error);
     res.status(500).send("Internal Server Error");
@@ -409,22 +562,6 @@ router.get("/activity_submit_list", async (req, res) => {
 
     // 비율 계산
     const ratio = (nonFeedbackTypeOneActivities / totalActivities) * 100;
-
-    const formatSignTime = (signTime) => {
-      if (!signTime) return null;
-      const date = new Date(signTime);
-      const year = date.getFullYear();
-      const month = date.getMonth() + 1; // 0-11 -> 1-12
-      const day = date.getDate();
-      const hours = date.getHours();
-      const minutes = date.getMinutes();
-      const seconds = date.getSeconds();
-      return `${year}.${month.toString().padStart(2, "0")}.${day
-        .toString()
-        .padStart(2, "0")}. ${hours.toString().padStart(2, "0")}:${minutes
-        .toString()
-        .padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
-    };
 
     const findMostFrequentExecutive = async (clubId) => {
       const activities = await Activity.findAll({
