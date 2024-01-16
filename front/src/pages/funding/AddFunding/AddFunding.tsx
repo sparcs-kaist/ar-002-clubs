@@ -524,7 +524,9 @@ export const AddFunding = (): JSX.Element => {
                       className="text-wrapper-8"
                     >
                       <option value="-1">분류 선택...</option>
-                      <option value="0">비품</option>
+                      <option value="0">
+                        비품 및 활동보고서로 증빙이 불가한 물품
+                      </option>
                       {activities.map((activity, index) => (
                         <option key={index} value={activity.id}>
                           {activity.title}
@@ -815,9 +817,7 @@ export const AddFunding = (): JSX.Element => {
                         <option value="1">비품 구매</option>
                         <option value="2">비품 관리</option>
                         <option value="3">비품이 아닌 동아리 물품 구매</option>
-                        <option value="4">
-                          비품이 아닌 동아리 물품 관리 중 선택
-                        </option>
+                        <option value="4">비품이 아닌 동아리 물품 관리</option>
                       </select>
                     </div>
                   </p>
@@ -1049,6 +1049,8 @@ export const AddFunding = (): JSX.Element => {
                   {(funding.transportation.type == 4 ||
                     funding.transportation.type == 5 ||
                     funding.transportation.type == 7 ||
+                    funding.transportation.type == 8 ||
+                    funding.transportation.type == 9 ||
                     funding.transportation.type == 10) && (
                     <>
                       <p className="div-2">

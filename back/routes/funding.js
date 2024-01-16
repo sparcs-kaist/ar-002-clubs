@@ -83,7 +83,7 @@ router.get("/funding_list", async (req, res) => {
     // Map funding to include activityName
     const fundingWithActivityNames = await Promise.all(
       fundings.map(async (funding) => {
-        let activityName = "비품";
+        let activityName = "비품 및 활동보고서로 증빙이 불가한 물품";
         if (funding.purpose > 0) {
           // Fetch the activity with the given ID
           const activity = await Activity.findByPk(funding.purpose);
