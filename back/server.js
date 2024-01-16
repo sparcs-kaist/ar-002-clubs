@@ -75,6 +75,8 @@ const activity = require("./routes/activity");
 app.use("/api/activity", activity);
 const feedback = require("./routes/feedback");
 app.use("/api/feedback", feedback);
+const funding = require("./routes/funding");
+app.use("/api/funding", funding);
 
 const httpServer = http.createServer(app);
 httpServer.listen(80, () => {

@@ -210,6 +210,7 @@ router.get("/club_members/:clubId", async (req, res) => {
       include: [
         {
           model: Member,
+          as: "student",
           attributes: ["student_id", "name"],
         },
       ],
@@ -217,8 +218,8 @@ router.get("/club_members/:clubId", async (req, res) => {
 
     // Prepare the response
     const memberDetails = members.map((member) => ({
-      student_id: member.Member.student_id,
-      name: member.Member.name,
+      student_id: member.student.student_id,
+      name: member.student.name,
     }));
 
     res.json(memberDetails);

@@ -269,6 +269,7 @@ export const ActivityDetail = (): JSX.Element => {
     try {
       await postRequest(
         `activity/deleteActivity/${id}`,
+        {},
         () => {},
         (error) => {
           console.error(error);
@@ -400,7 +401,7 @@ export const ActivityDetail = (): JSX.Element => {
           </div>
         </div>
         <UnderBar />
-        {typeId < 4 && (
+        {typeId < 4 && durationStatus > 0 && (
           <div className="frame-16">
             <div
               className="frame-17"

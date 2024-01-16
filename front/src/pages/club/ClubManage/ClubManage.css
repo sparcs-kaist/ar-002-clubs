@@ -272,10 +272,10 @@
   align-items: center;
   display: flex;
   gap: 20px;
-  left: 630px;
+  left: 610px;
   position: absolute;
   top: 5px;
-  width: 160px;
+  width: 200px;
 }
 
 .club-manage .group-3 {

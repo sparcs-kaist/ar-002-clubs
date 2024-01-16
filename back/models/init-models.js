@@ -26,8 +26,17 @@ var _Duration = require("./Duration");
 var _ExecutiveBureau = require("./ExecutiveBureau");
 var _ExecutiveMember = require("./ExecutiveMember");
 var _ExecutiveType = require("./ExecutiveType");
-var _Fixture = require("./Fixture");
 var _Funding = require("./Funding");
+var _FundingEvidence = require("./FundingEvidence");
+var _FundingEvidenceType = require("./FundingEvidenceType");
+var _FundingFeedbackType = require("./FundingFeedbackType");
+var _FundingFixture = require("./FundingFixture");
+var _FundingFixtureObjectType = require("./FundingFixtureObjectType");
+var _FundingFixtureType = require("./FundingFixtureType");
+var _FundingNoncorp = require("./FundingNoncorp");
+var _FundingTransportation = require("./FundingTransportation");
+var _FundingTransportationMember = require("./FundingTransportationMember");
+var _FundingTransportationType = require("./FundingTransportationType");
 var _Meeting = require("./Meeting");
 var _MeetingMemberType = require("./MeetingMemberType");
 var _MeetingType = require("./MeetingType");
@@ -72,8 +81,26 @@ function initModels(sequelize) {
   var ExecutiveBureau = _ExecutiveBureau(sequelize, DataTypes);
   var ExecutiveMember = _ExecutiveMember(sequelize, DataTypes);
   var ExecutiveType = _ExecutiveType(sequelize, DataTypes);
-  var Fixture = _Fixture(sequelize, DataTypes);
   var Funding = _Funding(sequelize, DataTypes);
+  var FundingEvidence = _FundingEvidence(sequelize, DataTypes);
+  var FundingEvidenceType = _FundingEvidenceType(sequelize, DataTypes);
+  var FundingFeedbackType = _FundingFeedbackType(sequelize, DataTypes);
+  var FundingFixture = _FundingFixture(sequelize, DataTypes);
+  var FundingFixtureObjectType = _FundingFixtureObjectType(
+    sequelize,
+    DataTypes
+  );
+  var FundingFixtureType = _FundingFixtureType(sequelize, DataTypes);
+  var FundingNoncorp = _FundingNoncorp(sequelize, DataTypes);
+  var FundingTransportation = _FundingTransportation(sequelize, DataTypes);
+  var FundingTransportationMember = _FundingTransportationMember(
+    sequelize,
+    DataTypes
+  );
+  var FundingTransportationType = _FundingTransportationType(
+    sequelize,
+    DataTypes
+  );
   var Meeting = _Meeting(sequelize, DataTypes);
   var MeetingMemberType = _MeetingMemberType(sequelize, DataTypes);
   var MeetingType = _MeetingType(sequelize, DataTypes);
@@ -99,6 +126,18 @@ function initModels(sequelize) {
     foreignKey: "club_id",
     otherKey: "semester_id",
   });
+  Funding.belongsToMany(Member, {
+    as: "student_id_Members",
+    through: FundingTransportationMember,
+    foreignKey: "funding_id",
+    otherKey: "student_id",
+  });
+  Member.belongsToMany(Funding, {
+    as: "funding_id_Fundings",
+    through: FundingTransportationMember,
+    foreignKey: "student_id",
+    otherKey: "funding_id",
+  });
   Member.belongsToMany(Semester, {
     as: "semester_id_Semester_MemberStatuses",
     through: MemberStatus,
@@ -118,7 +157,7 @@ function initModels(sequelize) {
     otherKey: "club_id",
   });
   Semester.belongsToMany(Member, {
-    as: "student_id_Members",
+    as: "student_id_Member_MemberStatuses",
     through: MemberStatus,
     foreignKey: "semester_id",
     otherKey: "student_id",
@@ -182,8 +221,6 @@ function initModels(sequelize) {
     as: "ClubRepresentatives",
     foreignKey: "club_id",
   });
-  Fixture.belongsTo(Club, { as: "club", foreignKey: "club_id" });
-  Club.hasMany(Fixture, { as: "Fixtures", foreignKey: "club_id" });
   MemberClub.belongsTo(Club, { as: "club", foreignKey: "club_id" });
   Club.hasMany(MemberClub, { as: "MemberClubs", foreignKey: "club_id" });
   PermanentClub.belongsTo(Club, { as: "club", foreignKey: "club_id" });
@@ -254,6 +291,86 @@ function initModels(sequelize) {
     as: "ExecutiveMembers",
     foreignKey: "type_id",
   });
+  FundingEvidence.belongsTo(Funding, {
+    as: "funding",
+    foreignKey: "funding_id",
+  });
+  Funding.hasMany(FundingEvidence, {
+    as: "FundingEvidences",
+    foreignKey: "funding_id",
+  });
+  FundingFixture.belongsTo(Funding, {
+    as: "funding",
+    foreignKey: "funding_id",
+  });
+  Funding.hasMany(FundingFixture, {
+    as: "FundingFixtures",
+    foreignKey: "funding_id",
+  });
+  FundingNoncorp.belongsTo(Funding, {
+    as: "funding",
+    foreignKey: "funding_id",
+  });
+  Funding.hasMany(FundingNoncorp, {
+    as: "FundingNoncorps",
+    foreignKey: "funding_id",
+  });
+  FundingTransportation.belongsTo(Funding, {
+    as: "funding",
+    foreignKey: "funding_id",
+  });
+  Funding.hasMany(FundingTransportation, {
+    as: "FundingTransportations",
+    foreignKey: "funding_id",
+  });
+  FundingTransportationMember.belongsTo(Funding, {
+    as: "funding",
+    foreignKey: "funding_id",
+  });
+  Funding.hasMany(FundingTransportationMember, {
+    as: "FundingTransportationMembers",
+    foreignKey: "funding_id",
+  });
+  FundingEvidence.belongsTo(FundingEvidenceType, {
+    as: "funding_evidence_type",
+    foreignKey: "funding_evidence_type_id",
+  });
+  FundingEvidenceType.hasMany(FundingEvidence, {
+    as: "FundingEvidences",
+    foreignKey: "funding_evidence_type_id",
+  });
+  Funding.belongsTo(FundingFeedbackType, {
+    as: "funding_feedback_type_FundingFeedbackType",
+    foreignKey: "funding_feedback_type",
+  });
+  FundingFeedbackType.hasMany(Funding, {
+    as: "Fundings",
+    foreignKey: "funding_feedback_type",
+  });
+  FundingFixture.belongsTo(FundingFixtureObjectType, {
+    as: "fixture_type",
+    foreignKey: "fixture_type_id",
+  });
+  FundingFixtureObjectType.hasMany(FundingFixture, {
+    as: "FundingFixtures",
+    foreignKey: "fixture_type_id",
+  });
+  FundingFixture.belongsTo(FundingFixtureType, {
+    as: "funding_fixture_type",
+    foreignKey: "funding_fixture_type_id",
+  });
+  FundingFixtureType.hasMany(FundingFixture, {
+    as: "FundingFixtures",
+    foreignKey: "funding_fixture_type_id",
+  });
+  FundingTransportation.belongsTo(FundingTransportationType, {
+    as: "transportation_type",
+    foreignKey: "transportation_type_id",
+  });
+  FundingTransportationType.hasMany(FundingTransportation, {
+    as: "FundingTransportations",
+    foreignKey: "transportation_type_id",
+  });
   Meeting.belongsTo(MeetingType, { as: "type", foreignKey: "type_id" });
   MeetingType.hasMany(Meeting, { as: "Meetings", foreignKey: "type_id" });
   ActivityFeedback.belongsTo(Member, {
@@ -296,19 +413,21 @@ function initModels(sequelize) {
     as: "ExecutiveMembers",
     foreignKey: "student_id",
   });
-  Meeting.belongsTo(Member, { as: "editor", foreignKey: "editorId" });
-  Member.hasMany(Meeting, { as: "Meetings", foreignKey: "editorId" });
-  MemberStatus.belongsTo(Member, { as: "student", foreignKey: "student_id" });
-  Member.hasMany(MemberStatus, {
-    as: "MemberStatuses",
-    foreignKey: "student_id",
-  });
-  MemberClub.belongsTo(MemberStatus, {
+  FundingTransportationMember.belongsTo(Member, {
     as: "student",
     foreignKey: "student_id",
   });
-  MemberStatus.hasMany(MemberClub, {
-    as: "MemberClubs",
+  Member.hasMany(FundingTransportationMember, {
+    as: "FundingTransportationMembers",
+    foreignKey: "student_id",
+  });
+  Meeting.belongsTo(Member, { as: "editor", foreignKey: "editorId" });
+  Member.hasMany(Meeting, { as: "Meetings", foreignKey: "editorId" });
+  MemberClub.belongsTo(Member, { as: "student", foreignKey: "student_id" });
+  Member.hasMany(MemberClub, { as: "MemberClubs", foreignKey: "student_id" });
+  MemberStatus.belongsTo(Member, { as: "student", foreignKey: "student_id" });
+  Member.hasMany(MemberStatus, {
+    as: "MemberStatuses",
     foreignKey: "student_id",
   });
   MemberClub.belongsTo(MemberStatus, {
@@ -316,7 +435,7 @@ function initModels(sequelize) {
     foreignKey: "semester_id",
   });
   MemberStatus.hasMany(MemberClub, {
-    as: "semester_MemberClubs",
+    as: "MemberClubs",
     foreignKey: "semester_id",
   });
   ActivitySign.belongsTo(Semester, {
@@ -353,10 +472,6 @@ function initModels(sequelize) {
     as: "SemesterClubs",
     foreignKey: "type_id",
   });
-  // Inside MemberClub model definition
-  MemberClub.belongsTo(Member, { foreignKey: "student_id" });
-  // And/or inside Member model definition
-  Member.hasMany(MemberClub, { foreignKey: "student_id" });
 
   return {
     Activity,
@@ -386,8 +501,17 @@ function initModels(sequelize) {
     ExecutiveBureau,
     ExecutiveMember,
     ExecutiveType,
-    Fixture,
     Funding,
+    FundingEvidence,
+    FundingEvidenceType,
+    FundingFeedbackType,
+    FundingFixture,
+    FundingFixtureObjectType,
+    FundingFixtureType,
+    FundingNoncorp,
+    FundingTransportation,
+    FundingTransportationMember,
+    FundingTransportationType,
     Meeting,
     MeetingMemberType,
     MeetingType,
