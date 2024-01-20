@@ -338,10 +338,10 @@ router.post("/editFunding", async (req, res) => {
       // Insert FundingFixtureEvidence
       await FundingEvidence.bulkCreate(
         fixture.fixtureImages.map((image) => ({
-          fixture_id: fundingFixture.id,
+          funding_id: funding.id,
           image_url: image.imageUrl,
           description: image.fileName,
-          funding_fixture_evidence_type_id: 4,
+          funding_evidence_type_id: 4,
         })),
         { transaction }
       );
@@ -349,10 +349,10 @@ router.post("/editFunding", async (req, res) => {
       // Insert FundingFixtureEvidence
       await FundingEvidence.bulkCreate(
         fixture.softwareProofImages.map((image) => ({
-          fixture_id: fundingFixture.id,
+          funding_id: funding.id,
           image_url: image.imageUrl,
           description: image.fileName,
-          funding_fixture_evidence_type_id: 5,
+          funding_evidence_type_id: 5,
         })),
         { transaction }
       );
@@ -489,7 +489,7 @@ router.get("/getFunding", async (req, res) => {
             (e) => e.funding_evidence_type_id === 1
           ).map((e) => ({
             imageUrl: e.image_url,
-            description: e.description,
+            fileName: e.description,
           }))
         : [],
       detailImages: funding.FundingEvidences
@@ -497,7 +497,7 @@ router.get("/getFunding", async (req, res) => {
             (e) => e.funding_evidence_type_id === 2
           ).map((e) => ({
             imageUrl: e.image_url,
-            description: e.description,
+            fileName: e.description,
           }))
         : [],
       additionalProof: {
@@ -514,7 +514,7 @@ router.get("/getFunding", async (req, res) => {
               (e) => e.funding_evidence_type_id === 3
             ).map((e) => ({
               imageUrl: e.image_url,
-              description: e.description,
+              fileName: e.description,
             }))
           : [],
       },
@@ -533,7 +533,7 @@ router.get("/getFunding", async (req, res) => {
               (e) => e.funding_evidence_type_id === 5
             ).map((e) => ({
               imageUrl: e.image_url,
-              description: e.description,
+              fileName: e.description,
             }))
           : [],
         name: funding.FundingFixtures[0]
@@ -550,7 +550,7 @@ router.get("/getFunding", async (req, res) => {
               (e) => e.funding_evidence_type_id === 4
             ).map((e) => ({
               imageUrl: e.image_url,
-              description: e.description,
+              fileName: e.description,
             }))
           : [],
       },
@@ -720,10 +720,10 @@ router.post("/addFunding", async (req, res) => {
       // Insert FundingFixtureEvidence
       await FundingEvidence.bulkCreate(
         fixture.fixtureImages.map((image) => ({
-          fixture_id: fundingFixture.id,
+          funding_id: funding.id,
           image_url: image.imageUrl,
           description: image.fileName,
-          funding_fixture_evidence_type_id: 4,
+          funding_evidence_type_id: 4,
         })),
         { transaction }
       );
@@ -731,10 +731,10 @@ router.post("/addFunding", async (req, res) => {
       // Insert FundingFixtureEvidence
       await FundingEvidence.bulkCreate(
         fixture.softwareProofImages.map((image) => ({
-          fixture_id: fundingFixture.id,
+          funding_id: funding.id,
           image_url: image.imageUrl,
           description: image.fileName,
-          funding_fixture_evidence_type_id: 5,
+          funding_evidence_type_id: 5,
         })),
         { transaction }
       );

@@ -81,6 +81,7 @@ interface Activity {
 export const EditFunding = (): JSX.Element => {
   const { userStatuses } = useUserRepresentativeStatus();
   // const { durationStatus, isLoading } = useReportDurationStatus();
+  const [initialLoad, setInitialLoad] = useState(3);
   const navigate = useNavigate();
   const { id } = useParams();
   const [funding, setFunding] = useState<FundingState>({
@@ -185,6 +186,11 @@ export const EditFunding = (): JSX.Element => {
   const maxDate = new Date("2023-12-15");
 
   useEffect(() => {
+    if (initialLoad > 0) {
+      setInitialLoad(initialLoad - 1); // 첫 로딩 후에는 false로 설정
+      return; // 첫 로딩에서는 나머지 로직을 실행하지 않음
+    }
+
     removeAllParticipants();
     funding.transportation.participants = [];
     searchMember(""); // Call this with an empty string to fetch all members initially

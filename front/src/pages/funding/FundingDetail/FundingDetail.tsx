@@ -184,11 +184,11 @@ export const FundingDetail = (): JSX.Element => {
   const minDate = new Date("2023-08-28");
   const maxDate = new Date("2023-12-15");
 
-  useEffect(() => {
-    removeAllParticipants();
-    funding.transportation.participants = [];
-    searchMember(""); // Call this with an empty string to fetch all members initially
-  }, [clubId, funding.purpose]);
+  // useEffect(() => {
+  //   removeAllParticipants();
+  //   funding.transportation.participants = [];
+  //   searchMember(""); // Call this with an empty string to fetch all members initially
+  // }, [clubId, funding.purpose]);
 
   // useEffect(() => {
   //   if (!isLoading && durationStatus != 1) {
@@ -560,7 +560,7 @@ export const FundingDetail = (): JSX.Element => {
                     >
                       <option value="-1">분류 선택...</option>
                       <option value="0">
-                        비품 및 활동보고서로 증빙이 불가한 물
+                        비품 및 활동보고서로 증빙이 불가한 물품
                       </option>
                       {activities.map((activity, index) => (
                         <option key={index} value={activity.id}>
