@@ -35,3 +35,38 @@ export const useReportDurationStatus = () => {
 
   return reportState;
 };
+
+export const useFundingDurationStatus = () => {
+  const [reportState, setReportState] = useState({
+    durationStatus: 0,
+    isLoading: true,
+    error: null,
+  });
+
+  useEffect(() => {
+    const fetchFundingDurationStatus = () => {
+      getRequest(
+        "funding/is_funding_duration",
+        (data) => {
+          setReportState({
+            durationStatus: data.fundingStatus,
+            isLoading: false,
+            error: null,
+          });
+        },
+        (error) => {
+          console.error("Failed to fetch report duration status:", error);
+          setReportState({
+            durationStatus: 0,
+            isLoading: false,
+            error: error,
+          });
+        }
+      );
+    };
+
+    fetchFundingDurationStatus();
+  }, []);
+
+  return reportState;
+};

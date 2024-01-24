@@ -1,0 +1,1 @@
+export { FundingAdminDetail } from "./FundingAdminDetail";

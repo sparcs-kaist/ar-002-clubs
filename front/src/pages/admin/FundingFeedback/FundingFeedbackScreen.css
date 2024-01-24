@@ -1,0 +1,171 @@
+.activity-feedback-screen {
+  background-color: #f6feff;
+  height: 1721px;
+  width: 1728px;
+}
+
+.activity-feedback-screen .frame-6 {
+  align-items: flex-start;
+  background-color: #f6feff;
+  display: inline-flex;
+  flex-direction: column;
+  gap: 23px;
+  height: 1721px;
+  position: relative;
+}
+
+.activity-feedback-screen .upper-bar {
+  background-size: 100% 100%;
+  height: 245px;
+  position: relative;
+  width: 1728px;
+}
+
+.activity-feedback-screen .group-2 {
+  height: 68px;
+  left: 21px;
+  position: absolute;
+  top: 19px;
+  width: 152px;
+}
+
+.activity-feedback-screen .img {
+  height: 60px;
+  left: 0;
+  object-fit: cover;
+  position: absolute;
+  top: 0;
+  width: 65px;
+}
+
+.activity-feedback-screen .text-wrapper-6 {
+  color: #7cd2d8;
+  font-family: "Noto Sans Arabic", Helvetica;
+  font-size: 31px;
+  font-weight: 600;
+  height: 65px;
+  left: 65px;
+  letter-spacing: 0;
+  line-height: normal;
+  position: absolute;
+  top: 3px;
+}
+
+.activity-feedback-screen .clubs {
+  color: #ffffff;
+  font-family: "NanumBarunGothic-Bold", Helvetica;
+  font-size: 48px;
+  font-weight: 700;
+  left: 86px;
+  letter-spacing: 0;
+  line-height: normal;
+  position: absolute;
+  top: 100px;
+  white-space: nowrap;
+}
+
+.activity-feedback-screen .loading-bar-instance {
+  left: 0 !important;
+  position: absolute !important;
+  top: 0 !important;
+}
+
+.activity-feedback-screen .frame-7 {
+  align-items: flex-start;
+  display: inline-flex;
+  gap: 902px;
+  left: 286px;
+  position: absolute;
+  top: 39px;
+}
+
+.activity-feedback-screen .frame-8 {
+  align-items: flex-start;
+  display: flex;
+  gap: 60px;
+  height: 30px;
+  position: relative;
+  width: 422px;
+}
+
+.activity-feedback-screen .design-component-instance-node {
+  flex: 0 0 auto !important;
+}
+
+.activity-feedback-screen .frame-9 {
+  align-items: center;
+  display: inline-flex;
+  flex: 0 0 auto;
+  gap: 11px;
+  justify-content: center;
+  position: relative;
+}
+
+.activity-feedback-screen .image-2 {
+  height: 18px;
+  object-fit: cover;
+  position: relative;
+  width: 18px;
+}
+
+.activity-feedback-screen .frame-wrapper {
+  align-items: flex-start;
+  display: flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+  gap: 10px;
+  padding: 10px 155px;
+  position: relative;
+  width: 1728px;
+}
+
+.activity-feedback-screen .frame-10 {
+  align-items: flex-start;
+  display: inline-flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+  gap: 40px;
+  position: relative;
+}
+
+.activity-feedback-screen .frame-11 {
+  align-items: flex-start;
+  display: flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+  gap: 15px;
+  position: relative;
+  width: 1399px;
+}
+
+.activity-feedback-screen .frame-12 {
+  align-items: flex-start;
+  display: inline-flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+  gap: 40px;
+  margin-right: -20px;
+  position: relative;
+}
+
+.activity-feedback-screen .frame-13 {
+  align-items: flex-start;
+  display: inline-flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+  gap: 15px;
+  position: relative;
+}
+
+.activity-feedback-screen .sub-title-instance {
+  margin-right: -37px !important;
+}
+
+.activity-feedback-screen .frame-14 {
+  align-items: flex-start;
+  display: inline-flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+  padding: 0px 20px;
+  position: relative;
+}

@@ -2,16 +2,13 @@ import React, { useEffect, useState } from "react";
 import { ActivityProof } from "components/activity/ActivityProof";
 import { SubTitle } from "components/home/SubTitle";
 import { UnderBar } from "components/home/UnderBar";
-import "./AddFunding.css";
+import "./FundingAdminDetail.css";
 import { UpperBar } from "components/home/UpperBar";
 import { ActivityFeedback } from "components/activity/ActivityFeedback";
 import { getRequest, postRequest } from "utils/api";
 import { useUserRepresentativeStatus } from "hooks/useUserPermission";
-import { useNavigate } from "react-router-dom";
-import {
-  useFundingDurationStatus,
-  useReportDurationStatus,
-} from "hooks/useReportDurationStatus";
+import { useNavigate, useParams } from "react-router-dom";
+import { useReportDurationStatus } from "hooks/useReportDurationStatus";
 
 interface Participant {
   student_id: string;
@@ -81,10 +78,11 @@ interface Activity {
   title: string;
 }
 
-export const AddFunding = (): JSX.Element => {
+export const FundingAdminDetail = (): JSX.Element => {
   const { userStatuses } = useUserRepresentativeStatus();
-  const { durationStatus, isLoading } = useFundingDurationStatus();
+  // const { durationStatus, isLoading } = useReportDurationStatus();
   const navigate = useNavigate();
+  const { id } = useParams();
   const [funding, setFunding] = useState<FundingState>({
     name: "",
     expenditureDate: "",
@@ -138,23 +136,30 @@ export const AddFunding = (): JSX.Element => {
   const [activities, setActivities] = useState<Activity[]>([]);
   const clubId = userStatuses.length > 0 ? userStatuses[0].clubId : null;
 
-  // Validation for date range and order
-  //TODO: 서버에서 불러와서 적용
-  const minDate = new Date("2023-08-28");
-  const maxDate = new Date("2023-12-15");
-
   useEffect(() => {
-    if (!isLoading && durationStatus != 1) {
-      alert("활동 추가 기간이 아닙니다. 기간을 확인해주세요.");
-      navigate(-1);
+    const fetchFundingData = async () => {
+      try {
+        console.log(id);
+        await getRequest(
+          `funding/getFunding/?id=${id}`,
+          (data) => {
+            setFunding(data.funding);
+          },
+          (error) => {
+            console.error(error);
+            alert("권한이 없습니다.");
+            navigate(-1);
+          }
+        );
+      } catch (error) {
+        console.error("Error fetching activity data:", error);
+      }
+    };
+
+    if (id) {
+      fetchFundingData();
     }
-  }, [isLoading]);
-
-  useEffect(() => {
-    removeAllParticipants();
-    funding.transportation.participants = [];
-    searchMember(""); // Call this with an empty string to fetch all members initially
-  }, [clubId, funding.purpose]);
+  }, [id]);
 
   useEffect(() => {
     const fetchActivities = async () => {
@@ -174,6 +179,17 @@ export const AddFunding = (): JSX.Element => {
     }
   }, [clubId]);
 
+  // Validation for date range and order
+  //TODO: 서버에서 불러와서 적용
+  const minDate = new Date("2023-08-28");
+  const maxDate = new Date("2023-12-15");
+
+  // useEffect(() => {
+  //   removeAllParticipants();
+  //   funding.transportation.participants = [];
+  //   searchMember(""); // Call this with an empty string to fetch all members initially
+  // }, [clubId, funding.purpose]);
+
   // useEffect(() => {
   //   if (!isLoading && durationStatus != 1) {
   //     alert("활동 추가 기간이 아닙니다. 기간을 확인해주세요.");
@@ -186,34 +202,56 @@ export const AddFunding = (): JSX.Element => {
       HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
     >
   ) => {
-    const { name, value, type } = e.target;
-    const isCheckbox = type === "checkbox";
-    const inputValue = isCheckbox
-      ? (e.target as HTMLInputElement).checked
-      : value;
+    // const { name, value, type } = e.target;
+    // const isCheckbox = type === "checkbox";
+    // const inputValue = isCheckbox
+    //   ? (e.target as HTMLInputElement).checked
+    //   : value;
+    // if (name.includes(".")) {
+    //   const [stateName, fieldName] = name.split(".");
+    //   setFunding((prevState) => {
+    //     const subState = prevState[stateName as keyof FundingState];
+    //     if (typeof subState === "object" && subState !== null) {
+    //       return {
+    //         ...prevState,
+    //         [stateName]: {
+    //           ...subState,
+    //           [fieldName]: inputValue,
+    //         },
+    //       };
+    //     }
+    //     return prevState;
+    //   });
+    // } else {
+    //   setFunding((prevState) => ({
+    //     ...prevState,
+    //     [name]: inputValue,
+    //   }));
+    // }
+  };
 
-    if (name.includes(".")) {
-      const [stateName, fieldName] = name.split(".");
+  const handleDeleteFunding = async () => {
+    const confirmDelete = window.confirm("활동을 삭제하시겠습니까?");
+    if (!confirmDelete) {
+      return; // Stop if the user cancels
+    }
 
-      setFunding((prevState) => {
-        const subState = prevState[stateName as keyof FundingState];
-
-        if (typeof subState === "object" && subState !== null) {
-          return {
-            ...prevState,
-            [stateName]: {
-              ...subState,
-              [fieldName]: inputValue,
-            },
-          };
+    try {
+      await postRequest(
+        `funding/deleteFunding/${id}`,
+        {},
+        () => {},
+        (error) => {
+          console.error(error);
+          alert(
+            "지원금 항목을 삭제하는 중 에러가 발생했습니다. 다시 시도해주세요."
+          );
         }
-        return prevState;
-      });
-    } else {
-      setFunding((prevState) => ({
-        ...prevState,
-        [name]: inputValue,
-      }));
+      );
+      navigate("/club_manage");
+    } catch (error) {
+      console.error("Error deleting activity:", error);
+      // Optionally, handle the error (e.g., show error message)
     }
   };
 
@@ -408,10 +446,9 @@ export const AddFunding = (): JSX.Element => {
       <span
         key={index}
         className="participant-tag"
-        onClick={() => removeParticipant(index)}
+        style={{ fontSize: "20px", width: "1000px" }}
       >
-        {participant.name}
-        <button>X</button>
+        {participant.name},
       </span>
     ));
   };
@@ -480,24 +517,12 @@ export const AddFunding = (): JSX.Element => {
   return (
     <div className="add-funding">
       <div className="frame-3">
-        <UpperBar title={"지원금 추가하기"} className={"upper-bar"} />
+        <UpperBar title={funding.name} className={"upper-bar"} />
         <div className="frame-wrapper">
           <div className="frame-7">
             <div className="frame-8">
               <SubTitle className="sub-title-instance" text="지원금 정보" />
               <div className="frame-9">
-                <p className="div-2">
-                  <span className="span">항목명: </span>
-                  <input
-                    type="text"
-                    name="name"
-                    value={funding.name}
-                    onChange={handleChange}
-                    placeholder="항목명을 입력하세요."
-                    className="text-wrapper-8"
-                    style={{ width: "942px" }}
-                  />
-                </p>
                 <p className="div-3">
                   <span className="span">지출 일자:</span>
                   <input
@@ -569,7 +594,7 @@ export const AddFunding = (): JSX.Element => {
             </div>
             <div className="frame-12">
               <SubTitle className="sub-title-instance" text="거래 사실 증빙" />
-              <div className="frame-9">
+              {/* <div className="frame-9">
                 <input
                   type="file"
                   onChange={(e) => {
@@ -578,7 +603,7 @@ export const AddFunding = (): JSX.Element => {
                     }
                   }}
                 />
-              </div>
+              </div> */}
               <div className="frame-9">
                 {groupProofImagesInPairs("transactionImages").map(
                   (pair, pairIndex) => (
@@ -588,7 +613,7 @@ export const AddFunding = (): JSX.Element => {
                           key={index}
                           url={image.imageUrl}
                           className="activity-proof-instance"
-                          property1="default"
+                          property1="variant-2"
                           fileName={image.fileName}
                           onDelete={() =>
                             handleDeleteImage(
@@ -608,7 +633,7 @@ export const AddFunding = (): JSX.Element => {
                 className="sub-title-instance"
                 text="거래 세부항목 증빙"
               />
-              <div className="frame-9">
+              {/* <div className="frame-9">
                 <input
                   type="file"
                   onChange={(e) => {
@@ -617,7 +642,7 @@ export const AddFunding = (): JSX.Element => {
                     }
                   }}
                 />
-              </div>
+              </div> */}
               <div className="frame-9">
                 {groupProofImagesInPairs("detailImages").map(
                   (pair, pairIndex) => (
@@ -627,7 +652,7 @@ export const AddFunding = (): JSX.Element => {
                           key={index}
                           url={image.imageUrl}
                           className="activity-proof-instance"
-                          property1="default"
+                          property1="variant-2"
                           fileName={image.fileName}
                           onDelete={() =>
                             handleDeleteImage(image.fileName, "detailImages")
@@ -771,7 +796,7 @@ export const AddFunding = (): JSX.Element => {
                   className="text-wrapper-10"
                   style={{ height: "150px" }}
                 />
-                <input
+                {/* <input
                   type="file"
                   onChange={(e) => {
                     if (e.target.files?.[0]) {
@@ -781,7 +806,7 @@ export const AddFunding = (): JSX.Element => {
                       );
                     }
                   }}
-                />
+                /> */}
               </div>
               <div className="frame-9">
                 {groupProofImagesInPairs(
@@ -793,7 +818,7 @@ export const AddFunding = (): JSX.Element => {
                         key={index}
                         url={image.imageUrl}
                         className="activity-proof-instance"
-                        property1="default"
+                        property1="variant-2"
                         fileName={image.fileName}
                         onDelete={() =>
                           handleDeleteImage(
@@ -872,7 +897,7 @@ export const AddFunding = (): JSX.Element => {
                         style={{ height: "150px" }}
                       />
 
-                      <input
+                      {/* <input
                         type="file"
                         onChange={(e) => {
                           if (e.target.files?.[0]) {
@@ -882,7 +907,7 @@ export const AddFunding = (): JSX.Element => {
                             );
                           }
                         }}
-                      />
+                      /> */}
                       {groupProofImagesInPairs(
                         "fixture.softwareProofImages"
                       ).map((pair, pairIndex) => (
@@ -892,7 +917,7 @@ export const AddFunding = (): JSX.Element => {
                               key={index}
                               url={image.imageUrl}
                               className="activity-proof-instance"
-                              property1="default"
+                              property1="variant-2"
                               fileName={image.fileName}
                               onDelete={() =>
                                 handleDeleteImage(
@@ -954,7 +979,7 @@ export const AddFunding = (): JSX.Element => {
                       <p className="div-3">
                         <span className="span">물품 사진</span>
                       </p>
-                      <input
+                      {/* <input
                         type="file"
                         onChange={(e) => {
                           if (e.target.files?.[0]) {
@@ -964,7 +989,7 @@ export const AddFunding = (): JSX.Element => {
                             );
                           }
                         }}
-                      />
+                      /> */}
                       {groupProofImagesInPairs("fixture.fixtureImages").map(
                         (pair, pairIndex) => (
                           <div key={pairIndex} className="frame-13">
@@ -973,7 +998,7 @@ export const AddFunding = (): JSX.Element => {
                                 key={index}
                                 url={image.imageUrl}
                                 className="activity-proof-instance"
-                                property1="default"
+                                property1="variant-2"
                                 fileName={image.fileName}
                                 onDelete={() =>
                                   handleDeleteImage(
@@ -1072,38 +1097,7 @@ export const AddFunding = (): JSX.Element => {
                       </p>
                       <div className="participants-input">
                         {renderParticipants()}
-                        <div>
-                          <button onClick={addAllParticipants}>
-                            전체 선택
-                          </button>
-                          <button onClick={removeAllParticipants}>
-                            전체 삭제
-                          </button>
-                        </div>
-                        <input
-                          type="text"
-                          value={searchTerm}
-                          onChange={handleSearchChange}
-                          placeholder={
-                            funding.transportation.participants.length
-                              ? ""
-                              : "회원 검색..."
-                          }
-                          className="text-wrapper-10"
-                        />
                       </div>
-                      {searchResults && searchResults.length > 0 && (
-                        <ul className="search-results">
-                          {searchResults.map((member, index) => (
-                            <li
-                              key={index}
-                              onClick={() => addParticipant(member)}
-                            >
-                              {member.name} {member.student_id}
-                            </li>
-                          ))}
-                        </ul>
-                      )}
                     </>
                   )}
                   {(funding.transportation.type == 5 ||
@@ -1193,20 +1187,27 @@ export const AddFunding = (): JSX.Element => {
                 </div>
               </div>
             )}
-            <div className="frame-12">
-              <div className="frame-14">
-                <div
-                  className="frame-15"
-                  onClick={handleSubmit}
-                  style={{ cursor: "pointer" }}
-                >
-                  <div className="text-wrapper-11">활동 저장</div>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
         <UnderBar />
+        <div className="frame-16">
+          <div
+            className="frame-17"
+            onClick={() => navigate(`/edit_funding/${id}`)}
+            style={{ cursor: "pointer" }}
+          >
+            수정
+          </div>
+          {/* {durationStatus == 1 && ( */}
+          <div
+            className="frame-17"
+            onClick={handleDeleteFunding}
+            style={{ cursor: "pointer" }}
+          >
+            삭제
+          </div>
+          {/* )} */}
+        </div>
       </div>
     </div>
   );

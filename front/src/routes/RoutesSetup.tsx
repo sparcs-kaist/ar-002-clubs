@@ -20,6 +20,10 @@ import { ActivityAdminDetail } from "pages/admin/ActivityAdminDetail";
 import { AddFunding } from "pages/funding/AddFunding";
 import { FundingDetail } from "pages/funding/FundingDetail";
 import { EditFunding } from "pages/funding/EditFunding";
+import { FundingFeedbackScreen } from "pages/admin/FundingFeedback/FundingFeedbackScreen";
+import { FundingDashboard } from "pages/admin/FundingDashboard";
+import { ClubFundingList } from "pages/admin/ClubFundingList";
+import { FundingAdminDetail } from "pages/admin/FundingAdminDetail";
 
 export default function RouteSetup() {
   return (
@@ -53,6 +57,14 @@ export default function RouteSetup() {
       <Route path="/admin/activity_dashboard" element={<ActivityDashboard />} />
       <Route path="/admin/club_activity/:id" element={<ClubActivityList />} />
       <Route path="/admin/activity/:id" element={<ActivityAdminDetail />} />
+
+      <Route
+        path="/admin/funding_feedback"
+        element={<FundingFeedbackScreen />}
+      />
+      <Route path="/admin/funding_dashboard" element={<FundingDashboard />} />
+      <Route path="/admin/club_funding/:id" element={<ClubFundingList />} />
+      <Route path="/admin/funding/:id" element={<FundingAdminDetail />} />
     </Routes>
   );
 }

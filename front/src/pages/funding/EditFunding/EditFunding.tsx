@@ -8,7 +8,10 @@ import { ActivityFeedback } from "components/activity/ActivityFeedback";
 import { getRequest, postRequest } from "utils/api";
 import { useUserRepresentativeStatus } from "hooks/useUserPermission";
 import { useNavigate, useParams } from "react-router-dom";
-import { useReportDurationStatus } from "hooks/useReportDurationStatus";
+import {
+  useFundingDurationStatus,
+  useReportDurationStatus,
+} from "hooks/useReportDurationStatus";
 
 interface Participant {
   student_id: string;
@@ -82,6 +85,7 @@ export const EditFunding = (): JSX.Element => {
   const { userStatuses } = useUserRepresentativeStatus();
   // const { durationStatus, isLoading } = useReportDurationStatus();
   const [initialLoad, setInitialLoad] = useState(3);
+  const { durationStatus, isLoading } = useFundingDurationStatus();
   const navigate = useNavigate();
   const { id } = useParams();
   const [funding, setFunding] = useState<FundingState>({
@@ -196,12 +200,12 @@ export const EditFunding = (): JSX.Element => {
     searchMember(""); // Call this with an empty string to fetch all members initially
   }, [clubId, funding.purpose]);
 
-  // useEffect(() => {
-  //   if (!isLoading && durationStatus != 1) {
-  //     alert("활동 추가 기간이 아닙니다. 기간을 확인해주세요.");
-  //     navigate(-1);
-  //   }
-  // }, [isLoading]);
+  useEffect(() => {
+    if (!isLoading && durationStatus == 0) {
+      alert("지원금 수정 기간이 아닙니다. 기간을 확인해주세요.");
+      navigate(-1);
+    }
+  }, [isLoading]);
 
   const handleChange = (
     e: React.ChangeEvent<

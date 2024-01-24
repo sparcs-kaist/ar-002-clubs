@@ -22,14 +22,8 @@ const {
 } = require("../models");
 const schedule = require("node-schedule");
 const checkPermission = require("../utils/permission");
-const { checkReportDuration } = require("../utils/duration");
+const checkReportDuration = require("../utils/duration");
 
-const BATCH_SIZE = 100; // 한 번에 처리할 데이터의 양
-
-// router.get("/migrate", async (req, res) => {
-//   await migrateDataInBatches();
-//   res.send("finish");
-// });
 const formatSignTime = (signTime) => {
   if (!signTime) return null;
   const date = new Date(signTime);
@@ -814,45 +808,5 @@ const migrateDataInBatches = async () => {
     console.error("Error during batch data migration:", error);
   }
 };
-
-const scheduleActivityModifyStart = async () => {
-  const currentDate = new Date();
-  currentDate.setHours(currentDate.getHours() + 9);
-
-  const currentSemester = await Semester.findOne({
-    where: {
-      start_date: { [Op.lte]: currentDate },
-      end_date: { [Op.gte]: currentDate },
-    },
-  });
-
-  if (!currentSemester) {
-    console.log("현재 학기를 찾을 수 없습니다.");
-    return;
-  }
-
-  const durations = await Duration.findAll({
-    where: {
-      semester_id: currentSemester.id,
-      duration_name: "ActivityModify",
-    },
-    attributes: ["start_date"],
-  });
-
-  if (durations.length > 0) {
-    const activityModifyStartDate = new Date(durations[0].start_date);
-    // activityModifyStartDate.setHours(-30, -7, 0, 0); // 시작일의 자정에 설정
-    activityModifyStartDate.setHours(0, 0, 0, 0); // 시작일의 자정에 설정
-
-    schedule.scheduleJob(activityModifyStartDate, async function () {
-      // 여기에 실행할 함수를 넣습니다.
-      console.log("ActivityModify 시작!");
-      await migrateDataInBatches();
-      // 실행할 함수 또는 로직
-    });
-  }
-};
-
-scheduleActivityModifyStart();
 
 module.exports = router;

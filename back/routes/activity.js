@@ -23,7 +23,7 @@ const {
   ActivityFeedback,
 } = require("../models");
 const checkPermission = require("../utils/permission");
-const checkReportDuration = require("../utils/duration");
+const { checkReportDuration } = require("../utils/duration");
 
 // Configure AWS with your access and secret key.
 // These should be stored in environment variables for security.

@@ -104,6 +104,18 @@ export const CenterCard = ({ SubTitleText }: Props): JSX.Element => {
       setPosts([
         {
           id: "1",
+          title: "지원금 신청 검토",
+          subtitle: "전체",
+          url: `${process.env.REACT_APP_FRONTEND_URL}/admin/funding_feedback`,
+        },
+        {
+          id: "1",
+          title: "지원금 신청 대시보드",
+          subtitle: "사무국장",
+          url: `${process.env.REACT_APP_FRONTEND_URL}/admin/funding_dashboard`,
+        },
+        {
+          id: "1",
           title: "활동보고서 검토",
           subtitle: "전체",
           url: `${process.env.REACT_APP_FRONTEND_URL}/admin/activity_feedback`,

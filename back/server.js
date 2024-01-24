@@ -77,6 +77,8 @@ const feedback = require("./routes/feedback");
 app.use("/api/feedback", feedback);
 const funding = require("./routes/funding");
 app.use("/api/funding", funding);
+const funding_feedback = require("./routes/funding_feedback");
+app.use("/api/funding_feedback", funding_feedback);
 
 const httpServer = http.createServer(app);
 httpServer.listen(80, () => {

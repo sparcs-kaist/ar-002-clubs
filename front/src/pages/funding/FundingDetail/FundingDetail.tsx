@@ -8,7 +8,10 @@ import { ActivityFeedback } from "components/activity/ActivityFeedback";
 import { getRequest, postRequest } from "utils/api";
 import { useUserRepresentativeStatus } from "hooks/useUserPermission";
 import { useNavigate, useParams } from "react-router-dom";
-import { useReportDurationStatus } from "hooks/useReportDurationStatus";
+import {
+  useFundingDurationStatus,
+  useReportDurationStatus,
+} from "hooks/useReportDurationStatus";
 
 interface Participant {
   student_id: string;
@@ -80,7 +83,7 @@ interface Activity {
 
 export const FundingDetail = (): JSX.Element => {
   const { userStatuses } = useUserRepresentativeStatus();
-  // const { durationStatus, isLoading } = useReportDurationStatus();
+  const { durationStatus } = useFundingDurationStatus();
   const navigate = useNavigate();
   const { id } = useParams();
   const [funding, setFunding] = useState<FundingState>({
@@ -1190,24 +1193,26 @@ export const FundingDetail = (): JSX.Element => {
           </div>
         </div>
         <UnderBar />
-        <div className="frame-16">
-          <div
-            className="frame-17"
-            onClick={() => navigate(`/edit_funding/${id}`)}
-            style={{ cursor: "pointer" }}
-          >
-            수정
+        {durationStatus > 0 && (
+          <div className="frame-16">
+            <div
+              className="frame-17"
+              onClick={() => navigate(`/edit_funding/${id}`)}
+              style={{ cursor: "pointer" }}
+            >
+              수정
+            </div>
+            {durationStatus == 1 && (
+              <div
+                className="frame-17"
+                onClick={handleDeleteFunding}
+                style={{ cursor: "pointer" }}
+              >
+                삭제
+              </div>
+            )}
           </div>
-          {/* {durationStatus == 1 && ( */}
-          <div
-            className="frame-17"
-            onClick={handleDeleteFunding}
-            style={{ cursor: "pointer" }}
-          >
-            삭제
-          </div>
-          {/* )} */}
-        </div>
+        )}
       </div>
     </div>
   );

@@ -8,7 +8,10 @@ import { UnderBar } from "components/home/UnderBar";
 import { UpperBar } from "components/home/UpperBar";
 import "./ClubManage.css";
 import { getRequest, postRequest } from "utils/api";
-import { useReportDurationStatus } from "hooks/useReportDurationStatus";
+import {
+  useReportDurationStatus,
+  useFundingDurationStatus,
+} from "hooks/useReportDurationStatus";
 import { Funding } from "components/activity/Funding";
 
 type Representative = {
@@ -45,6 +48,7 @@ type FundingInfo = {
 export const ClubManage = (): JSX.Element => {
   const userRepresentativeStatuses = useUserRepresentativeStatus(); // 배열을 반환한다고 가정
   const { durationStatus } = useReportDurationStatus();
+  const { durationStatus: fundingStatus } = useReportDurationStatus();
   const navigate = useNavigate();
   const [clubInfos, setClubInfos] = useState<{ [key: number]: ClubInfo }>({});
   const [advisorSignedStatus, setAdvisorSignedStatus] = useState<{
@@ -409,7 +413,7 @@ export const ClubManage = (): JSX.Element => {
                         />
                       </div>
                       <div className="frame-28">
-                        {status.typeId < 4 && (
+                        {status.typeId < 4 && durationStatus == 1 && (
                           <>
                             <div
                               className="rectangle"

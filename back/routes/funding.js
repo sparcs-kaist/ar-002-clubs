@@ -20,7 +20,7 @@ const {
   FundingTransportationMember,
 } = require("../models");
 const checkPermission = require("../utils/permission");
-const checkReportDuration = require("../utils/duration");
+const { checkFundingDuration } = require("../utils/duration");
 
 router.get("/funding_list", async (req, res) => {
   const clubId = req.query.club_id;
@@ -116,6 +116,11 @@ router.get("/funding_list", async (req, res) => {
 });
 
 router.post("/deleteFunding/:fundingId", async (req, res) => {
+  const durationCheck = await checkFundingDuration();
+  if (!durationCheck.found || durationCheck.reportStatus !== 1) {
+    return res.status(400).send({ message: "활동 삭제 기한이 지났습니다." });
+  }
+
   const { fundingId } = req.params;
 
   const transaction = await sequelize.transaction();
@@ -628,6 +633,11 @@ router.post("/addFunding", async (req, res) => {
     return;
   }
 
+  const durationCheck = await checkFundingDuration();
+  if (!durationCheck.found || durationCheck.reportStatus !== 1) {
+    return res.status(400).send({ message: "활동 추가 기한이 지났습니다." });
+  }
+
   const transaction = await sequelize.transaction();
 
   // Calculate the current date/time in KST (Korean Standard Time)
@@ -792,21 +802,6 @@ router.post("/addFunding", async (req, res) => {
   }
 });
 
-// router.get("/is_report_duration", async (req, res) => {
-//   try {
-//     const durationCheck = await checkReportDuration();
-
-//     if (!durationCheck.found) {
-//       return res.status(404).json({ message: durationCheck.message });
-//     }
-
-//     res.json({ reportStatus: durationCheck.reportStatus });
-//   } catch (error) {
-//     console.error("Error checking report duration:", error);
-//     res.status(500).json({ message: "서버 오류가 발생했습니다." });
-//   }
-// });
-
 router.get("/search_members", async (req, res) => {
   const { activity_id: activity_id, query } = req.query;
 
@@ -854,6 +849,21 @@ router.get("/search_members", async (req, res) => {
     });
   } catch (error) {
     console.error(error);
+    res.status(500).json({ message: "서버 오류가 발생했습니다." });
+  }
+});
+
+router.get("/is_funding_duration", async (req, res) => {
+  try {
+    const durationCheck = await checkFundingDuration();
+
+    if (!durationCheck.found) {
+      return res.status(404).json({ message: durationCheck.message });
+    }
+
+    res.json({ fundingStatus: durationCheck.fundingStatus });
+  } catch (error) {
+    console.error("Error checking report duration:", error);
     res.status(500).json({ message: "서버 오류가 발생했습니다." });
   }
 });
