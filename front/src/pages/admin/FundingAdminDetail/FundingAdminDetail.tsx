@@ -20,6 +20,11 @@ interface ProofImage {
   fileName: string;
 }
 
+interface FeedbackResult {
+  feedback_time: string;
+  text: string;
+}
+
 interface AdditionalProof {
   isFoodExpense: boolean;
   isLaborContract: boolean;
@@ -33,8 +38,10 @@ interface AdditionalProof {
 
 interface FundingState {
   name: string;
+  clubId: number;
   expenditureDate: string;
   expenditureAmount: number;
+  approvedAmount: number;
   purpose: number;
   isTransportation: boolean;
   isNonCorporateTransaction: boolean;
@@ -44,6 +51,8 @@ interface FundingState {
   fixture: FixtureState;
   transportation: TransportationState;
   nonCorp: NonCorpState;
+  feedbackResults: FeedbackResult[];
+  isCommittee: boolean;
 }
 
 interface FixtureState {
@@ -85,8 +94,10 @@ export const FundingAdminDetail = (): JSX.Element => {
   const { id } = useParams();
   const [funding, setFunding] = useState<FundingState>({
     name: "",
+    clubId: 0,
     expenditureDate: "",
     expenditureAmount: 0,
+    approvedAmount: 0,
     purpose: -1,
     isTransportation: false,
     isNonCorporateTransaction: false,
@@ -126,6 +137,8 @@ export const FundingAdminDetail = (): JSX.Element => {
       traderAccountNumber: "",
       wasteExplanation: "",
     },
+    isCommittee: false,
+    feedbackResults: [],
   });
 
   const [searchTerm, setSearchTerm] = useState("");
@@ -135,13 +148,14 @@ export const FundingAdminDetail = (): JSX.Element => {
   >([]);
   const [activities, setActivities] = useState<Activity[]>([]);
   const clubId = userStatuses.length > 0 ? userStatuses[0].clubId : null;
+  const [reviewResult, setReviewResult] = useState("");
 
   useEffect(() => {
     const fetchFundingData = async () => {
       try {
         console.log(id);
         await getRequest(
-          `funding/getFunding/?id=${id}`,
+          `funding_feedback/getFunding/${id}`,
           (data) => {
             setFunding(data.funding);
           },
@@ -164,7 +178,7 @@ export const FundingAdminDetail = (): JSX.Element => {
   useEffect(() => {
     const fetchActivities = async () => {
       getRequest(
-        `activity/activity_list?club_id=${clubId}`,
+        `activity/activity_list?club_id=${funding.clubId}`,
         (data) => {
           setActivities(data.activities || []);
         },
@@ -177,7 +191,7 @@ export const FundingAdminDetail = (): JSX.Element => {
     if (clubId) {
       fetchActivities();
     }
-  }, [clubId]);
+  }, [funding.clubId]);
 
   // Validation for date range and order
   //TODO: 서버에서 불러와서 적용
@@ -197,106 +211,50 @@ export const FundingAdminDetail = (): JSX.Element => {
   //   }
   // }, [isLoading]);
 
+  const handleReviewResultChange = (
+    event: React.ChangeEvent<HTMLTextAreaElement>
+  ) => {
+    setReviewResult(event.target.value);
+  };
+
   const handleChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
     >
   ) => {
-    // const { name, value, type } = e.target;
-    // const isCheckbox = type === "checkbox";
-    // const inputValue = isCheckbox
-    //   ? (e.target as HTMLInputElement).checked
-    //   : value;
-    // if (name.includes(".")) {
-    //   const [stateName, fieldName] = name.split(".");
-    //   setFunding((prevState) => {
-    //     const subState = prevState[stateName as keyof FundingState];
-    //     if (typeof subState === "object" && subState !== null) {
-    //       return {
-    //         ...prevState,
-    //         [stateName]: {
-    //           ...subState,
-    //           [fieldName]: inputValue,
-    //         },
-    //       };
-    //     }
-    //     return prevState;
-    //   });
-    // } else {
-    //   setFunding((prevState) => ({
-    //     ...prevState,
-    //     [name]: inputValue,
-    //   }));
-    // }
-  };
-
-  const handleDeleteFunding = async () => {
-    const confirmDelete = window.confirm("활동을 삭제하시겠습니까?");
-    if (!confirmDelete) {
-      return; // Stop if the user cancels
-    }
-
-    try {
-      await postRequest(
-        `funding/deleteFunding/${id}`,
-        {},
-        () => {},
-        (error) => {
-          console.error(error);
-          alert(
-            "지원금 항목을 삭제하는 중 에러가 발생했습니다. 다시 시도해주세요."
-          );
-        }
-      );
-      navigate("/club_manage");
-    } catch (error) {
-      console.error("Error deleting activity:", error);
-      // Optionally, handle the error (e.g., show error message)
-    }
-  };
-
-  const handleFileUpload = async (file: File, imageTypePath: string) => {
-    const formData = new FormData();
-    formData.append("file", file);
-
-    const handleSuccess = (response: {
-      data: { fileDetails: { location: string } };
-    }) => {
-      const uploadedFileUrl = response.data.fileDetails.location;
-      const pathParts = imageTypePath.split(".");
-
+    const { name, value, type } = e.target;
+    const isCheckbox = type === "checkbox";
+    const inputValue = isCheckbox
+      ? (e.target as HTMLInputElement).checked
+      : value;
+    if (name.includes(".")) {
+      const [stateName, fieldName] = name.split(".");
       setFunding((prevState) => {
-        // Clone the state to avoid direct mutation
-        const newState = JSON.parse(JSON.stringify(prevState));
-
-        let current: any = newState;
-        for (let i = 0; i < pathParts.length - 1; i++) {
-          current = current[pathParts[i]] as any;
+        const subState = prevState[stateName as keyof FundingState];
+        if (typeof subState === "object" && subState !== null) {
+          return {
+            ...prevState,
+            [stateName]: {
+              ...subState,
+              [fieldName]: inputValue,
+            },
+          };
         }
-
-        // Add the new image
-        const lastKey = pathParts[pathParts.length - 1];
-        if (!Array.isArray(current[lastKey])) {
-          current[lastKey] = [];
-        }
-        current[lastKey].push({
-          imageUrl: uploadedFileUrl,
-          fileName: file.name,
-        });
-
-        return newState;
+        return prevState;
       });
-    };
-
-    const handleError = (error: any) => {
-      console.error("Error uploading file:", error);
-      alert(
-        `파일을 업로드하는 도중 오류가 발생했습니다. 파일을 다시 확인해주세요. ${error}`
-      );
-    };
-
-    postRequest("activity/upload", formData, handleSuccess, handleError);
+    } else {
+      setFunding((prevState) => ({
+        ...prevState,
+        [name]: inputValue,
+      }));
+    }
   };
+
+  const noChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >
+  ) => {};
 
   const handleDeleteImage = async (fileName: string, imageTypePath: string) => {
     const confirmDelete = window.confirm("첨부 파일을 삭제하시겠습니까?");
@@ -453,65 +411,30 @@ export const FundingAdminDetail = (): JSX.Element => {
     ));
   };
 
-  const handleSubmit = async () => {
-    const requiredFields = [
-      clubId,
-      funding.name,
-      funding.expenditureDate,
-      funding.expenditureAmount,
-      funding.purpose,
-      funding.transactionImages,
-      funding.detailImages,
-    ];
-
-    const isAnyFieldEmpty = requiredFields.some((field) => !field);
-
-    if (isAnyFieldEmpty) {
-      alert("비어 있는 값이 있습니다. 다시 확인해주세요.");
-      return;
-    }
-
-    const expenditureDate = new Date(funding.expenditureDate);
-    if (expenditureDate < minDate || expenditureDate > maxDate) {
-      alert("날짜 범위가 올바르지 않습니다. 다시 확인해주세요.");
-      return;
-    }
-
-    // Prepare the data to be sent
-    const dataToSend = {
-      clubId, // Assuming clubId is part of your state
-      name: funding.name,
-      expenditureDate: funding.expenditureDate,
-      expenditureAmount: funding.expenditureAmount,
-      purpose: funding.purpose,
-      isTransportation: funding.isTransportation,
-      isNonCorporateTransaction: funding.isNonCorporateTransaction,
-      transactionImages: funding.transactionImages,
-      detailImages: funding.detailImages,
-      additionalProof: funding.additionalProof,
-      fixture: funding.fixture,
-      transportation: funding.transportation,
-      nonCorp: funding.nonCorp,
-    };
-
-    // Success callback
-    const handleSuccess = (response: any) => {
-      console.log("Activity added successfully:", response);
-      navigate(`/club_manage`);
-      // Additional success logic here (e.g., redirecting or showing a success message)
-    };
-
-    // Error callback
-    const handleError = (error: any) => {
-      console.error("Error adding activity:", error);
-      alert(
-        "지원금을 추가하는 중 문제가 발생했습니다. 잠시 후 다시 시도해주세요"
+  const handleReviewComplete = async () => {
+    try {
+      await postRequest(
+        "funding_feedback/feedback",
+        {
+          funding_id: id,
+          reviewResult: reviewResult,
+          funding: funding,
+        },
+        () => navigate(-1)
       );
-      // Additional error handling logic here (e.g., showing an error message)
-    };
+    } catch (error) {
+      console.error("Failed to post review:", error);
+    }
+  };
 
-    // Send the POST request
-    postRequest("funding/addFunding", dataToSend, handleSuccess, handleError);
+  const renderActivityFeedback = () => {
+    return funding.feedbackResults.map((feedback, index) => (
+      <ActivityFeedback
+        key={index}
+        text={feedback.feedback_time}
+        text1={feedback.text}
+      />
+    ));
   };
 
   return (
@@ -529,7 +452,7 @@ export const FundingAdminDetail = (): JSX.Element => {
                     type="date"
                     name="expenditureDate"
                     value={funding.expenditureDate}
-                    onChange={handleChange}
+                    onChange={noChange}
                     placeholder="지출 일자"
                     className="text-wrapper-8"
                   />
@@ -540,7 +463,7 @@ export const FundingAdminDetail = (): JSX.Element => {
                     type="number"
                     name="expenditureAmount"
                     value={funding.expenditureAmount}
-                    onChange={handleChange}
+                    onChange={noChange}
                     placeholder="지출 금액"
                     className="text-wrapper-8"
                   />
@@ -555,7 +478,7 @@ export const FundingAdminDetail = (): JSX.Element => {
                       name="purpose"
                       id="activity-type"
                       value={funding.purpose}
-                      onChange={handleChange}
+                      onChange={noChange}
                       className="text-wrapper-8"
                     >
                       <option value="-1">분류 선택...</option>
@@ -576,7 +499,7 @@ export const FundingAdminDetail = (): JSX.Element => {
                     type="checkbox"
                     name="isTransportation"
                     checked={funding.isTransportation}
-                    onChange={handleChange}
+                    onChange={noChange}
                     className="check-box"
                   />
                 </p>
@@ -586,7 +509,7 @@ export const FundingAdminDetail = (): JSX.Element => {
                     type="checkbox"
                     name="isNonCorporateTransaction"
                     checked={funding.isNonCorporateTransaction}
-                    onChange={handleChange}
+                    onChange={noChange}
                     className="check-box"
                   />
                 </p>
@@ -673,7 +596,7 @@ export const FundingAdminDetail = (): JSX.Element => {
                     type="checkbox"
                     name="additionalProof.isFoodExpense"
                     checked={funding.additionalProof.isFoodExpense}
-                    onChange={handleChange}
+                    onChange={noChange}
                     className="check-box"
                   />
                   <span className="span">근로 계약</span>
@@ -681,7 +604,7 @@ export const FundingAdminDetail = (): JSX.Element => {
                     type="checkbox"
                     name="additionalProof.isLaborContract"
                     checked={funding.additionalProof.isLaborContract}
-                    onChange={handleChange}
+                    onChange={noChange}
                     className="check-box"
                   />
                   <span className="span">외부 행사 참가비</span>
@@ -691,7 +614,7 @@ export const FundingAdminDetail = (): JSX.Element => {
                     checked={
                       funding.additionalProof.isExternalEventParticipationFee
                     }
-                    onChange={handleChange}
+                    onChange={noChange}
                     className="check-box"
                   />
                   <span className="span">발간물</span>
@@ -699,7 +622,7 @@ export const FundingAdminDetail = (): JSX.Element => {
                     type="checkbox"
                     name="additionalProof.isPublication"
                     checked={funding.additionalProof.isPublication}
-                    onChange={handleChange}
+                    onChange={noChange}
                     className="check-box"
                   />
                   <span className="span">수익 사업</span>
@@ -707,7 +630,7 @@ export const FundingAdminDetail = (): JSX.Element => {
                     type="checkbox"
                     name="additionalProof.isProfitMakingActivity"
                     checked={funding.additionalProof.isProfitMakingActivity}
-                    onChange={handleChange}
+                    onChange={noChange}
                     className="check-box"
                   />
                   <span className="span">공동 경비</span>
@@ -715,7 +638,7 @@ export const FundingAdminDetail = (): JSX.Element => {
                     type="checkbox"
                     name="additionalProof.isJointExpense"
                     checked={funding.additionalProof.isJointExpense}
-                    onChange={handleChange}
+                    onChange={noChange}
                     className="check-box"
                   />
                 </p>
@@ -791,7 +714,7 @@ export const FundingAdminDetail = (): JSX.Element => {
                 <textarea
                   name="additionalProof.additionalText"
                   value={funding.additionalProof.additionalText}
-                  onChange={handleChange}
+                  onChange={noChange}
                   placeholder="추가 증빙을 입력하세요."
                   className="text-wrapper-10"
                   style={{ height: "150px" }}
@@ -845,7 +768,7 @@ export const FundingAdminDetail = (): JSX.Element => {
                         name="fixture.type"
                         id="activity-type"
                         value={funding.fixture.type}
-                        onChange={handleChange}
+                        onChange={noChange}
                         className="text-wrapper-8"
                       >
                         <option value="0">분류 선택...</option>
@@ -862,7 +785,7 @@ export const FundingAdminDetail = (): JSX.Element => {
                       type="checkbox"
                       name="fixture.isSoftware"
                       checked={funding.fixture.isSoftware}
-                      onChange={handleChange}
+                      onChange={noChange}
                       className="check-box"
                     />
                   </p>
@@ -891,7 +814,7 @@ export const FundingAdminDetail = (): JSX.Element => {
                       <textarea
                         name="fixture.softwareProofText"
                         value={funding.fixture.softwareProofText}
-                        onChange={handleChange}
+                        onChange={noChange}
                         placeholder="소프트웨어 증빙을 입력하세요."
                         className="text-wrapper-10"
                         style={{ height: "150px" }}
@@ -939,7 +862,7 @@ export const FundingAdminDetail = (): JSX.Element => {
                           type="text"
                           name="fixture.name"
                           value={funding.fixture.name}
-                          onChange={handleChange}
+                          onChange={noChange}
                           placeholder="물품명을 입력하세요."
                           className="text-wrapper-8"
                           style={{ width: "942px" }}
@@ -954,7 +877,7 @@ export const FundingAdminDetail = (): JSX.Element => {
                             name="fixture.fixtureType"
                             id="activity-type"
                             value={funding.fixture.fixtureType}
-                            onChange={handleChange}
+                            onChange={noChange}
                             className="text-wrapper-8"
                           >
                             <option value="0">분류 선택...</option>
@@ -971,7 +894,7 @@ export const FundingAdminDetail = (): JSX.Element => {
                       <textarea
                         name="fixture.purpose"
                         value={funding.fixture.purpose}
-                        onChange={handleChange}
+                        onChange={noChange}
                         placeholder="물품 목적을 입력하세요."
                         className="text-wrapper-10"
                         style={{ height: "150px" }}
@@ -1029,7 +952,7 @@ export const FundingAdminDetail = (): JSX.Element => {
                         name="transportation.type"
                         id="activity-type"
                         value={funding.transportation.type}
-                        onChange={handleChange}
+                        onChange={noChange}
                         className="text-wrapper-8"
                       >
                         <option value="0">분류 선택...</option>
@@ -1052,7 +975,7 @@ export const FundingAdminDetail = (): JSX.Element => {
                       type="text"
                       name="transportation.origin"
                       value={funding.transportation.origin}
-                      onChange={handleChange}
+                      onChange={noChange}
                       placeholder="출발지를 입력하세요."
                       className="text-wrapper-8"
                       style={{ width: "942px" }}
@@ -1064,7 +987,7 @@ export const FundingAdminDetail = (): JSX.Element => {
                       type="text"
                       name="transportation.destination"
                       value={funding.transportation.destination}
-                      onChange={handleChange}
+                      onChange={noChange}
                       placeholder="도착지를 입력하세요."
                       className="text-wrapper-8"
                       style={{ width: "942px" }}
@@ -1076,7 +999,7 @@ export const FundingAdminDetail = (): JSX.Element => {
                   <textarea
                     name="transportation.purpose"
                     value={funding.transportation.purpose}
-                    onChange={handleChange}
+                    onChange={noChange}
                     placeholder="이용 목적을 입력하세요."
                     className="text-wrapper-10"
                     style={{ height: "150px" }}
@@ -1111,7 +1034,7 @@ export const FundingAdminDetail = (): JSX.Element => {
                       <textarea
                         name="transportation.cargoList"
                         value={funding.transportation.cargoList}
-                        onChange={handleChange}
+                        onChange={noChange}
                         placeholder="화물 목록을 입력하세요."
                         className="text-wrapper-10"
                         style={{ height: "150px" }}
@@ -1128,7 +1051,7 @@ export const FundingAdminDetail = (): JSX.Element => {
                       <textarea
                         name="transportation.placeValidity"
                         value={funding.transportation.placeValidity}
-                        onChange={handleChange}
+                        onChange={noChange}
                         placeholder="행사 장소 타당성을 입력하세요."
                         className="text-wrapper-10"
                         style={{ height: "150px" }}
@@ -1154,7 +1077,7 @@ export const FundingAdminDetail = (): JSX.Element => {
                         type="text"
                         name="nonCorp.traderName"
                         value={funding.nonCorp.traderName}
-                        onChange={handleChange}
+                        onChange={noChange}
                         placeholder="거래자명을 입력하세요."
                         className="text-wrapper-8"
                         style={{ width: "922px" }}
@@ -1167,7 +1090,7 @@ export const FundingAdminDetail = (): JSX.Element => {
                       type="text"
                       name="nonCorp.traderAccountNumber"
                       value={funding.nonCorp.traderAccountNumber}
-                      onChange={handleChange}
+                      onChange={noChange}
                       placeholder="거래자 계좌번호를 입력하세요."
                       className="text-wrapper-8"
                       style={{ width: "860px" }}
@@ -1179,7 +1102,7 @@ export const FundingAdminDetail = (): JSX.Element => {
                   <textarea
                     name="nonCorp.wasteExplanation"
                     value={funding.nonCorp.wasteExplanation}
-                    onChange={handleChange}
+                    onChange={noChange}
                     placeholder="낭비가 아니라는 소명을 입력하세요."
                     className="text-wrapper-10"
                     style={{ height: "150px" }}
@@ -1187,25 +1110,77 @@ export const FundingAdminDetail = (): JSX.Element => {
                 </div>
               </div>
             )}
+            <div className="frame-11">
+              <SubTitle className="sub-title-instance" text="검토 결과" />
+              <div className="frame-9">
+                <p className="div-3">
+                  <span className="span">승인 금액:</span>
+                  <input
+                    type="number"
+                    name="approvedAmount"
+                    value={funding.approvedAmount}
+                    onChange={handleChange}
+                    placeholder="승인 금액"
+                    className="text-wrapper-8"
+                  />
+                  <span className="span">
+                    원 / {funding.expenditureAmount}원
+                  </span>
+                  <button
+                    className="div-3"
+                    style={{ marginLeft: "10px" }}
+                    onClick={() => {
+                      setFunding((prevState) => ({
+                        ...prevState,
+                        approvedAmount: prevState.expenditureAmount,
+                      }));
+                    }}
+                  >
+                    전액승인
+                  </button>
+                  <button
+                    className="div-3"
+                    style={{ marginLeft: "10px" }}
+                    onClick={() => {
+                      setFunding((prevState) => ({
+                        ...prevState,
+                        approvedAmount: 0,
+                      }));
+                    }}
+                  >
+                    미승인
+                  </button>
+                </p>
+                <p className="div-3">
+                  <span className="span">운영위원회 심의 필요 여부</span>
+                  <input
+                    type="checkbox"
+                    name="isCommittee"
+                    checked={funding.isCommittee}
+                    onChange={handleChange}
+                    className="check-box"
+                  />
+                </p>
+                <textarea
+                  className="text-area"
+                  value={reviewResult}
+                  onChange={handleReviewResultChange}
+                />
+                <div className="frame-14">
+                  <div
+                    className="frame-15"
+                    style={{ cursor: "pointer" }}
+                    onClick={handleReviewComplete}
+                  >
+                    <div className="text-wrapper-11">검토 완료</div>
+                  </div>
+                </div>
+                {renderActivityFeedback()}
+              </div>
+            </div>
           </div>
         </div>
         <UnderBar />
-        {/* <div className="frame-16">
-          <div
-            className="frame-17"
-            onClick={() => navigate(`/edit_funding/${id}`)}
-            style={{ cursor: "pointer" }}
-          >
-            수정
-          </div>
-          <div
-            className="frame-17"
-            onClick={handleDeleteFunding}
-            style={{ cursor: "pointer" }}
-          >
-            삭제
-          </div>
-        </div> */}
       </div>
     </div>
   );

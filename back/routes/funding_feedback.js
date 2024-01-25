@@ -6,6 +6,12 @@ const {
   Semester,
   Club,
   Funding,
+  FundingFeedback,
+  FundingEvidence,
+  FundingFixture,
+  FundingTransportation,
+  FundingTransportationMember,
+  FundingNoncorp,
   SemesterClub,
   Duration,
   ExecutiveMember,
@@ -165,25 +171,32 @@ router.post("/feedback", async (req, res) => {
       return;
     }
 
-    const { activity_id, reviewResult } = req.body;
+    const { funding_id, reviewResult, funding } = req.body;
     const studentId = req.session.user.student_id;
     const currentTimePlusNineHours = new Date(
       new Date().getTime() + 9 * 60 * 60 * 1000
     );
 
     // Update feedback_type in Activity based on reviewResult
-    const feedbackType = reviewResult === "" ? 2 : 3;
-    await Activity.update(
+    const feedbackType =
+      funding.approvedAmount === 0
+        ? 4
+        : funding.approvedAmount < funding.expenditureAmount
+        ? 3
+        : 2;
+    await Funding.update(
       {
-        feedback_type: feedbackType,
+        funding_feedback_type: feedbackType,
         recent_feedback: currentTimePlusNineHours,
+        is_committee: funding.isCommittee,
+        approved_amount: funding.approvedAmount,
       },
-      { where: { id: activity_id } }
+      { where: { id: funding_id } }
     );
 
     // Save a new record in ActivityFeedback
-    await ActivityFeedback.create({
-      activity: activity_id,
+    await FundingFeedback.create({
+      funding: funding_id,
       student_id: studentId,
       added_time: currentTimePlusNineHours,
       feedback: reviewResult,
@@ -197,7 +210,7 @@ router.post("/feedback", async (req, res) => {
 });
 
 router.get("/getFunding/:fundingId", async (req, res) => {
-  const { activityId: id } = req.params;
+  const { fundingId: id } = req.params;
 
   if (!id) {
     return res.status(400).json({
@@ -258,12 +271,37 @@ router.get("/getFunding/:fundingId", async (req, res) => {
         message: "Funding not found",
       });
     }
+
+    const feedbacks = await FundingFeedback.findAll({
+      where: { funding: id },
+      include: [
+        {
+          model: Member,
+          attributes: ["name"],
+          as: "student",
+        },
+      ],
+    });
+
+    // Filter and format feedback results
+    const feedbackResults = feedbacks
+      .filter((feedback) => feedback.feedback.trim() !== "") // Exclude empty feedback
+      .map((feedback) => {
+        return {
+          addedTime: feedback.added_time,
+          text: feedback.feedback,
+          reviewerName: feedback.student.name, // assuming you want to include the name of the reviewer
+        };
+      });
+
     // Format the response
     const responseData = {
       id: funding.id,
       name: funding.name,
+      clubId: funding.club_id,
       expenditureDate: funding.expenditure_date,
       expenditureAmount: funding.expenditure_amount,
+      approvedAmount: funding.approved_amount,
       purpose: funding.purpose,
       isTransportation: funding.is_transportation,
       isNonCorporateTransaction: funding.is_non_corporate_transaction,
@@ -374,6 +412,8 @@ router.get("/getFunding/:fundingId", async (req, res) => {
           ? funding.FundingNoncorps[0].waste_explanation
           : "",
       },
+      isCommittee: funding.is_committee ? funding.is_committee : false,
+      feedbackResults,
     };
 
     res.json({
@@ -396,37 +436,32 @@ router.get("/my_feedback_funding", async (req, res) => {
     const studentId = req.session.user.student_id;
 
     // Find activities associated with the current user
-    const feedbackExecutives = await ActivityFeedbackExecutive.findAll({
-      where: { student_id: studentId },
+    const feedbackExecutives = await Funding.findAll({
+      where: { funding_executive: studentId },
       include: [
         {
-          model: Activity,
-          as: "activity_Activity", // Use the correct alias as defined in your model association
-          include: [
-            {
-              model: Club,
-              as: "club", // Assuming 'Club' is the alias used in the Activity-Club association
-              attributes: ["name"],
-            },
-          ],
+          model: Club,
+          as: "club", // Assuming 'Club' is the alias used in the Activity-Club association
+          attributes: ["name"],
         },
       ],
     });
 
     const responseArray = await Promise.all(
       feedbackExecutives.map(async (feedbackExecutive) => {
-        const activity = feedbackExecutive.activity_Activity;
+        const activity = feedbackExecutive;
 
         // Check if activity and club are defined
         const clubName =
           activity && activity.club ? activity.club.name : "Unknown Club";
-        const activityName = activity ? activity.title : "Unknown Activity";
-        const feedbackTypeId = activity ? activity.feedback_type : null;
-        const activityType = activity ? activity.activity_type_id : null;
+        const activityName = activity ? activity.name : "Unknown Funding";
+        const feedbackTypeId = activity ? activity.funding_feedback_type : null;
+        const expenditureAmount = activity ? activity.expenditure_amount : null;
+        const approvedAmount = activity ? activity.approved_amount : null;
 
         // Fetch feedback details
-        const feedbackDetail = await ActivityFeedback.findOne({
-          where: { activity: activity ? activity.id : null },
+        const feedbackDetail = await FundingFeedback.findOne({
+          where: { funding: activity ? activity.id : null },
           include: [
             {
               model: Member,
@@ -435,8 +470,6 @@ router.get("/my_feedback_funding", async (req, res) => {
             },
           ],
         });
-
-        console.log(feedbackDetail);
         // Check if feedbackDetail and Member are defined
         const feedbackMemberName =
           feedbackDetail && feedbackDetail.student
@@ -451,7 +484,8 @@ router.get("/my_feedback_funding", async (req, res) => {
           clubName,
           activityName,
           feedbackMemberName,
-          activityType,
+          expenditureAmount,
+          approvedAmount,
           feedbackType: feedbackTypeId,
         };
       })

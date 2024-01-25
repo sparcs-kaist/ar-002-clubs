@@ -13,7 +13,11 @@ module.exports = function(sequelize, DataTypes) {
     },
     club_id: {
       type: DataTypes.INTEGER,
-      allowNull: true
+      allowNull: true,
+      references: {
+        model: 'Club',
+        key: 'id'
+      }
     },
     semester_id: {
       type: DataTypes.INTEGER,
@@ -96,7 +100,7 @@ module.exports = function(sequelize, DataTypes) {
       allowNull: true
     },
     recent_feedback: {
-      type: DataTypes.TEXT,
+      type: DataTypes.DATE,
       allowNull: true
     }
   }, {
@@ -124,6 +128,13 @@ module.exports = function(sequelize, DataTypes) {
         using: "BTREE",
         fields: [
           { name: "funding_executive" },
+        ]
+      },
+      {
+        name: "Funding_Club_id_fk",
+        using: "BTREE",
+        fields: [
+          { name: "club_id" },
         ]
       },
     ]

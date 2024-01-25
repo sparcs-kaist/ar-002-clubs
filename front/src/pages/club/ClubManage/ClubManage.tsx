@@ -12,7 +12,7 @@ import {
   useReportDurationStatus,
   useFundingDurationStatus,
 } from "hooks/useReportDurationStatus";
-import { Funding } from "components/activity/Funding";
+import { Funding } from "components/funding/Funding";
 
 type Representative = {
   student_id: number;

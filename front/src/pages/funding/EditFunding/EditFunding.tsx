@@ -23,6 +23,11 @@ interface ProofImage {
   fileName: string;
 }
 
+interface FeedbackResult {
+  feedback_time: string;
+  text: string;
+}
+
 interface AdditionalProof {
   isFoodExpense: boolean;
   isLaborContract: boolean;
@@ -36,8 +41,10 @@ interface AdditionalProof {
 
 interface FundingState {
   name: string;
+  clubId: number;
   expenditureDate: string;
   expenditureAmount: number;
+  approvedAmount: number;
   purpose: number;
   isTransportation: boolean;
   isNonCorporateTransaction: boolean;
@@ -47,6 +54,8 @@ interface FundingState {
   fixture: FixtureState;
   transportation: TransportationState;
   nonCorp: NonCorpState;
+  feedbackResults: FeedbackResult[];
+  isCommittee: boolean;
 }
 
 interface FixtureState {
@@ -90,8 +99,10 @@ export const EditFunding = (): JSX.Element => {
   const { id } = useParams();
   const [funding, setFunding] = useState<FundingState>({
     name: "",
+    clubId: 0,
     expenditureDate: "",
     expenditureAmount: 0,
+    approvedAmount: 0,
     purpose: -1,
     isTransportation: false,
     isNonCorporateTransaction: false,
@@ -131,6 +142,8 @@ export const EditFunding = (): JSX.Element => {
       traderAccountNumber: "",
       wasteExplanation: "",
     },
+    isCommittee: false,
+    feedbackResults: [],
   });
 
   const [searchTerm, setSearchTerm] = useState("");
@@ -502,6 +515,22 @@ export const EditFunding = (): JSX.Element => {
 
     // Send the POST request
     postRequest("funding/editFunding", dataToSend, handleSuccess, handleError);
+  };
+
+  const noChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >
+  ) => {};
+
+  const renderActivityFeedback = () => {
+    return funding.feedbackResults.map((feedback, index) => (
+      <ActivityFeedback
+        key={index}
+        text={feedback.feedback_time}
+        text1={feedback.text}
+      />
+    ));
   };
 
   return (
@@ -1229,6 +1258,36 @@ export const EditFunding = (): JSX.Element => {
                 >
                   <div className="text-wrapper-11">활동 저장</div>
                 </div>
+              </div>
+            </div>
+            <div className="frame-11">
+              <SubTitle className="sub-title-instance" text="검토 결과" />
+              <div className="frame-9">
+                <p className="div-3">
+                  <span className="span">승인 금액:</span>
+                  <input
+                    type="number"
+                    name="approvedAmount"
+                    value={funding.approvedAmount}
+                    onChange={noChange}
+                    placeholder="승인 금액"
+                    className="text-wrapper-8"
+                  />
+                  <span className="span">
+                    원 / {funding.expenditureAmount}원
+                  </span>
+                </p>
+                <p className="div-3">
+                  <span className="span">운영위원회 심의 필요 여부</span>
+                  <input
+                    type="checkbox"
+                    name="isCommittee"
+                    checked={funding.isCommittee}
+                    onChange={noChange}
+                    className="check-box"
+                  />
+                </p>
+                {renderActivityFeedback()}
               </div>
             </div>
           </div>

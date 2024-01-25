@@ -18,6 +18,7 @@ const {
   FundingNoncorp,
   FundingTransportation,
   FundingTransportationMember,
+  FundingFeedback,
 } = require("../models");
 const checkPermission = require("../utils/permission");
 const { checkFundingDuration } = require("../utils/duration");
@@ -480,12 +481,34 @@ router.get("/getFunding", async (req, res) => {
         message: "Funding not found",
       });
     }
+
+    const feedbacks = await FundingFeedback.findAll({
+      where: { funding: id },
+      include: [
+        {
+          model: Member,
+          attributes: ["name"],
+          as: "student",
+        },
+      ],
+    });
+
+    // Filter and format feedback results
+    const feedbackResults = feedbacks.map((feedback) => {
+      return {
+        addedTime: feedback.added_time,
+        text: feedback.feedback,
+        reviewerName: feedback.student.name, // assuming you want to include the name of the reviewer
+      };
+    });
+
     // Format the response
     const responseData = {
       id: funding.id,
       name: funding.name,
       expenditureDate: funding.expenditure_date,
       expenditureAmount: funding.expenditure_amount,
+      approvedAmount: funding.approved_amount,
       purpose: funding.purpose,
       isTransportation: funding.is_transportation,
       isNonCorporateTransaction: funding.is_non_corporate_transaction,
@@ -596,6 +619,8 @@ router.get("/getFunding", async (req, res) => {
           ? funding.FundingNoncorps[0].waste_explanation
           : "",
       },
+      isCommittee: funding.is_committee ? funding.is_committee : false,
+      feedbackResults,
     };
 
     res.json({

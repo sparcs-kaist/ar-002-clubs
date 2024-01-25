@@ -247,3 +247,15 @@
   position: relative;
   width: 36px;
 }
+
+.add-funding .text-area {
+  width: 1040px;
+  border: solid;
+  border-width: 1px;
+  padding: 5px;
+  color: #000000;
+  font-family: "Inter-Regular", Helvetica;
+  font-size: 18px;
+  font-weight: 400;
+  height: 100px;
+}

@@ -5,9 +5,10 @@ Please share your feedback here: https://form.asana.com/?k=uvp-HPgd3_hyoXRBw1IcN
 
 import PropTypes from "prop-types";
 import React from "react";
-import { ActivityState } from "../ActivityState";
+import { ActivityState } from "../../activity/ActivityState";
 import "./style.css";
 import { useNavigate } from "react-router-dom";
+import { FundingState } from "../FundingState";
 
 interface Props {
   id: number;
@@ -62,15 +63,7 @@ export const Funding = ({
               <div className="text-wrapper-3">{approvedMoney}원</div>
             </div>
             <div className="activity-state-wrapper">
-              <ActivityState
-                property1={
-                  activityStateProperty1 === 1
-                    ? "default"
-                    : activityStateProperty1 === 2
-                    ? "variant-2"
-                    : "variant-3"
-                }
-              />
+              <FundingState property1={activityStateProperty1} />
             </div>
           </>
         )}

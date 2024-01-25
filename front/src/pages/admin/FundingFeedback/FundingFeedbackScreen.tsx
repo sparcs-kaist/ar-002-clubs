@@ -6,13 +6,15 @@ import "./FundingFeedbackScreen.css";
 import { UpperBar } from "components/home/UpperBar";
 import { getRequest } from "utils/api";
 import { useExecutiveStatus } from "contexts/ExecutiveStatusContext";
+import { FundingFeedbackList } from "components/admin/\bFundingFeedbackList";
 
 interface ActivityFeedbackData {
   activityId: number;
   clubName: string;
   activityName: string;
   feedbackMemberName: string;
-  activityType: number;
+  expenditureAmount: number;
+  approvedAmount: number;
   feedbackType: number;
 }
 
@@ -24,8 +26,11 @@ export const FundingFeedbackScreen = (): JSX.Element => {
 
   useEffect(() => {
     getRequest(
-      "funding_feedback/my_feedback_activity", // Replace with your actual API endpoint
-      (data) => setFeedbackActivities(data),
+      "funding_feedback/my_feedback_funding", // Replace with your actual API endpoint
+      (data) => {
+        setFeedbackActivities(data);
+        console.log(data);
+      },
       (error) => console.error("Error fetching activity feedback data:", error)
     );
   }, []);
@@ -33,7 +38,7 @@ export const FundingFeedbackScreen = (): JSX.Element => {
   return (
     <div className="activity-feedback-screen">
       <div className="frame-6">
-        <UpperBar className={"upper-bar"} title={"활동 보고서 검토하기"} />
+        <UpperBar className={"upper-bar"} title={"지원금 신청 검토하기"} />
         <div className="frame-wrapper">
           <div className="frame-10">
             <div className="frame-11">
@@ -41,25 +46,20 @@ export const FundingFeedbackScreen = (): JSX.Element => {
                 <div className="frame-13">
                   <SubTitle
                     className="sub-title-instance"
-                    text="활동 보고서 검토"
+                    text="지원금 신청 검토"
                   />
                   <div className="frame-14">
-                    <ActivityFeedbackList title="zero" />
+                    <FundingFeedbackList title="zero" />
                     {Array.isArray(feedbackActivities) &&
                       feedbackActivities.map((activity, index) => (
-                        <ActivityFeedbackList
+                        <FundingFeedbackList
                           key={index}
                           title="one"
                           index={String(index + 1)}
                           club={activity.clubName}
                           activity={activity.activityName}
-                          activityType={
-                            activity.activityType === 1
-                              ? "비합치"
-                              : activity.activityType === 2
-                              ? "내부"
-                              : "외부"
-                          }
+                          expenditureAmount={`${activity.expenditureAmount}원`}
+                          approvedAmount={`${activity.approvedAmount}원`}
                           doneby={activity.feedbackMemberName}
                           state={activity.feedbackType}
                           activity_id={activity.activityId}

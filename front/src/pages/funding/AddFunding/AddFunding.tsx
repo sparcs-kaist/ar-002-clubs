@@ -23,6 +23,11 @@ interface ProofImage {
   fileName: string;
 }
 
+interface FeedbackResult {
+  feedback_time: string;
+  text: string;
+}
+
 interface AdditionalProof {
   isFoodExpense: boolean;
   isLaborContract: boolean;
@@ -36,8 +41,10 @@ interface AdditionalProof {
 
 interface FundingState {
   name: string;
+  clubId: number;
   expenditureDate: string;
   expenditureAmount: number;
+  approvedAmount: number;
   purpose: number;
   isTransportation: boolean;
   isNonCorporateTransaction: boolean;
@@ -47,6 +54,8 @@ interface FundingState {
   fixture: FixtureState;
   transportation: TransportationState;
   nonCorp: NonCorpState;
+  feedbackResults: FeedbackResult[];
+  isCommittee: boolean;
 }
 
 interface FixtureState {
@@ -87,8 +96,10 @@ export const AddFunding = (): JSX.Element => {
   const navigate = useNavigate();
   const [funding, setFunding] = useState<FundingState>({
     name: "",
+    clubId: 0,
     expenditureDate: "",
     expenditureAmount: 0,
+    approvedAmount: 0,
     purpose: -1,
     isTransportation: false,
     isNonCorporateTransaction: false,
@@ -128,6 +139,8 @@ export const AddFunding = (): JSX.Element => {
       traderAccountNumber: "",
       wasteExplanation: "",
     },
+    isCommittee: false,
+    feedbackResults: [],
   });
 
   const [searchTerm, setSearchTerm] = useState("");
