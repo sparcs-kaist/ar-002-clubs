@@ -79,6 +79,18 @@ module.exports = function(sequelize, DataTypes) {
         key: 'type_id'
       }
     },
+    funding_executive: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      references: {
+        model: 'Member',
+        key: 'student_id'
+      }
+    },
+    is_committee: {
+      type: DataTypes.BOOLEAN,
+      allowNull: true
+    },
     recent_edit: {
       type: DataTypes.DATE,
       allowNull: true
@@ -105,6 +117,13 @@ module.exports = function(sequelize, DataTypes) {
         using: "BTREE",
         fields: [
           { name: "funding_feedback_type" },
+        ]
+      },
+      {
+        name: "Funding_Member_student_id_fk",
+        using: "BTREE",
+        fields: [
+          { name: "funding_executive" },
         ]
       },
     ]

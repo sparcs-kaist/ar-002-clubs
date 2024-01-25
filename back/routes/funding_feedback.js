@@ -3,19 +3,11 @@ const router = express.Router();
 const { Op } = require("sequelize");
 const {
   Sequelize,
-  ActivitySign,
   Semester,
   Club,
+  Funding,
   SemesterClub,
   Duration,
-  Activity,
-  ActivityFeedback,
-  ActivityEvidence,
-  ActivityFeedbackExecutive,
-  ActivityMember,
-  Activity_init,
-  ActivityEvidence_init,
-  ActivityMember_init,
   ExecutiveMember,
   Member,
   MemberClub,
@@ -40,7 +32,7 @@ const formatSignTime = (signTime) => {
     .padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
 };
 
-router.get("/club_activity_list", async (req, res) => {
+router.get("/club_funding_list", async (req, res) => {
   try {
     const club_id = req.query.club_id; // or req.body.club_id, depending on how you're sending the data
 
@@ -204,132 +196,197 @@ router.post("/feedback", async (req, res) => {
   }
 });
 
-router.get("/getActivity/:activityId", async (req, res) => {
-  const durationCheck = await checkReportDuration();
-  // if (!durationCheck.found || durationCheck.reportStatus !== 1) {
-  //   return res.status(400).send({ message: "활동 추가 기한이 지났습니다." });
-  // }
-  const { activityId } = req.params;
+router.get("/getFunding/:fundingId", async (req, res) => {
+  const { activityId: id } = req.params;
+
+  if (!id) {
+    return res.status(400).json({
+      success: false,
+      message: "ID query parameter is required",
+    });
+  }
+
+  const authorized = await checkPermission(req, res, [{ executive: 4 }]);
+  if (!authorized) {
+    return;
+  }
 
   try {
-    let activity;
-    let evidence;
-    let participants;
-
-    // Fetch activity details
-    activity = await Activity.findByPk(activityId);
-    if (!activity) {
-      return res.status(404).send("Activity not found");
-    }
-
-    const authorized = await checkPermission(req, res, [{ executive: 4 }]);
-    if (!authorized) {
-      return;
-    }
-
-    const isAdvisor = authorized.some((auth) => auth.hasOwnProperty("advisor"));
-
-    if (durationCheck.reportStatus === 2 && isAdvisor) {
-      activity = await Activity_init.findByPk(activityId);
-      evidence = await ActivityEvidence_init.findAll({
-        where: { activity_id: activityId },
-      });
-      participants = await ActivityMember_init.findAll({
-        where: { activity_id: activityId },
-        include: [
-          {
-            model: Member,
-            attributes: ["name"],
-            as: "member_student",
-          },
-        ],
-      });
-    } else {
-      activity = await Activity.findByPk(activityId);
-      evidence = await ActivityEvidence.findAll({
-        where: { activity_id: activityId },
-      });
-      participants = await ActivityMember.findAll({
-        where: { activity_id: activityId },
-        include: [
-          {
-            model: Member,
-            attributes: ["name"],
-            as: "member_student",
-          },
-        ],
-      });
-    }
-
-    // Function to extract the timestamp from the S3 URL
-    const extractTimestamp = (url) => {
-      const matches = url.match(
-        /uploads\/(\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2})/
-      );
-      return matches ? new Date(matches[1].replace(/-/g, ":")) : new Date();
-    };
-
-    // Sort evidence by the extracted timestamp
-    evidence.sort((a, b) => {
-      const timestampA = extractTimestamp(a.image_url);
-      const timestampB = extractTimestamp(b.image_url);
-      return timestampA - timestampB;
-    });
-
-    console.log(105);
-
-    const feedbacks = await ActivityFeedback.findAll({
-      where: { activity: activityId },
+    // Fetch Funding data
+    const funding = await Funding.findByPk(id, {
       include: [
         {
-          model: Member,
-          attributes: ["name"],
-          as: "student",
+          model: FundingEvidence,
+          as: "FundingEvidences",
+          attributes: ["image_url", "description", "funding_evidence_type_id"],
+        },
+        {
+          model: FundingFixture,
+          as: "FundingFixtures",
+        },
+        {
+          model: FundingTransportation,
+          as: "FundingTransportations",
+        },
+        {
+          model: FundingTransportationMember,
+          as: "FundingTransportationMembers",
+          attributes: ["student_id"],
+          include: [
+            {
+              model: Member,
+              as: "student",
+              attributes: ["name"],
+            },
+          ],
+        },
+        {
+          model: FundingNoncorp,
+          as: "FundingNoncorps",
+          attributes: [
+            "trader_name",
+            "trader_account_number",
+            "waste_explanation",
+          ],
         },
       ],
     });
 
-    // Filter and format feedback results
-    const feedbackResults = feedbacks
-      .filter((feedback) => feedback.feedback.trim() !== "") // Exclude empty feedback
-      .map((feedback) => {
-        return {
-          addedTime: feedback.added_time,
-          text: feedback.feedback,
-          reviewerName: feedback.student.name, // assuming you want to include the name of the reviewer
-        };
+    if (!funding) {
+      return res.status(404).json({
+        success: false,
+        message: "Funding not found",
       });
-
+    }
     // Format the response
-    const response = {
-      clubId: activity.club_id,
-      name: activity.title,
-      type: activity.activity_type_id,
-      startDate: activity.start_date,
-      endDate: activity.end_date,
-      location: activity.location,
-      purpose: activity.purpose,
-      content: activity.content,
-      proofText: activity.proof_text,
-      participants: participants.map((p) => ({
-        student_id: p.member_student_id,
-        name: p.member_student.name,
-      })),
-      proofImages: evidence.map((e) => ({
-        imageUrl: e.image_url,
-        fileName: e.description,
-      })),
-      feedbackResults, // Adjust based on how you store 'feedbackResults'
+    const responseData = {
+      id: funding.id,
+      name: funding.name,
+      expenditureDate: funding.expenditure_date,
+      expenditureAmount: funding.expenditure_amount,
+      purpose: funding.purpose,
+      isTransportation: funding.is_transportation,
+      isNonCorporateTransaction: funding.is_non_corporate_transaction,
+      transactionImages: funding.FundingEvidences
+        ? funding.FundingEvidences.filter(
+            (e) => e.funding_evidence_type_id === 1
+          ).map((e) => ({
+            imageUrl: e.image_url,
+            fileName: e.description,
+          }))
+        : [],
+      detailImages: funding.FundingEvidences
+        ? funding.FundingEvidences.filter(
+            (e) => e.funding_evidence_type_id === 2
+          ).map((e) => ({
+            imageUrl: e.image_url,
+            fileName: e.description,
+          }))
+        : [],
+      additionalProof: {
+        isFoodExpense: funding.is_food_expense,
+        isLaborContract: funding.is_labor_contract,
+        isExternalEventParticipationFee:
+          funding.is_external_event_participation_fee,
+        isPublication: funding.is_publication,
+        isProfitMakingActivity: funding.is_profit_making_activity,
+        isJointExpense: funding.is_joint_expense,
+        additionalText: funding.additional_explanation,
+        additionalImages: funding.FundingEvidences
+          ? funding.FundingEvidences.filter(
+              (e) => e.funding_evidence_type_id === 3
+            ).map((e) => ({
+              imageUrl: e.image_url,
+              fileName: e.description,
+            }))
+          : [],
+      },
+      fixture: {
+        type: funding.FundingFixtures[0]
+          ? funding.FundingFixtures[0].funding_fixture_type_id
+          : 0,
+        isSoftware: funding.FundingFixtures[0]
+          ? funding.FundingFixtures[0].is_software
+          : false,
+        softwareProofText: funding.FundingFixtures[0]
+          ? funding.FundingFixtures[0].software_proof_text
+          : "",
+        softwareProofImages: funding.FundingFixtures[0]
+          ? funding.FundingEvidences.filter(
+              (e) => e.funding_evidence_type_id === 5
+            ).map((e) => ({
+              imageUrl: e.image_url,
+              fileName: e.description,
+            }))
+          : [],
+        name: funding.FundingFixtures[0]
+          ? funding.FundingFixtures[0].fixture_name
+          : "",
+        fixtureType: funding.FundingFixtures[0]
+          ? funding.FundingFixtures[0].fixture_type_id
+          : 0,
+        purpose: funding.FundingFixtures[0]
+          ? funding.FundingFixtures[0].usage_purpose
+          : "",
+        fixtureImages: funding.FundingEvidences
+          ? funding.FundingEvidences.filter(
+              (e) => e.funding_evidence_type_id === 4
+            ).map((e) => ({
+              imageUrl: e.image_url,
+              fileName: e.description,
+            }))
+          : [],
+      },
+      transportation: {
+        type: funding.FundingTransportations[0]
+          ? funding.FundingTransportations[0].transportation_type_id
+          : 0,
+        origin: funding.FundingTransportations[0]
+          ? funding.FundingTransportations[0].origin
+          : "",
+        destination: funding.FundingTransportations[0]
+          ? funding.FundingTransportations[0].destination
+          : "",
+        purpose: funding.FundingTransportations[0]
+          ? funding.FundingTransportations[0].purpose_of_use
+          : "",
+        cargoList: funding.FundingTransportations[0]
+          ? funding.FundingTransportations[0].cargo_list
+          : "",
+        participants: funding.FundingTransportationMembers
+          ? funding.FundingTransportationMembers.map((e) => ({
+              student_id: e.student_id,
+              name: e.student.name,
+            }))
+          : [],
+        placeValidity: funding.FundingTransportations[0]
+          ? funding.FundingTransportations[0].place_validity
+          : "",
+      },
+      nonCorp: {
+        traderName: funding.FundingNoncorps[0]
+          ? funding.FundingNoncorps[0].trader_name
+          : "",
+        traderAccountNumber: funding.FundingNoncorps[0]
+          ? funding.FundingNoncorps[0].trader_account_number
+          : "",
+        wasteExplanation: funding.FundingNoncorps[0]
+          ? funding.FundingNoncorps[0].waste_explanation
+          : "",
+      },
     };
 
-    res.status(200).send(response);
+    res.json({
+      success: true,
+      funding: responseData,
+    });
   } catch (error) {
-    console.error("Error fetching activity:", error);
-    res.status(500).send("Error fetching activity");
+    console.error("Error retrieving funding:", error);
+    res.status(500).json({ success: false, message: "Internal server error" });
   }
 });
 
-router.get("/my_feedback_activity", async (req, res) => {
+router.get("/my_feedback_funding", async (req, res) => {
   try {
     const authorized = await checkPermission(req, res, [{ executive: 4 }]);
     if (!authorized) {
@@ -428,8 +485,7 @@ router.get("/my_feedback_activity", async (req, res) => {
 });
 
 router.post("/update_executive", async (req, res) => {
-  const { student_id, club_id, activity_id } = req.body;
-  console.log(activity_id);
+  const { student_id, club_id, funding_id } = req.body;
 
   try {
     const authorized = await checkPermission(req, res, [{ executive: 3 }]);
@@ -451,47 +507,36 @@ router.post("/update_executive", async (req, res) => {
       return res.status(404).send("Current semester not found.");
     }
 
-    if (activity_id) {
+    if (funding_id) {
       // Update ActivityFeedbackExecutive for a specific activity
-      await ActivityFeedbackExecutive.upsert({
-        activity: activity_id,
-        student_id: student_id,
+      await Funding.upsert({
+        id: funding_id,
+        funding_executive: student_id,
       });
       res.send("Executive updated successfully for the specific activity.");
     } else if (club_id) {
-      // Fetch the activity duration for the current semester
-      const activityDuration = await Duration.findOne({
+      // 현재 날짜를 포함하는 학기 찾기
+      const currentSemester = await Semester.findOne({
         where: {
-          semester_id: currentSemester.id,
-          duration_name: "Activity",
+          start_date: { [Sequelize.Op.lte]: today },
+          end_date: { [Sequelize.Op.gte]: today },
         },
-        attributes: ["start_date", "end_date"],
       });
 
-      if (!activityDuration) {
-        return res
-          .status(404)
-          .send("Activity duration not found for the current semester.");
-      }
-
-      // Fetch filtered activities
-      const filteredActivities = await Activity.findAll({
+      // Fetch all activities within the activity duration range
+      const filteredActivities = await Funding.findAll({
         where: {
           club_id: club_id,
-          [Sequelize.Op.and]: [
-            { start_date: { [Sequelize.Op.gte]: activityDuration.start_date } },
-            { end_date: { [Sequelize.Op.lte]: activityDuration.end_date } },
-          ],
+          semester_id: currentSemester.id,
         },
-        attributes: ["id"],
       });
 
       // Update ActivityFeedbackExecutive for each activity
       for (const activity of filteredActivities) {
-        await ActivityFeedbackExecutive.upsert({
-          activity: activity.id,
-          student_id: student_id,
-        });
+        await Funding.update(
+          { funding_executive: student_id },
+          { where: { id: activity.id } }
+        );
       }
 
       res.send("Executive updated successfully for all activities.");
@@ -504,7 +549,7 @@ router.post("/update_executive", async (req, res) => {
   }
 });
 
-router.get("/activity_submit_list", async (req, res) => {
+router.get("/funding_submit_list", async (req, res) => {
   try {
     const authorized = await checkPermission(req, res, [{ executive: 4 }]);
     if (!authorized) {
@@ -521,70 +566,46 @@ router.get("/activity_submit_list", async (req, res) => {
       },
     });
 
-    // Find the 'Activity' duration for the current semester
-    // Fetch the activity duration for the current semester
-    const activityDuration = await Duration.findOne({
-      where: {
-        semester_id: currentSemester.id,
-        duration_name: "Activity",
-      },
-      attributes: ["start_date", "end_date"], // Select only the columns that exist
-    });
-
-    if (!activityDuration) {
-      return res
-        .status(404)
-        .send("Activity duration not found for the current semester.");
-    }
-
     // 전체 활동 개수 및 feedbackType이 1이 아닌 활동의 개수 조회
     // Fetch all activities within the activity duration range
-    const filteredActivities = await Activity.findAll({
+    const filteredActivities = await Funding.findAll({
       where: {
-        [Sequelize.Op.and]: [
-          { start_date: { [Sequelize.Op.gte]: activityDuration.start_date } },
-          { end_date: { [Sequelize.Op.lte]: activityDuration.end_date } },
-        ],
+        semester_id: currentSemester.id,
       },
     });
 
     // Compute total activities and non-feedback type one activities
     const totalActivities = filteredActivities.length;
     const nonFeedbackTypeOneActivities = filteredActivities.filter(
-      (activity) => activity.feedback_type !== 1
+      (activity) => activity.funding_feedback_type !== 1
     ).length;
 
     // 비율 계산
     const ratio = (nonFeedbackTypeOneActivities / totalActivities) * 100;
 
     const findMostFrequentExecutive = async (clubId) => {
-      const activities = await Activity.findAll({
+      const activities = await Funding.findAll({
         where: {
           club_id: clubId,
-          [Sequelize.Op.and]: [
-            Sequelize.where(Sequelize.col("start_date"), {
-              [Sequelize.Op.gte]: activityDuration.start_date,
-            }),
-            Sequelize.where(Sequelize.col("end_date"), {
-              [Sequelize.Op.lte]: activityDuration.end_date,
-            }),
-          ],
+          semester_id: currentSemester.id,
         },
         attributes: ["id"],
       });
       const activityIds = activities.map((a) => a.id);
 
-      const executives = await ActivityFeedbackExecutive.findAll({
-        where: { activity: activityIds },
-        attributes: ["student_id"],
-        group: ["student_id"],
-        order: [[Sequelize.fn("COUNT", Sequelize.col("student_id")), "DESC"]],
+      const executives = await Funding.findAll({
+        where: { id: activityIds },
+        attributes: ["funding_executive"],
+        group: ["funding_executive"],
+        order: [
+          [Sequelize.fn("COUNT", Sequelize.col("funding_executive")), "DESC"],
+        ],
         limit: 1,
       });
 
       if (executives.length === 0)
         return { executive_id: null, executive: null };
-      const mostFrequentStudentId = executives[0].student_id;
+      const mostFrequentStudentId = executives[0].funding_executive;
 
       const executiveMember = await Member.findByPk(mostFrequentStudentId);
       return {
@@ -609,40 +630,10 @@ router.get("/activity_submit_list", async (req, res) => {
 
         // Feedback type calculation
         const feedbackTypesCount = clubActivities.reduce((acc, activity) => {
-          acc[activity.feedback_type] = (acc[activity.feedback_type] || 0) + 1;
+          acc[activity.funding_feedback_type] =
+            (acc[activity.funding_feedback_type] || 0) + 1;
           return acc;
         }, {});
-
-        // Advisor signature check
-        let advisorStatus = sc.advisor ? "서명 미완료" : "선택적 지도교수";
-        const latestSign = await ActivitySign.findOne({
-          where: {
-            club_id: sc.club_id,
-            semester_id: currentSemester.id,
-          },
-          order: [["sign_time", "DESC"]],
-        });
-
-        const latestEdit = await Activity_init.findOne({
-          where: {
-            club_id: sc.club_id,
-            recent_edit: {
-              [Op.between]: [
-                currentSemester.start_date,
-                currentSemester.end_date,
-              ],
-            },
-          },
-          order: [["recent_edit", "DESC"]],
-        });
-
-        // Determine the advisor status
-        const signed =
-          latestSign &&
-          (!latestEdit || latestSign.sign_time > latestEdit.recent_edit);
-        if (signed) {
-          advisorStatus = formatSignTime(latestSign.sign_time);
-        }
 
         const { executive_id, executive } = await findMostFrequentExecutive(
           sc.club_id
@@ -654,8 +645,18 @@ router.get("/activity_submit_list", async (req, res) => {
           feedbackTypeOne: feedbackTypesCount[1] || 0,
           feedbackTypeTwo: feedbackTypesCount[2] || 0,
           feedbackTypeThree: feedbackTypesCount[3] || 0,
+          feedbackTypeFour: feedbackTypesCount[4] || 0,
           totalClubActivities: clubActivities.length,
-          advisorStatus,
+          totalExpenditureMoney: clubActivities.reduce(
+            (total, activity) =>
+              total + parseFloat(activity.expenditure_amount || 0),
+            0
+          ),
+          totalApprovedMoney: clubActivities.reduce(
+            (total, activity) =>
+              total + parseFloat(activity.approved_amount || 0),
+            0
+          ),
           executive_id,
           executive,
         };
@@ -663,12 +664,15 @@ router.get("/activity_submit_list", async (req, res) => {
     );
 
     clubData.sort((a, b) => b.feedbackTypeOne - a.feedbackTypeOne);
+    const filteredClubData = clubData.filter(
+      (data) => data.totalClubActivities > 0
+    );
 
     res.json({
       totalActivities,
       nonFeedbackTypeOneActivities,
       ratio,
-      clubData,
+      clubData: filteredClubData,
     });
   } catch (error) {
     console.error("Error in /activity_submit_list:", error);
@@ -750,63 +754,5 @@ router.get("/club_executive", async (req, res) => {
     res.status(500).send("Internal Server Error");
   }
 });
-
-const migrateDataInBatches = async () => {
-  try {
-    await Activity_init.destroy({ where: {} });
-    await ActivityMember_init.destroy({ where: {} });
-    await ActivityEvidence_init.destroy({ where: {} });
-
-    // Activity 데이터 이동
-    const totalActivities = await Activity.count();
-    const activityIterations = Math.ceil(totalActivities / BATCH_SIZE);
-
-    for (let i = 0; i < activityIterations; i++) {
-      const activities = await Activity.findAll({
-        limit: BATCH_SIZE,
-        offset: i * BATCH_SIZE,
-      });
-
-      const activityData = activities.map((a) => a.get({ plain: true }));
-      await Activity_init.bulkCreate(activityData, { ignoreDuplicates: true });
-    }
-
-    // ActivityMember 데이터 이동
-    const totalMembers = await ActivityMember.count();
-    const memberIterations = Math.ceil(totalMembers / BATCH_SIZE);
-
-    for (let i = 0; i < memberIterations; i++) {
-      const members = await ActivityMember.findAll({
-        limit: BATCH_SIZE,
-        offset: i * BATCH_SIZE,
-      });
-
-      const memberData = members.map((m) => m.get({ plain: true }));
-      await ActivityMember_init.bulkCreate(memberData, {
-        ignoreDuplicates: true,
-      });
-    }
-
-    // ActivityEvidence 데이터 이동
-    const totalEvidence = await ActivityEvidence.count();
-    const evidenceIterations = Math.ceil(totalEvidence / BATCH_SIZE);
-
-    for (let i = 0; i < evidenceIterations; i++) {
-      const evidence = await ActivityEvidence.findAll({
-        limit: BATCH_SIZE,
-        offset: i * BATCH_SIZE,
-      });
-
-      const evidenceData = evidence.map((e) => e.get({ plain: true }));
-      await ActivityEvidence_init.bulkCreate(evidenceData, {
-        ignoreDuplicates: true,
-      });
-    }
-
-    console.log("Data migration completed successfully");
-  } catch (error) {
-    console.error("Error during batch data migration:", error);
-  }
-};
 
 module.exports = router;

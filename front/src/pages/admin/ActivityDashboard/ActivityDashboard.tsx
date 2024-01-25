@@ -119,7 +119,7 @@ export const ActivityDashboard = (): JSX.Element => {
                       ))}
                   </div>
                 </div>
-                <div className="frame-14">
+                {/* <div className="frame-14">
                   <SubTitle
                     className="sub-title-instance"
                     text="활동 보고서 검토 현황"
@@ -162,7 +162,7 @@ export const ActivityDashboard = (): JSX.Element => {
                       title="one"
                     />
                   </div>
-                </div>
+                </div> */}
               </div>
             </div>
           </div>

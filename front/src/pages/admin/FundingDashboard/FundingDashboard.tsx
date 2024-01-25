@@ -7,6 +7,7 @@ import "./FundingDashboard.css";
 import { SubTitle } from "components/home/SubTitle";
 import { getRequest } from "utils/api";
 import { useExecutiveStatus } from "contexts/ExecutiveStatusContext";
+import { DashboardFundingList } from "components/admin/DashboardFundingList";
 
 interface ClubData {
   clubName: string;
@@ -14,6 +15,8 @@ interface ClubData {
   feedbackTypeTwo: number;
   feedbackTypeThree: number;
   totalClubActivities: number;
+  totalExpenditureMoney: number;
+  totalApprovedMoney: number;
   advisorStatus: string;
   executive_id: number;
   executive: string;
@@ -40,7 +43,7 @@ export const FundingDashboard = (): JSX.Element => {
   useEffect(() => {
     const fetchDashboardData = async () => {
       getRequest(
-        "feedback/activity_submit_list",
+        "funding_feedback/funding_submit_list",
         (data) => {
           console.log(data);
           setDashboardData(data);
@@ -55,7 +58,7 @@ export const FundingDashboard = (): JSX.Element => {
   return (
     <div className="activity-dashboard">
       <div className="frame-7">
-        <UpperBar className={"UpperBar"} title={"활동보고서 대시보드"} />
+        <UpperBar className={"UpperBar"} title={"지원금 신청 대시보드"} />
         <div className="frame-wrapper">
           <div className="frame-11">
             <div className="frame-12">
@@ -63,12 +66,12 @@ export const FundingDashboard = (): JSX.Element => {
                 <div className="frame-14">
                   <SubTitle
                     className="sub-title-instance"
-                    text="활동 보고서 제출 현황"
+                    text="지원금 신청 제출 현황"
                   />
                   <div className="frame-15">
                     <div className="group-3">
                       <p className="p">
-                        <span className="span">전체 활동수 :</span>
+                        <span className="span">전체 지원금 신청수 :</span>
                         <span className="text-wrapper-8">
                           {" "}
                           {dashboardData.totalActivities}개
@@ -77,7 +80,7 @@ export const FundingDashboard = (): JSX.Element => {
                     </div>
                     <div className="group-4">
                       <p className="element-3">
-                        <span className="span">검토 활동수 :</span>
+                        <span className="span">검토 지원금 신청수 :</span>
                         <span className="text-wrapper-8">
                           {" "}
                           {dashboardData.nonFeedbackTypeOneActivities}개
@@ -95,13 +98,13 @@ export const FundingDashboard = (): JSX.Element => {
                     </div>
                   </div>
                   <div className="frame-16">
-                    <DashboardClubList
+                    <DashboardFundingList
                       className="design-component-instance-node"
                       title="zero"
                     />
                     {Array.isArray(dashboardData.clubData) &&
                       dashboardData.clubData.map((club: any, index: any) => (
-                        <DashboardClubList
+                        <DashboardFundingList
                           key={index}
                           className="design-component-instance-node"
                           clubId={club.clubId}
@@ -110,19 +113,21 @@ export const FundingDashboard = (): JSX.Element => {
                           text2={String(club.feedbackTypeOne)}
                           text3={String(club.feedbackTypeTwo)}
                           text4={String(club.feedbackTypeThree)}
-                          text5={String(club.totalClubActivities)}
-                          text6={club.advisorStatus}
+                          text5={String(club.feedbackTypeFour)}
+                          text6={String(club.totalClubActivities)}
+                          text7={`${club.totalExpenditureMoney}원`}
+                          text8={`${club.totalApprovedMoney}원`}
                           executive_id={club.executive_id}
-                          text7={club.executive}
+                          text9={club.executive}
                           title="one"
                         />
                       ))}
                   </div>
                 </div>
-                <div className="frame-14">
+                {/* <div className="frame-14">
                   <SubTitle
                     className="sub-title-instance"
-                    text="활동 보고서 검토 현황"
+                    text="지원금 신청 검토 현황"
                   />
                   <div className="frame-16">
                     <DashboardExecutive
@@ -162,7 +167,7 @@ export const FundingDashboard = (): JSX.Element => {
                       title="one"
                     />
                   </div>
-                </div>
+                </div> */}
               </div>
             </div>
           </div>

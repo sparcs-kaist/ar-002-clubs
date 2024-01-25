@@ -1190,7 +1190,7 @@ export const FundingAdminDetail = (): JSX.Element => {
           </div>
         </div>
         <UnderBar />
-        <div className="frame-16">
+        {/* <div className="frame-16">
           <div
             className="frame-17"
             onClick={() => navigate(`/edit_funding/${id}`)}
@@ -1198,7 +1198,6 @@ export const FundingAdminDetail = (): JSX.Element => {
           >
             수정
           </div>
-          {/* {durationStatus == 1 && ( */}
           <div
             className="frame-17"
             onClick={handleDeleteFunding}
@@ -1206,8 +1205,7 @@ export const FundingAdminDetail = (): JSX.Element => {
           >
             삭제
           </div>
-          {/* )} */}
-        </div>
+        </div> */}
       </div>
     </div>
   );

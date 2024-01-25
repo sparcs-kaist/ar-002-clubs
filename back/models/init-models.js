@@ -29,6 +29,7 @@ var _ExecutiveType = require("./ExecutiveType");
 var _Funding = require("./Funding");
 var _FundingEvidence = require("./FundingEvidence");
 var _FundingEvidenceType = require("./FundingEvidenceType");
+var _FundingFeedback = require("./FundingFeedback");
 var _FundingFeedbackType = require("./FundingFeedbackType");
 var _FundingFixture = require("./FundingFixture");
 var _FundingFixtureObjectType = require("./FundingFixtureObjectType");
@@ -84,6 +85,7 @@ function initModels(sequelize) {
   var Funding = _Funding(sequelize, DataTypes);
   var FundingEvidence = _FundingEvidence(sequelize, DataTypes);
   var FundingEvidenceType = _FundingEvidenceType(sequelize, DataTypes);
+  var FundingFeedback = _FundingFeedback(sequelize, DataTypes);
   var FundingFeedbackType = _FundingFeedbackType(sequelize, DataTypes);
   var FundingFixture = _FundingFixture(sequelize, DataTypes);
   var FundingFixtureObjectType = _FundingFixtureObjectType(
@@ -299,6 +301,14 @@ function initModels(sequelize) {
     as: "FundingEvidences",
     foreignKey: "funding_id",
   });
+  FundingFeedback.belongsTo(Funding, {
+    as: "funding_Funding",
+    foreignKey: "funding",
+  });
+  Funding.hasMany(FundingFeedback, {
+    as: "FundingFeedbacks",
+    foreignKey: "funding",
+  });
   FundingFixture.belongsTo(Funding, {
     as: "funding",
     foreignKey: "funding_id",
@@ -413,6 +423,19 @@ function initModels(sequelize) {
     as: "ExecutiveMembers",
     foreignKey: "student_id",
   });
+  Funding.belongsTo(Member, {
+    as: "funding_executive_Member",
+    foreignKey: "funding_executive",
+  });
+  Member.hasMany(Funding, { as: "Fundings", foreignKey: "funding_executive" });
+  FundingFeedback.belongsTo(Member, {
+    as: "student",
+    foreignKey: "student_id",
+  });
+  Member.hasMany(FundingFeedback, {
+    as: "FundingFeedbacks",
+    foreignKey: "student_id",
+  });
   FundingTransportationMember.belongsTo(Member, {
     as: "student",
     foreignKey: "student_id",
@@ -504,6 +527,7 @@ function initModels(sequelize) {
     Funding,
     FundingEvidence,
     FundingEvidenceType,
+    FundingFeedback,
     FundingFeedbackType,
     FundingFixture,
     FundingFixtureObjectType,

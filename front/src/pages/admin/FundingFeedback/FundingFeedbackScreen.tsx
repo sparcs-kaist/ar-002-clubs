@@ -24,7 +24,7 @@ export const FundingFeedbackScreen = (): JSX.Element => {
 
   useEffect(() => {
     getRequest(
-      "feedback/my_feedback_activity", // Replace with your actual API endpoint
+      "funding_feedback/my_feedback_activity", // Replace with your actual API endpoint
       (data) => setFeedbackActivities(data),
       (error) => console.error("Error fetching activity feedback data:", error)
     );
