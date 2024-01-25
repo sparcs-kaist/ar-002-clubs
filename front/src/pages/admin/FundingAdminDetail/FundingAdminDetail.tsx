@@ -9,6 +9,7 @@ import { getRequest, postRequest } from "utils/api";
 import { useUserRepresentativeStatus } from "hooks/useUserPermission";
 import { useNavigate, useParams } from "react-router-dom";
 import { useReportDurationStatus } from "hooks/useReportDurationStatus";
+import { useExecutiveStatus } from "contexts/ExecutiveStatusContext";
 
 interface Participant {
   student_id: string;
@@ -88,8 +89,7 @@ interface Activity {
 }
 
 export const FundingAdminDetail = (): JSX.Element => {
-  const { userStatuses } = useUserRepresentativeStatus();
-  // const { durationStatus, isLoading } = useReportDurationStatus();
+  const { executiveStatuses } = useExecutiveStatus();
   const navigate = useNavigate();
   const { id } = useParams();
   const [funding, setFunding] = useState<FundingState>({
@@ -147,7 +147,7 @@ export const FundingAdminDetail = (): JSX.Element => {
     Participant[]
   >([]);
   const [activities, setActivities] = useState<Activity[]>([]);
-  const clubId = userStatuses.length > 0 ? userStatuses[0].clubId : null;
+  // const clubId = userStatuses.length > 0 ? userStatuses[0].clubId : null;
   const [reviewResult, setReviewResult] = useState("");
 
   useEffect(() => {
@@ -188,7 +188,7 @@ export const FundingAdminDetail = (): JSX.Element => {
       );
     };
 
-    if (clubId) {
+    if (funding.clubId) {
       fetchActivities();
     }
   }, [funding.clubId]);
