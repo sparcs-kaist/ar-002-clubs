@@ -413,15 +413,22 @@ export const FundingAdminDetail = (): JSX.Element => {
 
   const handleReviewComplete = async () => {
     try {
-      await postRequest(
-        "funding_feedback/feedback",
-        {
-          funding_id: id,
-          reviewResult: reviewResult,
-          funding: funding,
-        },
-        () => navigate(-1)
-      );
+      if (
+        funding.approvedAmount >= 0 &&
+        funding.approvedAmount <= funding.expenditureAmount
+      ) {
+        await postRequest(
+          "funding_feedback/feedback",
+          {
+            funding_id: id,
+            reviewResult: reviewResult,
+            funding: funding,
+          },
+          () => navigate(-1)
+        );
+      } else {
+        alert("승인 금액이 범위 밖에 있습니다. 다시 확인해주세요.");
+      }
     } catch (error) {
       console.error("Failed to post review:", error);
     }

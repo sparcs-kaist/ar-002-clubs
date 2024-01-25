@@ -177,13 +177,21 @@ router.post("/feedback", async (req, res) => {
       new Date().getTime() + 9 * 60 * 60 * 1000
     );
 
+    console.log(funding.approvedAmount);
+
     // Update feedback_type in Activity based on reviewResult
-    const feedbackType =
-      funding.approvedAmount === 0
-        ? 4
-        : funding.approvedAmount < funding.expenditureAmount
-        ? 3
-        : 2;
+    let feedbackType = 4;
+    if (funding.approvedAmount === 0) {
+      feedbackType = 4;
+    } else if (
+      0 < funding.approvedAmount &&
+      funding.approvedAmount < funding.expenditureAmount
+    ) {
+      feedbackType = 3;
+    } else if (funding.approvedAmount === funding.expenditureAmount) {
+      feedbackType = 2;
+    }
+
     await Funding.update(
       {
         funding_feedback_type: feedbackType,
