@@ -98,10 +98,10 @@ export const ClubFundingElement = ({
       style={clubId > 0 ? { cursor: "pointer" } : {}}
     >
       <div className="frame" onClick={handleClick}>
-        <div className="element">{number}</div>
+        <div className="element">{type == "two" ? "" : number}</div>
       </div>
       <div className="div-wrapper" onClick={handleClick}>
-        <div className="text-wrapper-2">{name}</div>
+        <div className="text-wrapper-2">{type == "two" ? "총계" : name}</div>
       </div>
       <div className="frame-2" onClick={handleClick}>
         <div className="text-wrapper-2">{expenditureAmount}</div>
@@ -110,11 +110,17 @@ export const ClubFundingElement = ({
         <div className="text-wrapper-2">{approvedAmount}</div>
       </div>
       <div className="frame-3" onClick={handleClick}>
-        <div className="text-wrapper-2">{feedbackName}</div>
+        <div className="text-wrapper-2">
+          {type == "two" ? "" : feedbackName}
+        </div>
       </div>
       {type === "zero" ? (
         <div className="frame-3">
           <div className="text-wrapper-2">{executiveName}</div>
+        </div>
+      ) : type == "two" ? (
+        <div className="frame-3">
+          <div className="text-wrapper-2">{""}</div>
         </div>
       ) : (
         <select

@@ -498,6 +498,20 @@ export const FundingAdminDetail = (): JSX.Element => {
                         </option>
                       ))}
                     </select>
+                    {funding.purpose > 0 && (
+                      <button
+                        className="div-3"
+                        style={{ marginLeft: "10px" }}
+                        onClick={() =>
+                          window.open(
+                            `/admin/activity/${funding.purpose}`,
+                            "_blank"
+                          )
+                        }
+                      >
+                        활동 바로가기
+                      </button>
+                    )}
                   </div>
                 </p>
                 <p className="div-3">

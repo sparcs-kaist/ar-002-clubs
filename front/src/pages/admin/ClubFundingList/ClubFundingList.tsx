@@ -80,6 +80,11 @@ export const ClubFundingList = (): JSX.Element => {
                           feedbackState={funding.feedbackType}
                         />
                       ))}
+                    <ClubFundingElement
+                      type="two"
+                      expenditureAmount={`${totalExpenditureAmount}원`}
+                      approvedAmount={`${totalApprovedAmount}원`}
+                    />
                   </div>
                 </div>
               </div>
