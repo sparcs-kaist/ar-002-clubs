@@ -300,9 +300,9 @@ router.get("/getActivity/:activityId", async (req, res) => {
       .filter((feedback) => feedback.feedback.trim() !== "") // Exclude empty feedback
       .map((feedback) => {
         return {
-          addedTime: feedback.added_time,
+          feedback_time: formatSignTime(feedback.added_time),
           text: feedback.feedback,
-          reviewerName: feedback.student.name, // assuming you want to include the name of the reviewer
+          // reviewerName: feedback.student.name, // assuming you want to include the name of the reviewer
         };
       });
 
@@ -684,7 +684,7 @@ router.get("/activity_submit_list", async (req, res) => {
 
 router.get("/club_executive", async (req, res) => {
   try {
-    const authorized = await checkPermission(req, res, [{ executive: 3 }]);
+    const authorized = await checkPermission(req, res, [{ executive: 4 }]);
     if (!authorized) {
       return;
     }

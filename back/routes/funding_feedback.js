@@ -61,34 +61,16 @@ router.get("/club_funding_list", async (req, res) => {
       return res.status(404).send("Current semester not found.");
     }
 
-    // Fetch the activity duration
-    const activityDuration = await Duration.findOne({
-      where: {
-        semester_id: currentSemester.id,
-        duration_name: "Activity",
-      },
-      attributes: ["start_date", "end_date"],
-    });
-
-    if (!activityDuration) {
-      return res
-        .status(404)
-        .send("Activity duration not found for the current semester.");
-    }
-
     // Fetch filtered activities
-    const filteredActivities = await Activity.findAll({
+    const filteredFundings = await Funding.findAll({
       where: {
         club_id: club_id,
-        [Sequelize.Op.and]: [
-          { start_date: { [Sequelize.Op.gte]: activityDuration.start_date } },
-          { end_date: { [Sequelize.Op.lte]: activityDuration.end_date } },
-        ],
+        semester_id: currentSemester.id,
       },
       include: [
         {
-          model: ActivityFeedback,
-          as: "ActivityFeedbacks", // Alias defined in your associations
+          model: FundingFeedback,
+          as: "FundingFeedbacks", // Alias defined in your associations
           include: [
             {
               model: Member,
@@ -100,53 +82,39 @@ router.get("/club_funding_list", async (req, res) => {
           limit: 1,
         },
         {
-          model: ActivityFeedbackExecutive,
-          as: "ActivityFeedbackExecutive",
-          include: [
-            {
-              model: ExecutiveMember,
-              as: "student", // Alias for ExecutiveMember association
-              include: [
-                {
-                  model: Member,
-                  as: "student", // Alias for Member association in ExecutiveMember
-                  attributes: ["name"],
-                },
-              ],
-            },
-          ],
+          model: Member,
+          as: "funding_executive_Member", // Alias for Member association in ExecutiveMember
+          attributes: ["student_id", "name"],
         },
       ],
-      order: [["feedback_type", "ASC"]],
+      order: [["funding_feedback_type", "ASC"]],
       attributes: [
         "id",
-        "title",
+        "name",
         "recent_edit",
         "recent_feedback",
-        "feedback_type",
+        "funding_feedback_type",
+        "expenditure_amount",
+        "approved_amount",
       ],
     });
 
-    console.log(
-      filteredActivities[0].ActivityFeedbackExecutive.student.student.name
-    );
-
     // Process and return the response
-    const responseArray = filteredActivities.map((activity) => {
-      const recentFeedback = activity.ActivityFeedbacks[0];
-      const executiveFeedback = activity.ActivityFeedbackExecutive;
+    const responseArray = filteredFundings.map((funding) => {
+      const recentFeedback = funding.FundingFeedbacks[0];
+      const executiveFeedback = funding.funding_executive_Member;
 
       return {
-        title: activity.title,
-        activityId: activity.id,
-        recent_edit: formatSignTime(activity.recent_edit),
-        recent_feedback: formatSignTime(activity.recent_feedback),
+        name: funding.name,
+        fundingId: funding.id,
+        recent_edit: formatSignTime(funding.recent_edit),
+        recent_feedback: formatSignTime(funding.recent_feedback),
         feedbackMemberName: recentFeedback ? recentFeedback.student.name : null,
         executive_id: executiveFeedback ? executiveFeedback.student_id : null,
-        executiveName: executiveFeedback
-          ? executiveFeedback.student.student.name
-          : null,
-        feedbackType: activity.feedback_type,
+        executiveName: executiveFeedback ? executiveFeedback.name : null,
+        feedbackType: funding.feedback_type,
+        expenditureAmount: funding.expenditure_amount,
+        approvedAmount: funding.approved_amount,
       };
     });
 
@@ -157,9 +125,22 @@ router.get("/club_funding_list", async (req, res) => {
     }
     const clubName = club.name;
 
-    res.json({ clubName, activities: responseArray });
+    const totalExpenditureAmount = filteredFundings.reduce((total, funding) => {
+      return total + (funding.expenditure_amount || 0);
+    }, 0);
+
+    const totalApprovedAmount = filteredFundings.reduce((total, funding) => {
+      return total + (funding.approved_amount || 0);
+    }, 0);
+
+    res.json({
+      clubName,
+      fundings: responseArray,
+      totalExpenditureAmount,
+      totalApprovedAmount,
+    });
   } catch (error) {
-    console.error("Error in /club_activity_list:", error);
+    console.error("Error in /club_funding_list:", error);
     res.status(500).send("Internal Server Error");
   }
 });
@@ -296,9 +277,9 @@ router.get("/getFunding/:fundingId", async (req, res) => {
       .filter((feedback) => feedback.feedback.trim() !== "") // Exclude empty feedback
       .map((feedback) => {
         return {
-          addedTime: feedback.added_time,
+          feedback_time: formatSignTime(feedback.added_time),
           text: feedback.feedback,
-          reviewerName: feedback.student.name, // assuming you want to include the name of the reviewer
+          // reviewerName: feedback.student.name, // assuming you want to include the name of the reviewer
         };
       });
 
@@ -470,6 +451,7 @@ router.get("/my_feedback_funding", async (req, res) => {
         // Fetch feedback details
         const feedbackDetail = await FundingFeedback.findOne({
           where: { funding: activity ? activity.id : null },
+          order: [["added_time", "DESC"]],
           include: [
             {
               model: Member,
@@ -724,7 +706,7 @@ router.get("/funding_submit_list", async (req, res) => {
 
 router.get("/club_executive", async (req, res) => {
   try {
-    const authorized = await checkPermission(req, res, [{ executive: 3 }]);
+    const authorized = await checkPermission(req, res, [{ executive: 4 }]);
     if (!authorized) {
       return;
     }

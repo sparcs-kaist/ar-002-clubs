@@ -5,25 +5,24 @@ Please share your feedback here: https://form.asana.com/?k=uvp-HPgd3_hyoXRBw1IcN
 
 import PropTypes from "prop-types";
 import React, { useEffect, useState } from "react";
+import { ActivityState } from "components/activity/ActivityState";
 import "./style.css";
 import { getRequest, postRequest } from "utils/api";
 import { useNavigate } from "react-router-dom";
+import { FundingState } from "components/funding/FundingState";
 
 interface Props {
-  title: "zero" | "one";
-  className: any;
-  text?: string;
-  text1?: string;
-  text2?: string;
-  text3?: string;
-  text4?: string;
-  text5?: string;
-  text6?: string;
-  text7?: string;
-  text8?: string;
-  text9?: string;
-  executive_id?: number;
+  type: "zero" | "one" | "two";
   clubId?: number;
+  number?: string;
+  name?: string;
+  approvedAmount?: string;
+  expenditureAmount?: string;
+  feedbackName?: string;
+  executiveId?: number;
+  executiveName?: string;
+  fundingId?: number;
+  feedbackState?: number;
 }
 
 interface Executive {
@@ -31,36 +30,37 @@ interface Executive {
   name: string;
 }
 
-export const DashboardFundingList = ({
-  title,
-  className,
-  text = "#",
-  text1 = "동아리명",
-  text2 = "검토전",
-  text3 = "전체승인",
-  text4 = "부분승인",
-  text5 = "미승인",
-  text6 = "전체",
-  text7 = "신청금액",
-  text8 = "승인금액",
-  text9 = "담당자",
-  executive_id = 0,
+export const ClubFundingElement = ({
+  type,
   clubId = 0,
+  fundingId = 0,
+  number = "#",
+  name = "활동명",
+  expenditureAmount = "신청 금액",
+  approvedAmount = "승인 금액",
+  feedbackName = "검토자",
+  executiveName = "담당자",
+  executiveId = 0,
+  feedbackState = 1,
 }: Props): JSX.Element => {
   const [executives, setExecutives] = useState<Executive[]>([]);
   const [selectedExecutive, setSelectedExecutive] = useState(
-    executive_id ? executive_id.toString() : "0"
+    executiveId ? executiveId.toString() : "0"
   );
   const navigate = useNavigate();
 
   useEffect(() => {
-    getRequest(`feedback/club_executive?club_id=${clubId}`, (data) => {
+    getRequest(`funding_feedback/club_executive?club_id=${clubId}`, (data) => {
       setExecutives(data);
-      if (executive_id === 0) {
-        setSelectedExecutive("0"); // Default option when no executive_id is provided
+      if (clubId === 0) {
+        setSelectedExecutive("0"); // Default option when no executiveId is provided
       }
     });
-  }, [clubId, executive_id]);
+  }, [clubId, executiveId]);
+
+  const handleClick = () => {
+    navigate(clubId > 0 ? `/admin/funding/${fundingId}` : "");
+  };
 
   const handleSelectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const newValue = event.target.value;
@@ -73,14 +73,13 @@ export const DashboardFundingList = ({
       : "선택안함";
 
     const confirmation = window.confirm(
-      `${text1}의 검토 담당자를 ${executiveName}(으)로 모두 변경하시겠습니까?`
+      `${name}의 검토 담당자를 ${executiveName}(으)로 변경하시겠습니까?`
     );
 
     if (confirmation) {
-      // Call POST API here
       postRequest(
         "funding_feedback/update_executive",
-        { student_id: newValue, club_id: clubId },
+        { student_id: newValue, funding_id: fundingId },
         (response) => {
           console.log("Post request successful", response.data);
           setSelectedExecutive(newValue);
@@ -93,51 +92,35 @@ export const DashboardFundingList = ({
     }
   };
 
-  const handleClick = () => {
-    navigate(clubId > 0 ? `/admin/club_funding/${clubId}` : "");
-  };
-
   return (
     <div
-      className={`dashboard-funding-list ${title} ${className}`}
+      className={`dashboard-activity ${type} design-component-instance-node`}
       style={clubId > 0 ? { cursor: "pointer" } : {}}
     >
       <div className="frame" onClick={handleClick}>
-        <div className="element">{text}</div>
+        <div className="element">{number}</div>
       </div>
       <div className="div-wrapper" onClick={handleClick}>
-        <div className="text-wrapper-2">{text1}</div>
+        <div className="text-wrapper-2">{name}</div>
       </div>
       <div className="frame-2" onClick={handleClick}>
-        <div className="text-wrapper-2">{text2}</div>
+        <div className="text-wrapper-2">{expenditureAmount}</div>
       </div>
       <div className="frame-2" onClick={handleClick}>
-        <div className="text-wrapper-2">{text3}</div>
-      </div>
-      <div className="frame-2" onClick={handleClick}>
-        <div className="text-wrapper-2">{text4}</div>
-      </div>
-      <div className="frame-2" onClick={handleClick}>
-        <div className="text-wrapper-2">{text5}</div>
-      </div>
-      <div className="frame-2" onClick={handleClick}>
-        <div className="text-wrapper-2">{text6}</div>
+        <div className="text-wrapper-2">{approvedAmount}</div>
       </div>
       <div className="frame-3" onClick={handleClick}>
-        <div className="text-wrapper-2">{text7}</div>
+        <div className="text-wrapper-2">{feedbackName}</div>
       </div>
-      <div className="frame-3" onClick={handleClick}>
-        <div className="text-wrapper-2">{text8}</div>
-      </div>
-      {title === "zero" ? (
-        <div className="frame-2">
-          <div className="text-wrapper-2">{text9}</div>
+      {type === "zero" ? (
+        <div className="frame-3">
+          <div className="text-wrapper-2">{executiveName}</div>
         </div>
       ) : (
         <select
           value={selectedExecutive}
           onChange={handleSelectChange}
-          className={"frame-2 text-wrapper-2"}
+          className={"frame-10 text-wrapper-2"}
         >
           <option key="0" value="0">
             선택안함
@@ -149,6 +132,11 @@ export const DashboardFundingList = ({
           ))}
         </select>
       )}
+      <div className="frame-4" onClick={handleClick}>
+        {type === "zero" && <div className="text-wrapper-2">검토 상태</div>}
+
+        {type === "one" && <FundingState property1={feedbackState} />}
+      </div>
     </div>
   );
 };

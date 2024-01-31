@@ -7,32 +7,39 @@ import { UpperBar } from "components/home/UpperBar";
 import { useExecutiveStatus } from "contexts/ExecutiveStatusContext";
 import { useNavigate, useParams } from "react-router-dom";
 import { getRequest } from "utils/api";
+import { ClubFundingElement } from "components/admin/ClubFundingList";
 
-interface Activity {
-  activityId: number;
-  title: string;
+interface Funding {
+  fundingId: number;
+  name: string;
   recent_edit: string;
   recent_feedback: string;
   feedbackMemberName: string;
   executiveName: string;
   executive_id: number;
   feedbackType: number;
+  expenditureAmount: number;
+  approvedAmount: number;
 }
 
 export const ClubFundingList = (): JSX.Element => {
   const { executiveStatuses } = useExecutiveStatus();
   const { id } = useParams();
-  const [activities, setActivities] = useState<Activity[]>([]);
+  const [fundings, setFundings] = useState<Funding[]>([]);
   const [clubName, setClubName] = useState("");
+  const [totalExpenditureAmount, setTotalExpenditureAmount] = useState(0);
+  const [totalApprovedAmount, setTotalApprovedAmount] = useState(0);
 
   useEffect(() => {
     const fetchActivities = async () => {
       getRequest(
-        `feedback/club_activity_list?club_id=${id}`,
+        `funding_feedback/club_funding_list?club_id=${id}`,
         (data) => {
           console.log(data);
-          setActivities(data.activities);
+          setFundings(data.fundings);
           setClubName(data.clubName);
+          setTotalExpenditureAmount(data.totalExpenditureAmount);
+          setTotalApprovedAmount(data.totalApprovedAmount);
         },
         (error) => console.error("Failed to fetch activities:", error)
       );
@@ -44,7 +51,7 @@ export const ClubFundingList = (): JSX.Element => {
   return (
     <div className="club-funding-list">
       <div className="frame-6">
-        <UpperBar className={"upper-bar"} title={`${clubName} 활동 보고서`} />
+        <UpperBar className={"upper-bar"} title={`${clubName} 지원금 신청`} />
         <div className="frame-wrapper">
           <div className="frame-10">
             <div className="frame-11">
@@ -52,28 +59,25 @@ export const ClubFundingList = (): JSX.Element => {
                 <div className="frame-13">
                   <SubTitle
                     className="sub-title-instance"
-                    text="활동 보고서 검토 현황"
+                    text="지원금 신청 검토 현황"
                   />
                   <div className="frame-14">
-                    <DashboardActivity
-                      type="zero"
-                      activityStateProperty1="default"
-                    />
-                    {Array.isArray(activities) &&
-                      activities.map((activity, index) => (
-                        <DashboardActivity
+                    <ClubFundingElement type="zero" />
+                    {Array.isArray(fundings) &&
+                      fundings.map((funding, index) => (
+                        <ClubFundingElement
                           key={index}
                           type="one"
                           clubId={parseInt(id ? id : "0")}
-                          activityId={activity.activityId}
+                          fundingId={funding.fundingId}
                           number={(index + 1).toString()}
-                          title={activity.title}
-                          editedTime={activity.recent_edit}
-                          feedbackTime={activity.recent_feedback}
-                          feedbackName={activity.feedbackMemberName}
-                          executiveName={activity.executiveName}
-                          executiveId={activity.executive_id}
-                          feedbackState={activity.feedbackType}
+                          name={funding.name}
+                          expenditureAmount={`${funding.expenditureAmount}원`}
+                          approvedAmount={`${funding.approvedAmount}원`}
+                          feedbackName={funding.feedbackMemberName}
+                          executiveName={funding.executiveName}
+                          executiveId={funding.executive_id}
+                          feedbackState={funding.feedbackType}
                         />
                       ))}
                   </div>
