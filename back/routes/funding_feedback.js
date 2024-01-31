@@ -112,7 +112,7 @@ router.get("/club_funding_list", async (req, res) => {
         feedbackMemberName: recentFeedback ? recentFeedback.student.name : null,
         executive_id: executiveFeedback ? executiveFeedback.student_id : null,
         executiveName: executiveFeedback ? executiveFeedback.name : null,
-        feedbackType: funding.feedback_type,
+        feedbackType: funding.funding_feedback_type,
         expenditureAmount: funding.expenditure_amount,
         approvedAmount: funding.approved_amount,
       };
