@@ -115,6 +115,9 @@ export const UpperBar = ({ className, title }: Props): JSX.Element => {
               <button onClick={() => navigate("/club_manage")}>
                 동아리 관리
               </button>
+              <button onClick={() => navigate("/club_registration")}>
+                동아리 등록 신청
+              </button>
             </div>
           )}
         </div>

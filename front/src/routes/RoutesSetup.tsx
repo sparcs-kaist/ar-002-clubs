@@ -24,6 +24,10 @@ import { FundingFeedbackScreen } from "pages/admin/FundingFeedback/FundingFeedba
 import { FundingDashboard } from "pages/admin/FundingDashboard";
 import { ClubFundingList } from "pages/admin/ClubFundingList";
 import { FundingAdminDetail } from "pages/admin/FundingAdminDetail";
+import { ClubRegistration } from "pages/club/ClubRegistration";
+import { ClubRegistrationRenewal } from "pages/club/ClubRegistrationRenewal";
+import { ClubRegistrationProvisional } from "pages/club/ClubRegistrationProvisional";
+import { ClubRegistrationPromotional } from "pages/club/ClubRegistrationPromotional/ClubRegistrationPromotional";
 
 export default function RouteSetup() {
   return (
@@ -32,6 +36,7 @@ export default function RouteSetup() {
       <Route path="/cafe_notice" element={<CafeNotice />} />
       <Route path="/club_list" element={<ClubList />} />
       <Route path="/my_club" element={<MyClub />} />
+
       <Route path="/recent_meeting/0" element={<RecentMeeting id={0} />} />
       <Route path="/recent_meeting/1" element={<RecentMeeting id={1} />} />
       <Route path="/recent_meeting/2" element={<RecentMeeting id={2} />} />
@@ -39,12 +44,28 @@ export default function RouteSetup() {
       <Route path="/recent_meeting/4" element={<RecentMeeting id={4} />} />
       <Route path="/add_meeting/:id" element={<AddMeeting />} />
       <Route path="/meeting_detail/:id" element={<MeetingDetail />} />
+
       <Route path="/edit_meeting/:id" element={<EditMeeting />} />
       <Route path="/club_detail/:id" element={<ClubDetail />} />
       <Route path="/club_manage" element={<ClubManage />} />
+      <Route path="/club_registration" element={<ClubRegistration />} />
+      <Route
+        path="/club_registration_renewal"
+        element={<ClubRegistrationRenewal />}
+      />
+      <Route
+        path="/club_registration_provisional"
+        element={<ClubRegistrationProvisional />}
+      />
+      <Route
+        path="/club_registration_promotional"
+        element={<ClubRegistrationPromotional />}
+      />
+
       <Route path="/add_activity" element={<AddActivity />} />
       <Route path="/activity_detail/:id" element={<ActivityDetail />} />
       <Route path="/edit_activity/:id" element={<EditActivity />} />
+
       <Route path="/add_funding" element={<AddFunding />} />
       <Route path="/funding_detail/:id" element={<FundingDetail />} />
       <Route path="/edit_funding/:id" element={<EditFunding />} />

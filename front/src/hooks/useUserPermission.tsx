@@ -13,7 +13,7 @@ type UserRepresentativeStatus = {
   clubId: number;
 };
 
-export const useUserRepresentativeStatus = () => {
+export const useUserRepresentativeStatus = (disable: boolean = false) => {
   const navigate = useNavigate();
   const [userStatuses, setUserStatuses] = useState<UserRepresentativeStatus[]>(
     []
@@ -41,8 +41,10 @@ export const useUserRepresentativeStatus = () => {
 
   useEffect(() => {
     if (!isLoading && userStatuses.length === 0) {
-      alert("접근 권한이 없습니다. 대표자/대의원만 접근 가능합니다.");
-      navigate(-1);
+      if (!disable) {
+        alert("접근 권한이 없습니다. 대표자/대의원만 접근 가능합니다.");
+        navigate(-1);
+      }
     }
   }, [isLoading]);
 
