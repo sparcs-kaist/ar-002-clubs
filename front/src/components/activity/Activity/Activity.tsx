@@ -11,7 +11,7 @@ import { useNavigate } from "react-router-dom";
 
 interface Props {
   id: number;
-  property1?: "variant-2" | "default";
+  property1?: "variant-2" | "default" | "variant-3";
   className?: string;
   activityStateProperty1: number;
   index?: number;
@@ -85,8 +85,28 @@ export const Activity = ({
             <div className="frame-2">
               <p className="text-wrapper-3">활동 분류</p>
             </div>
-            <div className="frame-3">
+            <div className="frame-30">
               <div className="text-wrapper-3">활동 기간</div>
+            </div>
+            <div className="frame-6">
+              <div className="text-wrapper-3">검토 상태</div>
+            </div>
+          </div>
+        )}
+
+        {property1 === "variant-3" && (
+          <div className="frame-4">
+            <div className="frame-5">
+              <div className="text-wrapper-2">#</div>
+            </div>
+            <div className="div-wrapper">
+              <p className="text-wrapper-3">신청 동아리</p>
+            </div>
+            <div className="frame-2">
+              <p className="text-wrapper-3">신청 분류</p>
+            </div>
+            <div className="frame-30">
+              <div className="text-wrapper-3">신청 일시</div>
             </div>
             <div className="frame-6">
               <div className="text-wrapper-3">검토 상태</div>

@@ -75,7 +75,7 @@
   width: 311px;
 }
 
-.activity .frame-3 {
+.activity .frame-30 {
   align-items: center;
   border-color: #000000;
   border-right-style: solid;
@@ -153,6 +153,13 @@
   width: 1379px;
 }
 
+.activity.variant-3 {
+  background-color: #7cd2d8;
+  border-top-style: solid;
+  border-top-width: 1px;
+  width: 1379px;
+}
+
 .activity.default .frame-31 {
   align-items: flex-start;
   display: inline-flex;
@@ -160,5 +167,9 @@
 }
 
 .activity.variant-2 .frame-31 {
+  height: 44px;
+}
+
+.activity.variant-3 .frame-31 {
   height: 44px;
 }

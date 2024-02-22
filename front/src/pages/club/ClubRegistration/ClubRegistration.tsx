@@ -8,11 +8,12 @@ import { ActivityFeedback } from "components/activity/ActivityFeedback";
 import { getRequest, postRequest } from "utils/api";
 import { useUserRepresentativeStatus } from "hooks/useUserPermission";
 import { useNavigate, useParams } from "react-router-dom";
-import { useReportDurationStatus } from "hooks/useReportDurationStatus";
+import { useRegistrationDurationStatus } from "hooks/useReportDurationStatus";
+import { Activity } from "components/activity/Activity";
 
 export const ClubRegistration = (): JSX.Element => {
   const { userStatuses, isLoading } = useUserRepresentativeStatus(true);
-  const { durationStatus } = useReportDurationStatus();
+  const { durationStatus } = useRegistrationDurationStatus();
   const navigate = useNavigate();
 
   const clubId = userStatuses.length > 0 ? userStatuses[0].clubId : null;
@@ -99,6 +100,15 @@ export const ClubRegistration = (): JSX.Element => {
                   </div>
                 </div>
               </div>
+              <SubTitle
+                className="sub-title-instance"
+                text="내가 신청한 등록"
+              />
+              <Activity
+                property1="variant-3"
+                activityStateProperty1={2}
+                id={0}
+              />
             </div>
           </div>
         </div>

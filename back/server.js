@@ -79,6 +79,8 @@ const funding = require("./routes/funding");
 app.use("/api/funding", funding);
 const funding_feedback = require("./routes/funding_feedback");
 app.use("/api/funding_feedback", funding_feedback);
+const registration = require("./routes/registration");
+app.use("/api/registration", registration);
 
 const httpServer = http.createServer(app);
 httpServer.listen(80, () => {
