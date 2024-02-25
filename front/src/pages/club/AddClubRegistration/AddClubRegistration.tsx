@@ -297,22 +297,63 @@ export const AddClubRegistration = ({ type = "provisional" }): JSX.Element => {
                 </div>
               </div>
             )}
-            {(type === "promotional" || type === "provisional") && (
-              <div className="frame-11">
-                <SubTitle text="활동 계획서" />
+            <div className="frame-11">
+              <SubTitle text="활동 계획서" />
 
+              <div className="frame-9">
+                <p className="div-3">
+                  <span className="span-notice">
+                    * 활동 목적 및 대중사업 계획을 포함한 활동 계획서 1부 제출
+                  </span>
+                </p>
+                <p className="div-3">
+                  <span className="span-notice">
+                    * 활동마다 활동명, 활동 기간, 활동 내용, 운영 예산을 포함한
+                    자유 양식으로 제출
+                  </span>
+                </p>
+                <input
+                  type="file"
+                  onChange={(e) => {
+                    if (e.target.files?.[0]) {
+                      // handleFileUpload(
+                      //   e.target.files[0],
+                      //   "fixture.softwareProofImages"
+                      // );
+                    }
+                  }}
+                />
+                {/* {groupProofImagesInPairs(
+                        "fixture.softwareProofImages"
+                      ).map((pair, pairIndex) => (
+                        <div key={pairIndex} className="frame-13">
+                          {pair.map((image, index) => (
+                            <ActivityProof
+                              key={index}
+                              url={image.imageUrl}
+                              className="activity-proof-instance"
+                              property1="default"
+                              fileName={image.fileName}
+                              onDelete={() =>
+                                handleDeleteImage(
+                                  image.fileName,
+                                  "fixture.softwareProofImages"
+                                )
+                              }
+                            />
+                          ))}
+                        </div>
+                      ))} */}
+              </div>
+            </div>
+            {type === "promotional" && (
+              <div className="frame-11">
+                <SubTitle text="동아리 회칙" />
                 <div className="frame-9">
                   <p className="div-3">
-                    <span className="span-notice">
-                      * 활동 목적 및 대중사업 계획을 포함한 활동 계획서 1부 제출
-                    </span>
+                    <span className="span-notice">* 동아리 회칙 작성</span>
                   </p>
-                  <p className="div-3">
-                    <span className="span-notice">
-                      * 활동마다 활동명, 활동 기간, 활동 내용, 운영 예산을
-                      포함한 자유 양식으로 제출
-                    </span>
-                  </p>
+
                   <input
                     type="file"
                     onChange={(e) => {
