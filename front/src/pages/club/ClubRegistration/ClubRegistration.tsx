@@ -43,7 +43,9 @@ export const ClubRegistration = (): JSX.Element => {
                     <div
                       className="frame-15"
                       style={{ cursor: "pointer" }}
-                      onClick={() => navigate("/club_registration_provisional")}
+                      onClick={() =>
+                        navigate("/add_club_registration/provisional")
+                      }
                     >
                       <div className="text-wrapper-11">등록 신청</div>
                     </div>
@@ -68,7 +70,9 @@ export const ClubRegistration = (): JSX.Element => {
                     <div
                       className="frame-15"
                       style={{ cursor: "pointer" }}
-                      onClick={() => navigate("/club_registration_promotional")}
+                      onClick={() =>
+                        navigate("/add_club_registration/promotional")
+                      }
                     >
                       <div className="text-wrapper-11">등록 신청</div>
                     </div>
@@ -88,7 +92,9 @@ export const ClubRegistration = (): JSX.Element => {
                       <div
                         className="frame-15"
                         style={{ cursor: "pointer" }}
-                        onClick={() => navigate("/club_registration_renewal")}
+                        onClick={() =>
+                          navigate("/add_club_registration/renewal")
+                        }
                       >
                         <div className="text-wrapper-11">등록 신청</div>
                       </div>

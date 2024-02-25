@@ -3,13 +3,13 @@ import React from "react";
 import "./style.css";
 
 interface Props {
-  className: any;
+  className?: any;
   divClassName?: any;
   text: string;
 }
 
 export const SubTitle = ({
-  className,
+  className = "sub-title-instance",
   divClassName,
   text = "카페 공지사항",
 }: Props): JSX.Element => {
