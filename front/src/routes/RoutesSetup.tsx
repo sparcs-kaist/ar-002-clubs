@@ -26,6 +26,9 @@ import { ClubFundingList } from "pages/admin/ClubFundingList";
 import { FundingAdminDetail } from "pages/admin/FundingAdminDetail";
 import { ClubRegistration } from "pages/club/ClubRegistration";
 import { AddClubRegistration } from "pages/club/AddClubRegistration";
+import { AddClubRegistrationActivity } from "pages/club/AddClubRegistrationActivity";
+import { ClubRegistrationActivityDetail } from "pages/club/ClubRegistrationActivityDetail";
+import { EditClubRegistrationActivity } from "pages/club/EditClubRegistrationActivity";
 
 export default function RouteSetup() {
   return (
@@ -58,6 +61,18 @@ export default function RouteSetup() {
       <Route
         path="/add_club_registration/renewal"
         element={<AddClubRegistration type="renewal" />}
+      />
+      <Route
+        path="/add_club_registration/add_activity"
+        element={<AddClubRegistrationActivity />}
+      />
+      <Route
+        path="/add_club_registration/edit_activity"
+        element={<EditClubRegistrationActivity />}
+      />
+      <Route
+        path="/add_club_registration/activity_detail"
+        element={<ClubRegistrationActivityDetail />}
       />
 
       <Route path="/add_activity" element={<AddActivity />} />

@@ -11,13 +11,260 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useReportDurationStatus } from "hooks/useReportDurationStatus";
 import { Activity } from "components/activity/Activity";
 
+interface ProofImage {
+  imageUrl: string;
+  fileName: string; // Added this line
+}
+
+interface ActivityInfo {
+  id: number;
+  title: string;
+  activityType: string;
+  startDate: string;
+  endDate: string;
+  feedbackType: number;
+}
+
+interface RegistrationState {
+  prevName: string;
+  currentName: string;
+  foundingMonth: string;
+  division: number;
+  isAdvisor: boolean;
+  advisorName: string;
+  advisorEmail: string;
+  advisorLevel: string;
+  characteristicKr: string;
+  characteristicEn: string;
+  divisionConsistency: string;
+  purpose: string;
+  mainPlan: string;
+  activityReport: ActivityInfo[];
+  activityPlan: ProofImage[];
+  regulation: ProofImage[];
+  externalTeacher: ProofImage[];
+  advisorPlan: string;
+  representativeSignature: boolean;
+  advisorSignature: boolean;
+}
+
+const initialState: RegistrationState = {
+  prevName: "",
+  currentName: "",
+  foundingMonth: "",
+  division: 0,
+  isAdvisor: false,
+  advisorName: "",
+  advisorEmail: "",
+  advisorLevel: "",
+  characteristicKr: "",
+  characteristicEn: "",
+  divisionConsistency: "",
+  purpose: "",
+  mainPlan: "",
+  activityReport: [],
+  activityPlan: [],
+  regulation: [],
+  externalTeacher: [],
+  advisorPlan: "",
+  representativeSignature: false,
+  advisorSignature: false,
+};
+
 export const AddClubRegistration = ({ type = "provisional" }): JSX.Element => {
   const { userStatuses, isLoading } = useUserRepresentativeStatus(true);
   const { durationStatus } = useReportDurationStatus();
   const navigate = useNavigate();
 
+  const [registration, setRegistration] = useState<RegistrationState>(() => {
+    // Try to load the registration state from local storage
+    const savedRegistration = localStorage.getItem("registration");
+    return savedRegistration ? JSON.parse(savedRegistration) : initialState;
+  });
+
+  useEffect(() => {
+    // This effect runs when the registration state changes.
+    // Save the updated registration state to local storage
+    localStorage.setItem("registration", JSON.stringify(registration));
+  }, [registration]);
+
+  const handleChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >
+  ) => {
+    const { name, value, type } = e.target;
+    const isCheckbox = type === "checkbox";
+    const inputValue = isCheckbox
+      ? (e.target as HTMLInputElement).checked
+      : value;
+
+    setRegistration({ ...registration, [name]: inputValue });
+    console.log(registration);
+  };
+
+  const handleSubmit = async () => {
+    const requiredFields = [
+      clubId,
+      // funding.name,
+      // funding.expenditureDate,
+      // funding.expenditureAmount,
+      // funding.purpose,
+      // funding.transactionImages,
+      // funding.detailImages,
+    ];
+
+    const isAnyFieldEmpty = requiredFields.some((field) => !field);
+
+    if (isAnyFieldEmpty) {
+      alert("비어 있는 값이 있습니다. 다시 확인해주세요.");
+      return;
+    }
+
+    // const expenditureDate = new Date(funding.expenditureDate);
+    // if (expenditureDate < minDate || expenditureDate > maxDate) {
+    //   alert("날짜 범위가 올바르지 않습니다. 다시 확인해주세요.");
+    //   return;
+    // }
+
+    // Prepare the data to be sent
+    const dataToSend = registration;
+
+    // Success callback
+    const handleSuccess = (response: any) => {
+      console.log("Activity added successfully:", response);
+      navigate(`/club_manage`);
+      // Additional success logic here (e.g., redirecting or showing a success message)
+    };
+
+    // Error callback
+    const handleError = (error: any) => {
+      console.error("Error adding activity:", error);
+      alert(
+        "지원금을 추가하는 중 문제가 발생했습니다. 잠시 후 다시 시도해주세요"
+      );
+      // Additional error handling logic here (e.g., showing an error message)
+    };
+
+    setRegistration(initialState);
+
+    // Send the POST request
+    postRequest(
+      "registration/add_registration",
+      dataToSend,
+      handleSuccess,
+      handleError
+    );
+  };
+
+  const handleFileUpload = async (file: File, imageTypePath: string) => {
+    const formData = new FormData();
+    formData.append("file", file);
+
+    const handleSuccess = (response: {
+      data: { fileDetails: { location: string } };
+    }) => {
+      const uploadedFileUrl = response.data.fileDetails.location;
+      const pathParts = imageTypePath.split(".");
+
+      setRegistration((prevState) => {
+        // Clone the state to avoid direct mutation
+        const newState = JSON.parse(JSON.stringify(prevState));
+
+        let current: any = newState;
+        for (let i = 0; i < pathParts.length - 1; i++) {
+          current = current[pathParts[i]] as any;
+        }
+
+        // Add the new image
+        const lastKey = pathParts[pathParts.length - 1];
+        if (!Array.isArray(current[lastKey])) {
+          current[lastKey] = [];
+        }
+        current[lastKey].push({
+          imageUrl: uploadedFileUrl,
+          fileName: file.name,
+        });
+
+        return newState;
+      });
+    };
+
+    const handleError = (error: any) => {
+      console.error("Error uploading file:", error);
+      alert(
+        `파일을 업로드하는 도중 오류가 발생했습니다. 파일을 다시 확인해주세요. ${error}`
+      );
+    };
+
+    postRequest("activity/upload", formData, handleSuccess, handleError);
+  };
+
+  const groupProofImagesInPairs = (imageTypePath: string): ProofImage[][] => {
+    const pathParts = imageTypePath.split(".");
+    let current: any = registration;
+    for (const part of pathParts) {
+      current = current[part] as any;
+    }
+    const images: ProofImage[] = current as ProofImage[];
+
+    const pairs: ProofImage[][] = [];
+    for (let i = 0; i < images.length; i += 2) {
+      pairs.push(images.slice(i, i + 2));
+    }
+    return pairs;
+  };
+
+  const handleDeleteImage = async (fileName: string, imageTypePath: string) => {
+    const confirmDelete = window.confirm("첨부 파일을 삭제하시겠습니까?");
+    if (!confirmDelete) return;
+
+    const pathParts = imageTypePath.split(".");
+
+    setRegistration((prevState) => {
+      const newState = { ...prevState };
+      let current: any = newState;
+      for (let i = 0; i < pathParts.length - 1; i++) {
+        current = current[pathParts[i]] as any;
+      }
+      current[pathParts[pathParts.length - 1]] = (
+        current[pathParts[pathParts.length - 1]] as ProofImage[]
+      ).filter((image) => image.fileName !== fileName);
+      return newState;
+    });
+
+    try {
+      const deleteResponse = await postRequest(
+        `activity/deleteImage`,
+        { fileName },
+        () => {}
+      );
+      // Handle the deleteResponse as needed
+    } catch (error) {
+      console.error("Error deleting file:", error);
+      // Handle the error
+    }
+  };
+
   const clubId = userStatuses.length > 0 ? userStatuses[0].clubId : null;
   const typeId = userStatuses.length > 0 ? userStatuses[0].typeId : 0;
+
+  // useEffect{
+  //   const fetchActivities = async () => {
+  //     await getRequest(
+  //       `activity/activity_list?club_id=${clubId}`,
+  //       (data) => {
+  //         setActivitiesLists((activitiesLists) => ({
+  //           ...activitiesLists,
+  //           [clubId]: data.activities,
+  //         }));
+  //       },
+  //       (error) => {
+  //         console.error("Error fetching activities:", error);
+  //       }
+  //     );
+  //   };
+  // }
 
   return (
     <div className="club-registration">
@@ -42,9 +289,9 @@ export const AddClubRegistration = ({ type = "provisional" }): JSX.Element => {
                     <span className="span">이전 동아리명: </span>
                     <input
                       type="text"
-                      name="name"
-                      // value={funding.name}
-                      // onChange={handleChange}
+                      name="prevName"
+                      value={registration.prevName}
+                      onChange={handleChange}
                       placeholder="동아리명을 입력하세요."
                       className="text-wrapper-8"
                       style={{ width: "880px" }}
@@ -56,9 +303,9 @@ export const AddClubRegistration = ({ type = "provisional" }): JSX.Element => {
                   <span className="span">신규 동아리명: </span>
                   <input
                     type="text"
-                    name="name"
-                    // value={funding.name}
-                    // onChange={handleChange}
+                    name="currentName"
+                    value={registration.currentName}
+                    onChange={handleChange}
                     placeholder="동아리명을 입력하세요."
                     className="text-wrapper-8"
                     style={{ width: "880px" }}
@@ -68,9 +315,9 @@ export const AddClubRegistration = ({ type = "provisional" }): JSX.Element => {
                   <span className="span">설립 연월:</span>
                   <input
                     type="month"
-                    name="expenditureDate"
-                    // value={funding.expenditureDate}
-                    // onChange={handleChange}
+                    name="foundingMonth"
+                    value={registration.foundingMonth}
+                    onChange={handleChange}
                     placeholder="설립 연월"
                     className="text-wrapper-8"
                   />
@@ -81,10 +328,10 @@ export const AddClubRegistration = ({ type = "provisional" }): JSX.Element => {
                       소속 분과:
                     </label>
                     <select
-                      name="purpose"
+                      name="division"
                       id="activity-type"
-                      // value={funding.purpose}
-                      // onChange={handleChange}
+                      value={registration.division}
+                      onChange={handleChange}
                       className="text-wrapper-8"
                     >
                       <option value="-1">분과 선택...</option>
@@ -112,9 +359,9 @@ export const AddClubRegistration = ({ type = "provisional" }): JSX.Element => {
                   <p className="div-3">
                     <input
                       type="checkbox"
-                      name="fixture.isSoftware"
-                      // checked={funding.fixture.isSoftware}
-                      // onChange={handleChange}
+                      name="isAdvisor"
+                      checked={registration.isAdvisor}
+                      onChange={handleChange}
                       className="check-box"
                     />
                     <span className="span">
@@ -122,54 +369,58 @@ export const AddClubRegistration = ({ type = "provisional" }): JSX.Element => {
                       가능합니다.)
                     </span>
                   </p>
-                  <p className="div-3">
-                    <span className="span">성함: </span>
-                    <input
-                      type="text"
-                      name="name"
-                      // value={funding.name}
-                      // onChange={handleChange}
-                      placeholder="지도교수 성함을 입력하세요."
-                      className="text-wrapper-8"
-                      style={{ width: "954px" }}
-                    />
-                  </p>
-                  <p className="div-3">
-                    <span className="span">카이스트 이메일: </span>
-                    <input
-                      type="text"
-                      name="name"
-                      // value={funding.name}
-                      // onChange={handleChange}
-                      placeholder="지도교수 카이스트 이메일을 입력하세요."
-                      className="text-wrapper-8"
-                      style={{ width: "860px" }}
-                    />
-                  </p>
-                  <p className="div-3">
-                    <div className="dropdown-container">
-                      <label className="span" htmlFor="activity-type">
-                        직급:
-                      </label>
-                      <select
-                        name="purpose"
-                        id="activity-type"
-                        // value={funding.purpose}
-                        // onChange={handleChange}
-                        className="text-wrapper-8"
-                      >
-                        <option value="-1">직급 선택...</option>
-                        <option value="0">정교수</option>
-                        <option value="1">부교수</option>
-                        <option value="2">조교수</option>
-                        {/* {activities.map((activity, index) => (
+                  {!registration.isAdvisor && (
+                    <>
+                      <p className="div-3">
+                        <span className="span">성함: </span>
+                        <input
+                          type="text"
+                          name="advisorName"
+                          value={registration.advisorName}
+                          onChange={handleChange}
+                          placeholder="지도교수 성함을 입력하세요."
+                          className="text-wrapper-8"
+                          style={{ width: "954px" }}
+                        />
+                      </p>
+                      <p className="div-3">
+                        <span className="span">카이스트 이메일: </span>
+                        <input
+                          type="text"
+                          name="advisorEmail"
+                          value={registration.advisorEmail}
+                          onChange={handleChange}
+                          placeholder="지도교수 카이스트 이메일을 입력하세요."
+                          className="text-wrapper-8"
+                          style={{ width: "860px" }}
+                        />
+                      </p>
+                      <p className="div-3">
+                        <div className="dropdown-container">
+                          <label className="span" htmlFor="activity-type">
+                            직급:
+                          </label>
+                          <select
+                            name="advisorLevel"
+                            id="activity-type"
+                            value={registration.advisorLevel}
+                            onChange={handleChange}
+                            className="text-wrapper-8"
+                          >
+                            <option value="-1">직급 선택...</option>
+                            <option value="0">정교수</option>
+                            <option value="1">부교수</option>
+                            <option value="2">조교수</option>
+                            {/* {activities.map((activity, index) => (
                         <option key={index} value={activity.id}>
                           {activity.title}
                         </option>
                       ))} */}
-                      </select>
-                    </div>
-                  </p>
+                          </select>
+                        </div>
+                      </p>
+                    </>
+                  )}
                 </div>
               </div>
             )}
@@ -180,9 +431,9 @@ export const AddClubRegistration = ({ type = "provisional" }): JSX.Element => {
                   <span className="span">국문: </span>
                   <input
                     type="text"
-                    name="name"
-                    // value={funding.name}
-                    // onChange={handleChange}
+                    name="characteristicKr"
+                    value={registration.characteristicKr}
+                    onChange={handleChange}
                     placeholder="활동분야를 입력하세요."
                     className="text-wrapper-8"
                     style={{ width: "954px" }}
@@ -192,9 +443,9 @@ export const AddClubRegistration = ({ type = "provisional" }): JSX.Element => {
                   <span className="span">영문: </span>
                   <input
                     type="text"
-                    name="name"
-                    // value={funding.name}
-                    // onChange={handleChange}
+                    name="characteristicEn"
+                    value={registration.characteristicEn}
+                    onChange={handleChange}
                     placeholder="활동분야를 입력하세요."
                     className="text-wrapper-8"
                     style={{ width: "954px" }}
@@ -207,9 +458,9 @@ export const AddClubRegistration = ({ type = "provisional" }): JSX.Element => {
               <SubTitle text="분과 정합성" />
               <div className="frame-9">
                 <textarea
-                  name="nonCorp.wasteExplanation"
-                  // value={funding.nonCorp.wasteExplanation}
-                  // onChange={handleChange}
+                  name="divisionConsistency"
+                  value={registration.divisionConsistency}
+                  onChange={handleChange}
                   placeholder="분과 정합성을 입력하세요."
                   className="text-wrapper-10"
                   style={{ height: "150px" }}
@@ -220,9 +471,9 @@ export const AddClubRegistration = ({ type = "provisional" }): JSX.Element => {
               <SubTitle text="설립 목적" />
               <div className="frame-9">
                 <textarea
-                  name="nonCorp.wasteExplanation"
-                  // value={funding.nonCorp.wasteExplanation}
-                  // onChange={handleChange}
+                  name="purpose"
+                  value={registration.purpose}
+                  onChange={handleChange}
                   placeholder="설립 목적을 입력하세요."
                   className="text-wrapper-10"
                   style={{ height: "150px" }}
@@ -233,9 +484,9 @@ export const AddClubRegistration = ({ type = "provisional" }): JSX.Element => {
               <SubTitle text="주요 활동계획" />
               <div className="frame-9">
                 <textarea
-                  name="nonCorp.wasteExplanation"
-                  // value={funding.nonCorp.wasteExplanation}
-                  // onChange={handleChange}
+                  name="mainPlan"
+                  value={registration.mainPlan}
+                  onChange={handleChange}
                   placeholder="주요 활동계획을 입력하세요."
                   className="text-wrapper-10"
                   style={{ height: "300px" }}
@@ -255,45 +506,50 @@ export const AddClubRegistration = ({ type = "provisional" }): JSX.Element => {
                     activityStateProperty1={2}
                     id={0}
                   />
-                  {/* {activitiesLists[status.clubId]?.map((activity, index) => (
-                  <Activity
-                    key={index}
-                    index={index + 1}
-                    name={activity.title}
-                    type={activity.activityType}
-                    start_date={activity.startDate}
-                    end_date={activity.endDate}
-                    activityStateProperty1={activity.feedbackType}
-                    id={activity.id}
-                  />
-                ))} */}
+                  {Array.isArray(registration.activityReport) &&
+                    registration.activityReport.map((activity, index) => (
+                      <Activity
+                        key={index}
+                        index={index + 1}
+                        name={activity.title}
+                        type={activity.activityType}
+                        start_date={activity.startDate}
+                        end_date={activity.endDate}
+                        activityStateProperty1={activity.feedbackType}
+                        id={activity.id}
+                      />
+                    ))}
                 </div>
                 <div className="frame-28">
-                  {/* {activitiesLists[status.clubId]?.length < 20 &&
-                  status.typeId < 4 &&
-                  durationStatus == 1 && ( */}
-                  <>
-                    <div
-                      className="rectangle"
-                      onClick={() => navigate("/add_activity")}
-                      style={{ cursor: "pointer" }}
-                    />
+                  {registration.activityReport?.length < 20 &&
+                    typeId < 4 &&
+                    durationStatus == 1 && (
+                      <>
+                        <div
+                          className="add-activity-button"
+                          onClick={() =>
+                            navigate("/add_club_registration/add_activity")
+                          }
+                          style={{ cursor: "pointer" }}
+                        />
 
-                    <div
-                      className="frame-29"
-                      onClick={() => navigate("/add_activity")}
-                      style={{ cursor: "pointer" }}
-                    >
-                      <div className="group-3">
-                        <div className="overlap-group-2">
-                          <div className="ellipse" />
-                          <div className="text-wrapper-13">+</div>
+                        <div
+                          className="frame-29"
+                          onClick={() =>
+                            navigate("/add_club_registration/add_activity")
+                          }
+                          style={{ cursor: "pointer" }}
+                        >
+                          <div className="group-3">
+                            <div className="overlap-group-2">
+                              <div className="ellipse" />
+                              <div className="text-wrapper-13">+</div>
+                            </div>
+                          </div>
+                          <div className="text-wrapper-14">활동 추가하기</div>
                         </div>
-                      </div>
-                      <div className="text-wrapper-14">활동 추가하기</div>
-                    </div>
-                  </>
-                  {/* )} */}
+                      </>
+                    )}
                 </div>
               </div>
             )}
@@ -316,34 +572,28 @@ export const AddClubRegistration = ({ type = "provisional" }): JSX.Element => {
                   type="file"
                   onChange={(e) => {
                     if (e.target.files?.[0]) {
-                      // handleFileUpload(
-                      //   e.target.files[0],
-                      //   "fixture.softwareProofImages"
-                      // );
+                      handleFileUpload(e.target.files[0], "activityPlan");
                     }
                   }}
                 />
-                {/* {groupProofImagesInPairs(
-                        "fixture.softwareProofImages"
-                      ).map((pair, pairIndex) => (
-                        <div key={pairIndex} className="frame-13">
-                          {pair.map((image, index) => (
-                            <ActivityProof
-                              key={index}
-                              url={image.imageUrl}
-                              className="activity-proof-instance"
-                              property1="default"
-                              fileName={image.fileName}
-                              onDelete={() =>
-                                handleDeleteImage(
-                                  image.fileName,
-                                  "fixture.softwareProofImages"
-                                )
-                              }
-                            />
-                          ))}
-                        </div>
-                      ))} */}
+                {groupProofImagesInPairs("activityPlan").map(
+                  (pair, pairIndex) => (
+                    <div key={pairIndex} className="frame-13">
+                      {pair.map((image, index) => (
+                        <ActivityProof
+                          key={index}
+                          url={image.imageUrl}
+                          className="activity-proof-instance"
+                          property1="default"
+                          fileName={image.fileName}
+                          onDelete={() =>
+                            handleDeleteImage(image.fileName, "activityPlan")
+                          }
+                        />
+                      ))}
+                    </div>
+                  )
+                )}
               </div>
             </div>
             {type === "promotional" && (
@@ -358,34 +608,28 @@ export const AddClubRegistration = ({ type = "provisional" }): JSX.Element => {
                     type="file"
                     onChange={(e) => {
                       if (e.target.files?.[0]) {
-                        // handleFileUpload(
-                        //   e.target.files[0],
-                        //   "fixture.softwareProofImages"
-                        // );
+                        handleFileUpload(e.target.files[0], "regulation");
                       }
                     }}
                   />
-                  {/* {groupProofImagesInPairs(
-                        "fixture.softwareProofImages"
-                      ).map((pair, pairIndex) => (
-                        <div key={pairIndex} className="frame-13">
-                          {pair.map((image, index) => (
-                            <ActivityProof
-                              key={index}
-                              url={image.imageUrl}
-                              className="activity-proof-instance"
-                              property1="default"
-                              fileName={image.fileName}
-                              onDelete={() =>
-                                handleDeleteImage(
-                                  image.fileName,
-                                  "fixture.softwareProofImages"
-                                )
-                              }
-                            />
-                          ))}
-                        </div>
-                      ))} */}
+                  {groupProofImagesInPairs("regulation").map(
+                    (pair, pairIndex) => (
+                      <div key={pairIndex} className="frame-13">
+                        {pair.map((image, index) => (
+                          <ActivityProof
+                            key={index}
+                            url={image.imageUrl}
+                            className="activity-proof-instance"
+                            property1="default"
+                            fileName={image.fileName}
+                            onDelete={() =>
+                              handleDeleteImage(image.fileName, "regulation")
+                            }
+                          />
+                        ))}
+                      </div>
+                    )
+                  )}
                 </div>
               </div>
             )}
@@ -404,34 +648,31 @@ export const AddClubRegistration = ({ type = "provisional" }): JSX.Element => {
                     type="file"
                     onChange={(e) => {
                       if (e.target.files?.[0]) {
-                        // handleFileUpload(
-                        //   e.target.files[0],
-                        //   "fixture.softwareProofImages"
-                        // );
+                        handleFileUpload(e.target.files[0], "externalTeacher");
                       }
                     }}
                   />
-                  {/* {groupProofImagesInPairs(
-                        "fixture.softwareProofImages"
-                      ).map((pair, pairIndex) => (
-                        <div key={pairIndex} className="frame-13">
-                          {pair.map((image, index) => (
-                            <ActivityProof
-                              key={index}
-                              url={image.imageUrl}
-                              className="activity-proof-instance"
-                              property1="default"
-                              fileName={image.fileName}
-                              onDelete={() =>
-                                handleDeleteImage(
-                                  image.fileName,
-                                  "fixture.softwareProofImages"
-                                )
-                              }
-                            />
-                          ))}
-                        </div>
-                      ))} */}
+                  {groupProofImagesInPairs("externalTeacher").map(
+                    (pair, pairIndex) => (
+                      <div key={pairIndex} className="frame-13">
+                        {pair.map((image, index) => (
+                          <ActivityProof
+                            key={index}
+                            url={image.imageUrl}
+                            className="activity-proof-instance"
+                            property1="default"
+                            fileName={image.fileName}
+                            onDelete={() =>
+                              handleDeleteImage(
+                                image.fileName,
+                                "externalTeacher"
+                              )
+                            }
+                          />
+                        ))}
+                      </div>
+                    )
+                  )}
                 </div>
               </div>
             )}
@@ -466,52 +707,59 @@ export const AddClubRegistration = ({ type = "provisional" }): JSX.Element => {
                       불이익에 대해 책임을 질 것을 선서합니다.
                     </span>
                   </p>
-                  <p className="div-3">
-                    <input
-                      type="checkbox"
-                      name="fixture.isSoftware"
-                      // checked={funding.fixture.isSoftware}
-                      // onChange={handleChange}
-                      className="check-box"
-                    />
-                    <span className="span">동의합니다.</span>
-                  </p>
+                  <div className="frame-20">
+                    <div className="text-wrapper-11">
+                      {registration.representativeSignature
+                        ? "확인완료"
+                        : "확인하기"}
+                    </div>
+                  </div>
                 </div>
               </div>
             )}
             {(type === "promotional" || type === "renewal") && (
               <div className="frame-11">
-                <SubTitle text="지도교수 취임 승낙 및 지도계획서" />
+                {!registration.isAdvisor && (
+                  <>
+                    <SubTitle text="지도교수 취임 승낙 및 지도계획서" />
 
-                <div className="frame-9">
-                  <textarea
-                    name="nonCorp.wasteExplanation"
-                    // value={funding.nonCorp.wasteExplanation}
-                    // onChange={handleChange}
-                    placeholder="지도계획을 입력하세요."
-                    className="text-wrapper-10"
-                    style={{ height: "300px" }}
-                  />
-                  <p className="div-3">
-                    <span className="span">
-                      본인은 동아리가 작성한 등록 신청서의 내용을 모두
-                      확인하였으며, 위 학생단체의 지도교수로 취임할 것을
-                      승낙합니다.
-                    </span>
-                  </p>
-                  <p className="div-3">
-                    <input
-                      type="checkbox"
-                      name="fixture.isSoftware"
-                      // checked={funding.fixture.isSoftware}
-                      // onChange={handleChange}
-                      className="check-box"
-                    />
-                    <span className="span">동의합니다.</span>
-                  </p>
-                </div>
+                    <div className="frame-9">
+                      <textarea
+                        name="advisorPlan"
+                        value={registration.advisorPlan}
+                        onChange={handleChange}
+                        placeholder="지도계획을 입력하세요."
+                        className="text-wrapper-10"
+                        style={{ height: "300px" }}
+                      />
+                      <p className="div-3">
+                        <span className="span">
+                          본인은 동아리가 작성한 등록 신청서의 내용을 모두
+                          확인하였으며, 위 학생단체의 지도교수로 취임할 것을
+                          승낙합니다.
+                        </span>
+                      </p>
+                      <div className="frame-20">
+                        <div className="text-wrapper-11">
+                          {registration.advisorSignature
+                            ? "확인완료"
+                            : "확인하기"}
+                        </div>
+                      </div>
+                    </div>
+                  </>
+                )}
               </div>
             )}
+            <div className="frame-14">
+              <div
+                className="frame-15"
+                onClick={handleSubmit}
+                style={{ cursor: "pointer" }}
+              >
+                <div className="text-wrapper-11">신청 저장</div>
+              </div>
+            </div>
           </div>
         </div>
         <UnderBar />

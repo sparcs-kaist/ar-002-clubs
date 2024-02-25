@@ -255,7 +255,7 @@
   width: 1000px;
 }
 
-.club-registration .rectangle {
+.club-registration .add-activity-button {
   border: 1px solid;
   border-color: #7cd2d8;
   border-radius: 20px;
@@ -369,4 +369,44 @@
 
 .club-registration .frame-31 {
   width: 1000px;
+}
+
+.club-registration .frame-20 {
+  align-items: center;
+  background-color: #7cd2d8;
+  border-radius: 10px;
+  display: flex;
+  gap: 10px;
+  height: 32px;
+  justify-content: center;
+  overflow: hidden;
+  padding: 12px 9px;
+  position: relative;
+  width: 116px;
+}
+
+.club-registration .frame-14 {
+  align-items: center;
+  display: flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+  gap: 10px;
+  justify-content: center;
+  padding: 10px;
+  position: relative;
+  width: 1041px;
+}
+
+.club-registration .frame-15 {
+  align-items: center;
+  background-color: #7cd2d8;
+  border-radius: 10px;
+  display: flex;
+  gap: 10px;
+  height: 32px;
+  justify-content: center;
+  overflow: hidden;
+  padding: 12px 9px;
+  position: relative;
+  width: 116px;
 }
