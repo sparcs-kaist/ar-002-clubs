@@ -8,7 +8,10 @@ import { ActivityFeedback } from "components/activity/ActivityFeedback";
 import { getRequest, postRequest } from "utils/api";
 import { useUserRepresentativeStatus } from "hooks/useUserPermission";
 import { useNavigate, useParams } from "react-router-dom";
-import { useReportDurationStatus } from "hooks/useReportDurationStatus";
+import {
+  useRegistrationDurationStatus,
+  useReportDurationStatus,
+} from "hooks/useReportDurationStatus";
 import { Activity } from "components/activity/Activity";
 
 interface ProofImage {
@@ -33,7 +36,7 @@ interface RegistrationState {
   isAdvisor: boolean;
   advisorName: string;
   advisorEmail: string;
-  advisorLevel: string;
+  advisorLevel: number;
   characteristicKr: string;
   characteristicEn: string;
   divisionConsistency: string;
@@ -56,7 +59,7 @@ const initialState: RegistrationState = {
   isAdvisor: false,
   advisorName: "",
   advisorEmail: "",
-  advisorLevel: "",
+  advisorLevel: 0,
   characteristicKr: "",
   characteristicEn: "",
   divisionConsistency: "",
@@ -73,7 +76,7 @@ const initialState: RegistrationState = {
 
 export const AddClubRegistration = ({ type = "provisional" }): JSX.Element => {
   const { userStatuses, isLoading } = useUserRepresentativeStatus(true);
-  const { durationStatus } = useReportDurationStatus();
+  const { durationStatus } = useRegistrationDurationStatus();
   const navigate = useNavigate();
 
   const [registration, setRegistration] = useState<RegistrationState>(() => {
@@ -100,12 +103,13 @@ export const AddClubRegistration = ({ type = "provisional" }): JSX.Element => {
       : value;
 
     setRegistration({ ...registration, [name]: inputValue });
-    console.log(registration);
   };
 
   const handleSubmit = async () => {
     const requiredFields = [
-      clubId,
+      // clubId,
+      registration.currentName,
+      registration.division,
       // funding.name,
       // funding.expenditureDate,
       // funding.expenditureAmount,
@@ -133,7 +137,7 @@ export const AddClubRegistration = ({ type = "provisional" }): JSX.Element => {
     // Success callback
     const handleSuccess = (response: any) => {
       console.log("Activity added successfully:", response);
-      navigate(`/club_manage`);
+      navigate("/club_registration");
       // Additional success logic here (e.g., redirecting or showing a success message)
     };
 
@@ -141,7 +145,7 @@ export const AddClubRegistration = ({ type = "provisional" }): JSX.Element => {
     const handleError = (error: any) => {
       console.error("Error adding activity:", error);
       alert(
-        "지원금을 추가하는 중 문제가 발생했습니다. 잠시 후 다시 시도해주세요"
+        "등록 신청을 추가하는 중 문제가 발생했습니다. 잠시 후 다시 시도해주세요"
       );
       // Additional error handling logic here (e.g., showing an error message)
     };
@@ -408,9 +412,9 @@ export const AddClubRegistration = ({ type = "provisional" }): JSX.Element => {
                             className="text-wrapper-8"
                           >
                             <option value="-1">직급 선택...</option>
-                            <option value="0">정교수</option>
-                            <option value="1">부교수</option>
-                            <option value="2">조교수</option>
+                            <option value="1">정교수</option>
+                            <option value="2">부교수</option>
+                            <option value="3">조교수</option>
                             {/* {activities.map((activity, index) => (
                         <option key={index} value={activity.id}>
                           {activity.title}

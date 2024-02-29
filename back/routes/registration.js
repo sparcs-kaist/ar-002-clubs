@@ -12,6 +12,8 @@ const {
   RegistrationActivity,
   RegistrationActivityEvidence,
   RegistrationActivityMember,
+  Semester,
+  RegistrationEvidence,
 } = require("../models");
 const checkPermission = require("../utils/permission");
 const { checkRegistrationDuration } = require("../utils/duration");
@@ -126,18 +128,21 @@ router.post("/add_registration", async (req, res) => {
       divisionConsistency,
       purpose,
       mainPlan,
+      activityPlan,
+      regulation,
+      externalTeacher,
       advisorPlan,
     } = req.body;
 
-    const authorized = await checkPermission(req, res, [
-      { club_rep: 4, club_id: clubId },
-    ]);
-    if (!authorized) {
-      return;
-    }
+    // const authorized = await checkPermission(req, res, [
+    //   { club_rep: 4, club_id: clubId },
+    // ]);
+    // if (!authorized) {
+    //   return;
+    // }
 
-    const durationCheck = await checkFundingDuration();
-    if (!durationCheck.found || durationCheck.reportStatus !== 1) {
+    const durationCheck = await checkRegistrationDuration();
+    if (durationCheck.registrationStatus !== 1) {
       return res.status(400).send({ message: "활동 추가 기한이 지났습니다." });
     }
 
@@ -164,31 +169,73 @@ router.post("/add_registration", async (req, res) => {
     const type_id = 1;
     const semester_id = currentSemester.id;
 
+    const foudningDate = foundingMonth + "-01";
+
     // Create a new registration entry
-    const newRegistration = await Registration.create({
-      club_id,
-      type_id,
-      semester_id,
-      prev_name: prevName,
-      current_name: currentName,
-      founding_month: foundingMonth,
-      division,
-      is_advisor: isAdvisorDb,
-      advisor_name: advisorName,
-      advisor_email: advisorEmail,
-      advisor_level: advisorLevel,
-      characteristic_kr: characteristicKr,
-      characteristic_en: characteristicEn,
-      division_consistency: divisionConsistency,
-      purpose,
-      main_plan: mainPlan,
-      advisor_plan: advisorPlan,
-      recent_edit: currentDateTimeUTC,
-    });
+    const registration = await Registration.create(
+      {
+        club_id,
+        student_id: req.session.user.student_id,
+        type_id,
+        semester_id,
+        prev_name: prevName,
+        current_name: currentName,
+        founding_month: new Date(foudningDate),
+        division,
+        is_advisor: isAdvisorDb,
+        advisor_name: advisorName,
+        advisor_email: advisorEmail,
+        advisor_level: advisorLevel,
+        characteristic_kr: characteristicKr,
+        characteristic_en: characteristicEn,
+        division_consistency: divisionConsistency,
+        purpose,
+        main_plan: mainPlan,
+        advisor_plan: advisorPlan,
+        recent_edit: currentDateTimeUTC,
+      },
+      { transaction }
+    );
+
+    // Insert FundingEvidence for transaction images
+    await RegistrationEvidence.bulkCreate(
+      activityPlan.map((image) => ({
+        registration_id: registration.id,
+        image_url: image.imageUrl,
+        description: image.fileName,
+        registration_evidence_type: 1,
+      })),
+      { transaction }
+    );
+
+    // Insert FundingEvidence for transaction images
+    await RegistrationEvidence.bulkCreate(
+      regulation.map((image) => ({
+        registration_id: registration.id,
+        image_url: image.imageUrl,
+        description: image.fileName,
+        registration_evidence_type: 2,
+      })),
+      { transaction }
+    );
+
+    // Insert FundingEvidence for transaction images
+    await RegistrationEvidence.bulkCreate(
+      externalTeacher.map((image) => ({
+        registration_id: registration.id,
+        image_url: image.imageUrl,
+        description: image.fileName,
+        registration_evidence_type: 3,
+      })),
+      { transaction }
+    );
+
+    // Commit the transaction
+    await transaction.commit();
 
     res.status(201).json({
       message: "Registration added successfully",
-      data: newRegistration,
+      data: registration,
     });
   } catch (error) {
     console.error("Error adding registration:", error);

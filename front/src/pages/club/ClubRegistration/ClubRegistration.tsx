@@ -93,7 +93,7 @@ export const ClubRegistration = (): JSX.Element => {
                         className="frame-15"
                         style={{ cursor: "pointer" }}
                         onClick={() =>
-                          navigate("/add_club_registrationrenewal")
+                          navigate("/add_club_registration/renewal")
                         }
                       >
                         <div className="text-wrapper-11">등록 신청</div>
