@@ -44,7 +44,7 @@ interface ActivityState {
 }
 
 export const ClubRegistrationActivityDetail = (): JSX.Element => {
-  const { userStatuses, isLoading } = useUserRepresentativeStatus();
+  const { userStatuses, isLoading } = useUserRepresentativeStatus(true);
   const { durationStatus } = useRegistrationDurationStatus();
   const { id } = useParams();
   const navigate = useNavigate();

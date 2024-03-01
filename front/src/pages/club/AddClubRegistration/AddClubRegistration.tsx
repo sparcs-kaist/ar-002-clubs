@@ -31,7 +31,9 @@ interface ActivityInfo {
 interface RegistrationState {
   prevName: string;
   currentName: string;
-  foundingMonth: string;
+  phoneNumber: string;
+  foundingYear: number;
+  foundingMonth: number;
   division: number;
   isAdvisor: boolean;
   advisorName: string;
@@ -54,7 +56,9 @@ interface RegistrationState {
 const initialState: RegistrationState = {
   prevName: "",
   currentName: "",
-  foundingMonth: "",
+  foundingMonth: 1,
+  foundingYear: 2000,
+  phoneNumber: "010",
   division: 0,
   isAdvisor: false,
   advisorName: "",
@@ -315,21 +319,46 @@ export const AddClubRegistration = ({ type = "provisional" }): JSX.Element => {
                     style={{ width: "880px" }}
                   />
                 </p>
-                <p className="div-3">
-                  <span className="span">설립 연월:</span>
+                <p className="div-2">
+                  <span className="span">대표자 전화번호: </span>
                   <input
-                    type="month"
-                    name="foundingMonth"
-                    value={registration.foundingMonth}
+                    type="text"
+                    name="phoneNumber"
+                    value={registration.phoneNumber}
                     onChange={handleChange}
-                    placeholder="설립 연월"
+                    placeholder="010-xxxx-xxxx"
                     className="text-wrapper-8"
+                    style={{ width: "862px" }}
                   />
                 </p>
                 <p className="div-3">
+                  <span className="span">설립 연도:</span>
+                  <input
+                    type="number"
+                    name="foundingYear"
+                    value={registration.foundingYear}
+                    onChange={handleChange}
+                    placeholder="설립 연도"
+                    className="text-wrapper-8"
+                  />
+                </p>
+                {type === "provisional" && (
+                  <p className="div-3">
+                    <span className="span">설립 월:</span>
+                    <input
+                      type="number"
+                      name="foundingMonth"
+                      value={registration.foundingMonth}
+                      onChange={handleChange}
+                      placeholder="설립 월"
+                      className="text-wrapper-8"
+                    />
+                  </p>
+                )}
+                <p className="div-3">
                   <div className="dropdown-container">
                     <label className="span" htmlFor="activity-type">
-                      소속 분과:
+                      소속/희망 분과:
                     </label>
                     <select
                       name="division"
@@ -557,49 +586,51 @@ export const AddClubRegistration = ({ type = "provisional" }): JSX.Element => {
                 </div>
               </div>
             )}
-            <div className="frame-11">
-              <SubTitle text="활동 계획서" />
+            {(type === "promotional" || type === "provisional") && (
+              <div className="frame-11">
+                <SubTitle text="활동 계획서" />
 
-              <div className="frame-9">
-                <p className="div-3">
-                  <span className="span-notice">
-                    * 활동 목적 및 대중사업 계획을 포함한 활동 계획서 1부 제출
-                  </span>
-                </p>
-                <p className="div-3">
-                  <span className="span-notice">
-                    * 활동마다 활동명, 활동 기간, 활동 내용, 운영 예산을 포함한
-                    자유 양식으로 제출
-                  </span>
-                </p>
-                <input
-                  type="file"
-                  onChange={(e) => {
-                    if (e.target.files?.[0]) {
-                      handleFileUpload(e.target.files[0], "activityPlan");
-                    }
-                  }}
-                />
-                {groupProofImagesInPairs("activityPlan").map(
-                  (pair, pairIndex) => (
-                    <div key={pairIndex} className="frame-13">
-                      {pair.map((image, index) => (
-                        <ActivityProof
-                          key={index}
-                          url={image.imageUrl}
-                          className="activity-proof-instance"
-                          property1="default"
-                          fileName={image.fileName}
-                          onDelete={() =>
-                            handleDeleteImage(image.fileName, "activityPlan")
-                          }
-                        />
-                      ))}
-                    </div>
-                  )
-                )}
+                <div className="frame-9">
+                  <p className="div-3">
+                    <span className="span-notice">
+                      * 활동 목적 및 대중사업 계획을 포함한 활동 계획서 1부 제출
+                    </span>
+                  </p>
+                  <p className="div-3">
+                    <span className="span-notice">
+                      * 활동마다 활동명, 활동 기간, 활동 내용, 운영 예산을
+                      포함한 자유 양식으로 제출
+                    </span>
+                  </p>
+                  <input
+                    type="file"
+                    onChange={(e) => {
+                      if (e.target.files?.[0]) {
+                        handleFileUpload(e.target.files[0], "activityPlan");
+                      }
+                    }}
+                  />
+                  {groupProofImagesInPairs("activityPlan").map(
+                    (pair, pairIndex) => (
+                      <div key={pairIndex} className="frame-13">
+                        {pair.map((image, index) => (
+                          <ActivityProof
+                            key={index}
+                            url={image.imageUrl}
+                            className="activity-proof-instance"
+                            property1="default"
+                            fileName={image.fileName}
+                            onDelete={() =>
+                              handleDeleteImage(image.fileName, "activityPlan")
+                            }
+                          />
+                        ))}
+                      </div>
+                    )
+                  )}
+                </div>
               </div>
-            </div>
+            )}
             {type === "promotional" && (
               <div className="frame-11">
                 <SubTitle text="동아리 회칙" />
@@ -690,21 +721,24 @@ export const AddClubRegistration = ({ type = "provisional" }): JSX.Element => {
                       1. 동아리연합회칙을 준수하겠습니다.
                     </span>
                   </p>
+
                   <p className="div-3">
                     <span className="span-notice">
-                      2. 분과자치규칙을 준수하겠습니다.
+                      2. KAIST의 대학 문화 발전을 위해 이바지하겠습니다.
                     </span>
                   </p>
                   <p className="div-3">
                     <span className="span-notice">
-                      3. KAIST의 대학 문화 발전을 위해 이바지하겠습니다.
+                      3. 본 회의 민주적 의사결정에 성실히 참여하겠습니다.
                     </span>
                   </p>
-                  <p className="div-3">
-                    <span className="span-notice">
-                      4. 본 회의 민주적 의사결정에 성실히 참여하겠습니다.
-                    </span>
-                  </p>
+                  {type === "promotional" && (
+                    <p className="div-3">
+                      <span className="span-notice">
+                        4. 분과자치규칙을 준수하겠습니다.
+                      </span>
+                    </p>
+                  )}
                   <p className="div-3">
                     <span className="span">
                       본 동아리는 다음을 따르고, 그러지 못할 경우 발생하는

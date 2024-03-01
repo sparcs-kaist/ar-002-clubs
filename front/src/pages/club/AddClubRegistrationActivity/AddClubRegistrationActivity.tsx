@@ -44,7 +44,7 @@ interface ActivityState {
 }
 
 export const AddClubRegistrationActivity = (): JSX.Element => {
-  const { userStatuses } = useUserRepresentativeStatus();
+  const { userStatuses } = useUserRepresentativeStatus(true);
   const { durationStatus, isLoading } = useRegistrationDurationStatus();
   const navigate = useNavigate();
   const [activity, setActivity] = useState<ActivityState>({

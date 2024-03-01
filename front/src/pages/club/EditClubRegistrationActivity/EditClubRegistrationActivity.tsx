@@ -41,7 +41,7 @@ interface ActivityState {
 }
 
 export const EditClubRegistrationActivity = (): JSX.Element => {
-  const { userStatuses } = useUserRepresentativeStatus();
+  const { userStatuses } = useUserRepresentativeStatus(true);
   const { durationStatus } = useRegistrationDurationStatus();
   const { id } = useParams();
   const navigate = useNavigate();
