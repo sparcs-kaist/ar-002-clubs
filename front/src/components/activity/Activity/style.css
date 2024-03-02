@@ -75,6 +75,19 @@
   width: 311px;
 }
 
+.activity .frame-33 {
+  align-items: center;
+  border-color: #000000;
+  border-right-style: solid;
+  border-right-width: 1px;
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  padding: 10px;
+  position: relative;
+  width: 258px;
+}
+
 .activity .frame-30 {
   align-items: center;
   border-color: #000000;
@@ -140,6 +153,19 @@
   padding: 10px;
   position: relative;
   width: 144px;
+}
+
+.activity .frame-77 {
+  align-items: center;
+  border-color: #000000;
+  border-right-style: solid;
+  border-right-width: 1px;
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  padding: 10px;
+  position: relative;
+  width: 258px;
 }
 
 .activity.default {

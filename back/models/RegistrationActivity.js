@@ -15,6 +15,14 @@ module.exports = function(sequelize, DataTypes) {
         key: 'id'
       }
     },
+    semester_id: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      references: {
+        model: 'Semester',
+        key: 'id'
+      }
+    },
     club_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
@@ -114,6 +122,13 @@ module.exports = function(sequelize, DataTypes) {
         using: "BTREE",
         fields: [
           { name: "registration" },
+        ]
+      },
+      {
+        name: "RegistrationActivity_Semester_id_fk",
+        using: "BTREE",
+        fields: [
+          { name: "semester_id" },
         ]
       },
     ]

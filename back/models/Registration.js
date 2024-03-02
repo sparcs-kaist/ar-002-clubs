@@ -23,6 +23,14 @@ module.exports = function(sequelize, DataTypes) {
         key: 'type_id'
       }
     },
+    feedback_type: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      references: {
+        model: 'ActivityFeedbackType',
+        key: 'id'
+      }
+    },
     semester_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
@@ -40,7 +48,15 @@ module.exports = function(sequelize, DataTypes) {
       allowNull: true
     },
     founding_month: {
-      type: DataTypes.DATEONLY,
+      type: DataTypes.INTEGER,
+      allowNull: true
+    },
+    founding_year: {
+      type: DataTypes.INTEGER,
+      allowNull: true
+    },
+    phone_number: {
+      type: DataTypes.STRING(15),
       allowNull: true
     },
     division: {
@@ -149,6 +165,13 @@ module.exports = function(sequelize, DataTypes) {
         using: "BTREE",
         fields: [
           { name: "student_id" },
+        ]
+      },
+      {
+        name: "Registration_ActivityFeedbackType_id_fk",
+        using: "BTREE",
+        fields: [
+          { name: "feedback_type" },
         ]
       },
     ]

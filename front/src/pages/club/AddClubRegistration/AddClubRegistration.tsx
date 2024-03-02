@@ -35,7 +35,7 @@ interface RegistrationState {
   foundingYear: number;
   foundingMonth: number;
   division: number;
-  isAdvisor: boolean;
+  isSelectiveAdvisor: boolean;
   advisorName: string;
   advisorEmail: string;
   advisorLevel: number;
@@ -60,7 +60,7 @@ const initialState: RegistrationState = {
   foundingYear: 2000,
   phoneNumber: "010",
   division: 0,
-  isAdvisor: false,
+  isSelectiveAdvisor: false,
   advisorName: "",
   advisorEmail: "",
   advisorLevel: 0,
@@ -83,6 +83,10 @@ export const AddClubRegistration = ({ type = "provisional" }): JSX.Element => {
   const { durationStatus } = useRegistrationDurationStatus();
   const navigate = useNavigate();
 
+  const clubId = userStatuses.length > 0 ? userStatuses[0].clubId : null;
+  console.log(clubId);
+  const typeId = userStatuses.length > 0 ? userStatuses[0].typeId : 0;
+
   const [registration, setRegistration] = useState<RegistrationState>(() => {
     // Try to load the registration state from local storage
     const savedRegistration = localStorage.getItem("registration");
@@ -94,6 +98,70 @@ export const AddClubRegistration = ({ type = "provisional" }): JSX.Element => {
     // Save the updated registration state to local storage
     localStorage.setItem("registration", JSON.stringify(registration));
   }, [registration]);
+
+  useEffect(() => {
+    const fetchActivities = async () => {
+      if (!clubId) {
+        return;
+      }
+      console.log(`Fetching activities for clubId: ${clubId}`);
+      await getRequest(
+        `registration/activity_list?club_id=${clubId}`,
+        (data) => {
+          setRegistration({ ...registration, activityReport: data.activities });
+          console.log(data.activities);
+        },
+        (error) => {
+          console.error("Error fetching activities:", error);
+        }
+      );
+    };
+
+    const fetchAdditionalInfo = async () => {
+      if (!clubId) {
+        return;
+      }
+      console.log(`Fetching activities for clubId: ${clubId}`);
+      await getRequest(
+        `registration/additional_info?club_id=${clubId}`,
+        (data) => {
+          const {
+            prevName,
+            advisorName,
+            advisorEmail,
+            foundingYear,
+            isSelectiveAdvisor,
+            characteristicEn,
+            characteristicKr,
+            division,
+          } = data.data;
+          setRegistration((prevState) => ({
+            ...prevState,
+            prevName,
+            currentName: prevName,
+            foundingYear,
+            isSelectiveAdvisor,
+            advisorName,
+            advisorEmail,
+            characteristicEn,
+            characteristicKr,
+            division,
+          }));
+        },
+        (error) => {
+          console.error("Error fetching activities:", error);
+        }
+      );
+    };
+    {
+      type === "promotional" && fetchActivities();
+    }
+    {
+      (type === "promotional" || type === "renewal") && fetchAdditionalInfo();
+    }
+  }, [clubId]); // clubId를 의존성 배열에 추가
+
+  const noChange = () => {};
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -110,17 +178,15 @@ export const AddClubRegistration = ({ type = "provisional" }): JSX.Element => {
   };
 
   const handleSubmit = async () => {
-    const requiredFields = [
-      // clubId,
-      registration.currentName,
-      registration.division,
-      // funding.name,
-      // funding.expenditureDate,
-      // funding.expenditureAmount,
-      // funding.purpose,
-      // funding.transactionImages,
-      // funding.detailImages,
-    ];
+    let requiredFields = [registration.currentName, registration.division];
+    if (type === "provisional") {
+    } else if (type === "promotional") {
+      if (!registration.representativeSignature) {
+        alert("대표자 서명이 필요합니다.");
+        return;
+      }
+    } else if (type === "renewal") {
+    }
 
     const isAnyFieldEmpty = requiredFields.some((field) => !field);
 
@@ -136,7 +202,11 @@ export const AddClubRegistration = ({ type = "provisional" }): JSX.Element => {
     // }
 
     // Prepare the data to be sent
-    const dataToSend = registration;
+    const dataToSend = {
+      ...registration,
+      clubId,
+      typeId: type === "provisional" ? 1 : type === "promotional" ? 2 : 3,
+    };
 
     // Success callback
     const handleSuccess = (response: any) => {
@@ -254,25 +324,25 @@ export const AddClubRegistration = ({ type = "provisional" }): JSX.Element => {
     }
   };
 
-  const clubId = userStatuses.length > 0 ? userStatuses[0].clubId : null;
-  const typeId = userStatuses.length > 0 ? userStatuses[0].typeId : 0;
+  const handleRepresentativeSign = () => {
+    if (!registration.representativeSignature) {
+      const isConfirmed = window.confirm(
+        "서약의 내용을 모두 확인했으며, 위 내용을 모두 준수할 것을 서약합니다."
+      );
 
-  // useEffect{
-  //   const fetchActivities = async () => {
-  //     await getRequest(
-  //       `activity/activity_list?club_id=${clubId}`,
-  //       (data) => {
-  //         setActivitiesLists((activitiesLists) => ({
-  //           ...activitiesLists,
-  //           [clubId]: data.activities,
-  //         }));
-  //       },
-  //       (error) => {
-  //         console.error("Error fetching activities:", error);
-  //       }
-  //     );
-  //   };
-  // }
+      if (isConfirmed) {
+        setRegistration((prevState) => ({
+          ...prevState,
+          representativeSignature: true,
+        }));
+      }
+    } else {
+      setRegistration((prevState) => ({
+        ...prevState,
+        representativeSignature: false,
+      }));
+    }
+  };
 
   return (
     <div className="club-registration">
@@ -299,7 +369,7 @@ export const AddClubRegistration = ({ type = "provisional" }): JSX.Element => {
                       type="text"
                       name="prevName"
                       value={registration.prevName}
-                      onChange={handleChange}
+                      onChange={noChange}
                       placeholder="동아리명을 입력하세요."
                       className="text-wrapper-8"
                       style={{ width: "880px" }}
@@ -385,15 +455,19 @@ export const AddClubRegistration = ({ type = "provisional" }): JSX.Element => {
                 </p>
               </div>
             </div>
-            {(type === "promotional" || type === "renewal") && (
-              <div className="frame-8">
-                <SubTitle className="sub-title-instance" text="지도교수 정보" />
-                <div className="frame-9">
-                  <p className="div-3">
+            {(type === "promotional" || type === "renewal") &&
+              !registration.isSelectiveAdvisor && (
+                <div className="frame-8">
+                  <SubTitle
+                    className="sub-title-instance"
+                    text="지도교수 정보"
+                  />
+                  <div className="frame-9">
+                    {/* <p className="div-3">
                     <input
                       type="checkbox"
                       name="isAdvisor"
-                      checked={registration.isAdvisor}
+                      checked={registration.isSelectiveAdvisor}
                       onChange={handleChange}
                       className="check-box"
                     />
@@ -401,62 +475,54 @@ export const AddClubRegistration = ({ type = "provisional" }): JSX.Element => {
                       지도교수 없음 (기존에 선택적 교수를 신청했던 동아리만
                       가능합니다.)
                     </span>
-                  </p>
-                  {!registration.isAdvisor && (
-                    <>
-                      <p className="div-3">
-                        <span className="span">성함: </span>
-                        <input
-                          type="text"
-                          name="advisorName"
-                          value={registration.advisorName}
+                  </p> */}
+
+                    <p className="div-3">
+                      <span className="span">성함: </span>
+                      <input
+                        type="text"
+                        name="advisorName"
+                        value={registration.advisorName}
+                        onChange={handleChange}
+                        placeholder="지도교수 성함을 입력하세요."
+                        className="text-wrapper-8"
+                        style={{ width: "954px" }}
+                      />
+                    </p>
+                    <p className="div-3">
+                      <span className="span">카이스트 이메일: </span>
+                      <input
+                        type="text"
+                        name="advisorEmail"
+                        value={registration.advisorEmail}
+                        onChange={handleChange}
+                        placeholder="지도교수 카이스트 이메일을 입력하세요."
+                        className="text-wrapper-8"
+                        style={{ width: "860px" }}
+                      />
+                    </p>
+                    <p className="div-3">
+                      <div className="dropdown-container">
+                        <label className="span" htmlFor="activity-type">
+                          직급:
+                        </label>
+                        <select
+                          name="advisorLevel"
+                          id="activity-type"
+                          value={registration.advisorLevel}
                           onChange={handleChange}
-                          placeholder="지도교수 성함을 입력하세요."
                           className="text-wrapper-8"
-                          style={{ width: "954px" }}
-                        />
-                      </p>
-                      <p className="div-3">
-                        <span className="span">카이스트 이메일: </span>
-                        <input
-                          type="text"
-                          name="advisorEmail"
-                          value={registration.advisorEmail}
-                          onChange={handleChange}
-                          placeholder="지도교수 카이스트 이메일을 입력하세요."
-                          className="text-wrapper-8"
-                          style={{ width: "860px" }}
-                        />
-                      </p>
-                      <p className="div-3">
-                        <div className="dropdown-container">
-                          <label className="span" htmlFor="activity-type">
-                            직급:
-                          </label>
-                          <select
-                            name="advisorLevel"
-                            id="activity-type"
-                            value={registration.advisorLevel}
-                            onChange={handleChange}
-                            className="text-wrapper-8"
-                          >
-                            <option value="-1">직급 선택...</option>
-                            <option value="1">정교수</option>
-                            <option value="2">부교수</option>
-                            <option value="3">조교수</option>
-                            {/* {activities.map((activity, index) => (
-                        <option key={index} value={activity.id}>
-                          {activity.title}
-                        </option>
-                      ))} */}
-                          </select>
-                        </div>
-                      </p>
-                    </>
-                  )}
+                        >
+                          <option value="-1">직급 선택...</option>
+                          <option value="1">정교수</option>
+                          <option value="2">부교수</option>
+                          <option value="3">조교수</option>
+                        </select>
+                      </div>
+                    </p>
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
             <div className="frame-8">
               <SubTitle className="sub-title-instance" text="활동분야" />
               <div className="frame-9">
@@ -534,24 +600,27 @@ export const AddClubRegistration = ({ type = "provisional" }): JSX.Element => {
                   text={`가등록/등록취소 기간 활동 보고서`}
                 />
                 <div className="frame-9">
-                  <Activity
-                    property1="variant-2"
-                    activityStateProperty1={2}
-                    id={0}
-                  />
-                  {Array.isArray(registration.activityReport) &&
-                    registration.activityReport.map((activity, index) => (
-                      <Activity
-                        key={index}
-                        index={index + 1}
-                        name={activity.title}
-                        type={activity.activityType}
-                        start_date={activity.startDate}
-                        end_date={activity.endDate}
-                        activityStateProperty1={activity.feedbackType}
-                        id={activity.id}
-                      />
-                    ))}
+                  <div>
+                    <Activity
+                      property1="variant-2"
+                      activityStateProperty1={2}
+                      id={0}
+                    />
+                    {Array.isArray(registration.activityReport) &&
+                      registration.activityReport.map((activity, index) => (
+                        <Activity
+                          isRegistration={true}
+                          key={index}
+                          index={index + 1}
+                          name={activity.title}
+                          type={activity.activityType}
+                          start_date={activity.startDate}
+                          end_date={activity.endDate}
+                          activityStateProperty1={activity.feedbackType}
+                          id={activity.id}
+                        />
+                      ))}
+                  </div>
                 </div>
                 <div className="frame-28">
                   {registration.activityReport?.length < 20 &&
@@ -602,6 +671,15 @@ export const AddClubRegistration = ({ type = "provisional" }): JSX.Element => {
                       포함한 자유 양식으로 제출
                     </span>
                   </p>
+                  <div className="div-3">
+                    <a
+                      href="https://ar-002-clubs.s3.ap-northeast-2.amazonaws.com/uploads/2024-03-02T05-03-16.387Z_%5B%C3%A1%C2%84%C2%8B%C3%A1%C2%85%C2%A3%C3%A1%C2%86%C2%BC%C3%A1%C2%84%C2%89%C3%A1%C2%85%C2%B5%C3%A1%C2%86%C2%A8%5D%20%C3%A1%C2%84%C2%92%C3%A1%C2%85%C2%AA%C3%A1%C2%86%C2%AF%C3%A1%C2%84%C2%83%C3%A1%C2%85%C2%A9%C3%A1%C2%86%C2%BC%20%C3%A1%C2%84%C2%80%C3%A1%C2%85%C2%A8%C3%A1%C2%84%C2%92%C3%A1%C2%85%C2%AC%C3%A1%C2%86%C2%A8%C3%A1%C2%84%C2%89%C3%A1%C2%85%C2%A5.docx"
+                      download="[양식] 활동 계획서.docx"
+                      className="span-notice"
+                    >
+                      양식 다운로드
+                    </a>
+                  </div>
                   <input
                     type="file"
                     onChange={(e) => {
@@ -638,7 +716,15 @@ export const AddClubRegistration = ({ type = "provisional" }): JSX.Element => {
                   <p className="div-3">
                     <span className="span-notice">* 동아리 회칙 작성</span>
                   </p>
-
+                  <div className="div-3">
+                    <a
+                      href="https://ar-002-clubs.s3.ap-northeast-2.amazonaws.com/uploads/2024-03-02T05-03-21.907Z_%5B%C3%A1%C2%84%C2%8B%C3%A1%C2%85%C2%A3%C3%A1%C2%86%C2%BC%C3%A1%C2%84%C2%89%C3%A1%C2%85%C2%B5%C3%A1%C2%86%C2%A8%5D%20%C3%A1%C2%84%C2%83%C3%A1%C2%85%C2%A9%C3%A1%C2%86%C2%BC%C3%A1%C2%84%C2%8B%C3%A1%C2%85%C2%A1%C3%A1%C2%84%C2%85%C3%A1%C2%85%C2%B5%20%C3%A1%C2%84%C2%92%C3%A1%C2%85%C2%AC%C3%A1%C2%84%C2%8E%C3%A1%C2%85%C2%B5%C3%A1%C2%86%C2%A8%20%C3%A1%C2%84%C2%90%C3%A1%C2%85%C2%A6%C3%A1%C2%86%C2%B7%C3%A1%C2%84%C2%91%C3%A1%C2%85%C2%B3%C3%A1%C2%86%C2%AF%C3%A1%C2%84%C2%85%C3%A1%C2%85%C2%B5%C3%A1%C2%86%C2%BA.docx"
+                      download="[양식] 동아리 회칙.docx"
+                      className="span-notice"
+                    >
+                      양식 다운로드
+                    </a>
+                  </div>
                   <input
                     type="file"
                     onChange={(e) => {
@@ -678,7 +764,15 @@ export const AddClubRegistration = ({ type = "provisional" }): JSX.Element => {
                       * (선택) 외부강사가 직접 작성하여 제출
                     </span>
                   </p>
-
+                  <div className="div-3">
+                    <a
+                      href="https://ar-002-clubs.s3.ap-northeast-2.amazonaws.com/uploads/2024-03-02T05-03-19.060Z_%5B%C3%A1%C2%84%C2%8B%C3%A1%C2%85%C2%A3%C3%A1%C2%86%C2%BC%C3%A1%C2%84%C2%89%C3%A1%C2%85%C2%B5%C3%A1%C2%86%C2%A8%5D%20%C3%A1%C2%84%C2%92%C3%A1%C2%85%C2%A1%C3%A1%C2%86%C2%A8%C3%A1%C2%84%C2%89%C3%A1%C2%85%C2%A2%C3%A1%C2%86%C2%BC%20%C3%A1%C2%84%C2%8C%C3%A1%C2%85%C2%B5%C3%A1%C2%84%C2%83%C3%A1%C2%85%C2%A9%C3%A1%C2%84%C2%80%C3%A1%C2%85%C2%A8%C3%A1%C2%84%C2%92%C3%A1%C2%85%C2%AC%C3%A1%C2%86%C2%A8%C3%A1%C2%84%C2%89%C3%A1%C2%85%C2%A5%28%C3%A1%C2%84%C2%8B%C3%A1%C2%85%C2%AC%C3%A1%C2%84%C2%87%C3%A1%C2%85%C2%AE%C3%A1%C2%84%C2%80%C3%A1%C2%85%C2%A1%C3%A1%C2%86%C2%BC%C3%A1%C2%84%C2%89%C3%A1%C2%85%C2%A1%C3%A1%C2%84%C2%8B%C3%A1%C2%85%C2%AD%C3%A1%C2%86%C2%BC%29.docx"
+                      download="[양식] 학생 지도계획서(외부강사용).docx"
+                      className="span-notice"
+                    >
+                      양식 다운로드
+                    </a>
+                  </div>
                   <input
                     type="file"
                     onChange={(e) => {
@@ -745,7 +839,15 @@ export const AddClubRegistration = ({ type = "provisional" }): JSX.Element => {
                       불이익에 대해 책임을 질 것을 선서합니다.
                     </span>
                   </p>
-                  <div className="frame-20">
+                  <div
+                    className="frame-20"
+                    onClick={handleRepresentativeSign}
+                    style={
+                      !registration.representativeSignature
+                        ? { cursor: "pointer" }
+                        : {}
+                    }
+                  >
                     <div className="text-wrapper-11">
                       {registration.representativeSignature
                         ? "확인완료"
@@ -755,9 +857,9 @@ export const AddClubRegistration = ({ type = "provisional" }): JSX.Element => {
                 </div>
               </div>
             )}
-            {(type === "promotional" || type === "renewal") && (
+            {/* {(type === "promotional" || type === "renewal") && (
               <div className="frame-11">
-                {!registration.isAdvisor && (
+                {!registration.isSelectiveAdvisor && (
                   <>
                     <SubTitle text="지도교수 취임 승낙 및 지도계획서" />
 
@@ -788,7 +890,7 @@ export const AddClubRegistration = ({ type = "provisional" }): JSX.Element => {
                   </>
                 )}
               </div>
-            )}
+            )} */}
             <div className="frame-14">
               <div
                 className="frame-15"

@@ -11,7 +11,11 @@ module.exports = function(sequelize, DataTypes) {
     },
     sign_type: {
       type: DataTypes.INTEGER,
-      allowNull: false
+      allowNull: false,
+      references: {
+        model: 'RegistrationSignType',
+        key: 'type_id'
+      }
     },
     sign_time: {
       type: DataTypes.DATE,
@@ -27,6 +31,13 @@ module.exports = function(sequelize, DataTypes) {
         using: "BTREE",
         fields: [
           { name: "registration" },
+        ]
+      },
+      {
+        name: "RegistrationSign_RegistrationSignType_type_id_fk",
+        using: "BTREE",
+        fields: [
+          { name: "sign_type" },
         ]
       },
     ]

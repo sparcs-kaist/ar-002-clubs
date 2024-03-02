@@ -140,6 +140,8 @@ function initModels(sequelize) {
   ActivityFeedbackType.hasMany(Activity, { as: "Activities", foreignKey: "feedback_type"});
   Activity_init.belongsTo(ActivityFeedbackType, { as: "feedback_type_ActivityFeedbackType", foreignKey: "feedback_type"});
   ActivityFeedbackType.hasMany(Activity_init, { as: "Activity_inits", foreignKey: "feedback_type"});
+  Registration.belongsTo(ActivityFeedbackType, { as: "feedback_type_ActivityFeedbackType", foreignKey: "feedback_type"});
+  ActivityFeedbackType.hasMany(Registration, { as: "Registrations", foreignKey: "feedback_type"});
   RegistrationActivity.belongsTo(ActivityFeedbackType, { as: "feedback_type_ActivityFeedbackType", foreignKey: "feedback_type"});
   ActivityFeedbackType.hasMany(RegistrationActivity, { as: "RegistrationActivities", foreignKey: "feedback_type"});
   Activity.belongsTo(ActivityType, { as: "activity_type", foreignKey: "activity_type_id"});
@@ -256,6 +258,8 @@ function initModels(sequelize) {
   RegistrationActivity.hasMany(RegistrationActivityMember, { as: "RegistrationActivityMembers", foreignKey: "activity_id"});
   RegistrationEvidence.belongsTo(RegistrationEvidenceType, { as: "registration_evidence_type_RegistrationEvidenceType", foreignKey: "registration_evidence_type"});
   RegistrationEvidenceType.hasMany(RegistrationEvidence, { as: "RegistrationEvidences", foreignKey: "registration_evidence_type"});
+  RegistrationSign.belongsTo(RegistrationSignType, { as: "sign_type_RegistrationSignType", foreignKey: "sign_type"});
+  RegistrationSignType.hasMany(RegistrationSign, { as: "RegistrationSigns", foreignKey: "sign_type"});
   Registration.belongsTo(RegistrationType, { as: "type", foreignKey: "type_id"});
   RegistrationType.hasMany(Registration, { as: "Registrations", foreignKey: "type_id"});
   ActivitySign.belongsTo(Semester, { as: "semester", foreignKey: "semester_id"});
@@ -266,6 +270,8 @@ function initModels(sequelize) {
   Semester.hasMany(MemberStatus, { as: "MemberStatuses", foreignKey: "semester_id"});
   Registration.belongsTo(Semester, { as: "semester", foreignKey: "semester_id"});
   Semester.hasMany(Registration, { as: "Registrations", foreignKey: "semester_id"});
+  RegistrationActivity.belongsTo(Semester, { as: "semester", foreignKey: "semester_id"});
+  Semester.hasMany(RegistrationActivity, { as: "RegistrationActivities", foreignKey: "semester_id"});
   SemesterClub.belongsTo(Semester, { as: "semester", foreignKey: "semester_id"});
   Semester.hasMany(SemesterClub, { as: "SemesterClubs", foreignKey: "semester_id"});
   SemesterClub.belongsTo(SemesterClubType, { as: "type", foreignKey: "type_id"});

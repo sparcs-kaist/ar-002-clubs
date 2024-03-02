@@ -9,25 +9,22 @@ const storage = multer.memoryStorage();
 const {
   sequelize,
   Registration,
+  RegistrationType,
   RegistrationActivity,
   RegistrationActivityEvidence,
   RegistrationActivityMember,
   Semester,
   RegistrationEvidence,
+  RegistrationSign,
+  ActivityType,
+  Club,
+  SemesterClub,
 } = require("../models");
 const checkPermission = require("../utils/permission");
 const { checkRegistrationDuration } = require("../utils/duration");
 
-router.get("/activity_list", async (req, res) => {
-  const clubId = req.query.club_id;
+router.get("/registration_list", async (req, res) => {
   const currentDate = new Date();
-
-  if (!clubId) {
-    return res.status(400).json({
-      success: false,
-      message: "club_id query parameter is required",
-    });
-  }
 
   try {
     // Find current semester
@@ -45,28 +42,150 @@ router.get("/activity_list", async (req, res) => {
       });
     }
 
-    // Find the 'Activity' duration
-    const activityDuration = await Duration.findOne({
+    // Find activities for the club within the duration
+    const registrations = await Registration.findAll({
       where: {
-        duration_name: "Activity",
+        student_id: req.session.user.student_id,
         semester_id: currentSemester.id,
       },
-      attributes: ["duration_name", "start_date", "end_date", "semester_id"],
+      include: [
+        {
+          model: RegistrationType,
+          as: "type",
+          attributes: ["registration_type"],
+        },
+      ],
+      attributes: [
+        "id",
+        "current_name",
+        "type_id",
+        "recent_edit",
+        "feedback_type",
+      ],
+      order: [["recent_edit", "ASC"]],
     });
 
-    if (!activityDuration) {
+    const formatDateString = (date) => {
+      if (!date) return "";
+      const d = new Date(date);
+      const year = d.getFullYear();
+      const month = String(d.getMonth() + 1).padStart(2, "0");
+      const day = String(d.getDate()).padStart(2, "0");
+      return `${year}.${month}.${day}.`;
+    };
+
+    res.json({
+      success: true,
+      registrations: registrations.map((registration) => ({
+        id: registration.id,
+        currentName: registration.current_name,
+        registrationType: registration.type.registration_type,
+        recentEdit: formatDateString(registration.recent_edit),
+        feedbackType: registration.feedback_type,
+      })),
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, message: "Internal Server Error" });
+  }
+});
+
+router.get("/additional_info", async (req, res) => {
+  const clubId = req.query.club_id;
+  const currentDate = new Date();
+
+  try {
+    // 현재 학기 찾기
+    const currentSemester = await Semester.findOne({
+      where: {
+        start_date: { [Op.lte]: currentDate },
+        end_date: { [Op.gte]: currentDate },
+      },
+    });
+
+    if (!currentSemester) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Current semester not found" });
+    }
+
+    // 클럽 정보 찾기
+    const clubInfo = await Club.findOne({
+      where: { id: clubId },
+      attributes: ["name", "founding_year", "division_id"],
+    });
+
+    if (!clubInfo) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Club not found" });
+    }
+
+    // 현재 학기에 해당하는 클럽의 지도 교수 정보 찾기
+    const semesterClubInfo = await SemesterClub.findOne({
+      where: {
+        club_id: clubId,
+        semester_id: currentSemester.id,
+      },
+      attributes: [
+        "advisor",
+        "advisor_mail",
+        "characteristic_kr",
+        "characteristic_en",
+      ],
+    });
+
+    const isSelectiveAdvisor = semesterClubInfo.advisor ? false : true;
+    const advisorName = semesterClubInfo.advisor;
+    const advisorEmail = semesterClubInfo.get("advisor_mail");
+    const characteristicKr = semesterClubInfo.get("characteristic_kr");
+    const characteristicEn = semesterClubInfo.get("characteristic_en");
+
+    // 응답 데이터 구성 및 반환
+    res.json({
+      success: true,
+      data: {
+        prevName: clubInfo.name,
+        foundingYear: clubInfo.founding_year,
+        isSelectiveAdvisor,
+        advisorName,
+        advisorEmail,
+        characteristicKr,
+        characteristicEn,
+        division: clubInfo.division_id,
+      },
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, message: "Internal Server Error" });
+  }
+});
+
+router.get("/activity_list", async (req, res) => {
+  const clubId = req.query.club_id;
+  const currentDate = new Date();
+
+  try {
+    // Find current semester
+    const currentSemester = await Semester.findOne({
+      where: {
+        start_date: { [Op.lte]: currentDate },
+        end_date: { [Op.gte]: currentDate },
+      },
+    });
+
+    if (!currentSemester) {
       return res.status(404).json({
         success: false,
-        message: "Activity duration not found for the current semester",
+        message: "Current semester not found",
       });
     }
 
     // Find activities for the club within the duration
-    const activities = await Activity.findAll({
+    const activities = await RegistrationActivity.findAll({
       where: {
         club_id: clubId,
-        start_date: { [Op.gte]: activityDuration.start_date },
-        end_date: { [Op.lte]: activityDuration.end_date },
+        semester_id: currentSemester.id,
       },
       include: [
         {
@@ -115,6 +234,8 @@ router.get("/activity_list", async (req, res) => {
 router.post("/add_registration", async (req, res) => {
   try {
     const {
+      clubId,
+      typeId,
       prevName,
       currentName,
       foundingMonth,
@@ -134,6 +255,7 @@ router.post("/add_registration", async (req, res) => {
       regulation,
       externalTeacher,
       advisorPlan,
+      activityReport,
     } = req.body;
 
     // const authorized = await checkPermission(req, res, [
@@ -142,7 +264,7 @@ router.post("/add_registration", async (req, res) => {
     // if (!authorized) {
     //   return;
     // }
-
+    console.log(req.body);
     const durationCheck = await checkRegistrationDuration();
     if (durationCheck.registrationStatus !== 1) {
       return res.status(400).send({ message: "활동 추가 기한이 지났습니다." });
@@ -165,25 +287,23 @@ router.post("/add_registration", async (req, res) => {
 
     // Convert isAdvisor to a format suitable for the database (e.g., from boolean to smallint)
     const isAdvisorDb = isAdvisor ? 1 : 0;
-
-    // Assuming club_id, type_id, and semester_id are provided in the request or determined by some logic here
-    const club_id = 1;
-    const type_id = 1;
     const semester_id = currentSemester.id;
 
-    const foudningDate = foundingMonth + "-01";
+    const founding_month =
+      foundingMonth > 0 && foundingMonth < 13 ? foundingMonth : null;
 
     // Create a new registration entry
     const registration = await Registration.create(
       {
-        club_id,
+        club_id: clubId,
         student_id: req.session.user.student_id,
-        type_id,
+        type_id: typeId,
+        feedback_type: 1,
         semester_id,
         prev_name: prevName,
         current_name: currentName,
         founding_month: foundingMonth,
-        fouding_year: foundingYear,
+        founding_year: foundingYear,
         phone_number: phoneNumber,
         division,
         is_advisor: isAdvisorDb,
@@ -197,7 +317,19 @@ router.post("/add_registration", async (req, res) => {
         main_plan: mainPlan,
         advisor_plan: advisorPlan,
         recent_edit: currentDateTimeUTC,
+        recent_edit: currentDateTimeUTC,
       },
+      { transaction }
+    );
+
+    await RegistrationSign.bulkCreate(
+      [
+        {
+          registration: registration.id, // 수정: 'registration' -> 'registration_id'
+          sign_type: 1,
+          sign_time: currentDateTimeUTC,
+        },
+      ],
       { transaction }
     );
 
@@ -277,6 +409,14 @@ router.post("/addActivity", async (req, res) => {
     return;
   }
 
+  const currentDate = new Date();
+  const currentSemester = await Semester.findOne({
+    where: {
+      start_date: { [Op.lte]: currentDate },
+      end_date: { [Op.gte]: currentDate },
+    },
+  });
+
   try {
     const existingActivitiesCount = await RegistrationActivity.count({
       where: { club_id: clubId },
@@ -298,6 +438,7 @@ router.post("/addActivity", async (req, res) => {
     const activity = await RegistrationActivity.create({
       club_id: clubId,
       title,
+      semester_id: currentSemester.id,
       activity_type_id: activityTypeId,
       start_date: startDate,
       end_date: endDate,

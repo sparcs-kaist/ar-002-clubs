@@ -11,6 +11,14 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useRegistrationDurationStatus } from "hooks/useReportDurationStatus";
 import { Activity } from "components/activity/Activity";
 
+interface Registration {
+  id: number;
+  currentName: string;
+  registrationType: string;
+  recentEdit: string;
+  feedbackType: number;
+}
+
 export const ClubRegistration = (): JSX.Element => {
   const { userStatuses, isLoading } = useUserRepresentativeStatus(true);
   const { durationStatus } = useRegistrationDurationStatus();
@@ -18,6 +26,28 @@ export const ClubRegistration = (): JSX.Element => {
 
   const clubId = userStatuses.length > 0 ? userStatuses[0].clubId : null;
   const typeId = userStatuses.length > 0 ? userStatuses[0].typeId : 0;
+
+  const [registrations, setRegistrations] = useState<Registration[]>([]);
+
+  useEffect(() => {
+    const fetchRegistrations = async () => {
+      if (!clubId) {
+        return;
+      }
+      console.log(`Fetching activities for clubId: ${clubId}`);
+      await getRequest(
+        `registration/registration_list`,
+        (data) => {
+          setRegistrations(data.registrations);
+          console.log(data);
+        },
+        (error) => {
+          console.error("Error fetching activities:", error);
+        }
+      );
+    };
+    fetchRegistrations();
+  }, [clubId]);
 
   return (
     <div className="club-registration">
@@ -110,11 +140,28 @@ export const ClubRegistration = (): JSX.Element => {
                 className="sub-title-instance"
                 text="내가 신청한 등록"
               />
-              <Activity
-                property1="variant-3"
-                activityStateProperty1={2}
-                id={0}
-              />
+              <div className="frame-9">
+                <div>
+                  <Activity
+                    property1="variant-3"
+                    activityStateProperty1={2}
+                    id={0}
+                  />
+                  {Array.isArray(registrations) &&
+                    registrations.map((registration, index) => (
+                      <Activity
+                        // isRegistration={true}
+                        key={index}
+                        index={index + 1}
+                        name={registration.currentName}
+                        type={registration.registrationType}
+                        start_date={registration.recentEdit}
+                        activityStateProperty1={registration.feedbackType}
+                        id={registration.id}
+                      />
+                    ))}
+                </div>
+              </div>
             </div>
           </div>
         </div>

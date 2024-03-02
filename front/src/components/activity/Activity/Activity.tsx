@@ -15,6 +15,7 @@ interface Props {
   className?: string;
   activityStateProperty1: number;
   index?: number;
+  isRegistration?: boolean;
   name?: string;
   type?: string;
   start_date?: string;
@@ -24,6 +25,7 @@ interface Props {
 export const Activity = ({
   property1 = "default",
   className = "activity-instance",
+  isRegistration = false,
   activityStateProperty1 = 1,
   index = 0,
   name = "",
@@ -39,7 +41,14 @@ export const Activity = ({
         className="frame-31"
         onClick={() => {
           {
-            property1 === "default" && navigate(`/activity_detail/${id}`);
+            if (property1 === "default") {
+              if (isRegistration) {
+                console.log("resgs");
+                navigate(`/add_club_registration/activity_detail/${id}`);
+              } else {
+                navigate(`/activity_detail/${id}`);
+              }
+            }
           }
         }}
         style={property1 === "default" ? { cursor: "pointer" } : {}}
@@ -55,7 +64,7 @@ export const Activity = ({
             <div className="frame-2">
               <p className="text-wrapper-3">{type}</p>
             </div>
-            <div className="frame-3">
+            <div className="frame-33">
               <div className="text-wrapper-3">
                 {start_date}~{end_date}
               </div>
@@ -85,7 +94,7 @@ export const Activity = ({
             <div className="frame-2">
               <p className="text-wrapper-3">활동 분류</p>
             </div>
-            <div className="frame-30">
+            <div className="frame-77">
               <div className="text-wrapper-3">활동 기간</div>
             </div>
             <div className="frame-6">
