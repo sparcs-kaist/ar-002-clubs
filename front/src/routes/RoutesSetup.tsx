@@ -24,11 +24,13 @@ import { FundingFeedbackScreen } from "pages/admin/FundingFeedback/FundingFeedba
 import { FundingDashboard } from "pages/admin/FundingDashboard";
 import { ClubFundingList } from "pages/admin/ClubFundingList";
 import { FundingAdminDetail } from "pages/admin/FundingAdminDetail";
-import { ClubRegistration } from "pages/club/ClubRegistration";
-import { AddClubRegistration } from "pages/club/AddClubRegistration";
-import { AddClubRegistrationActivity } from "pages/club/AddClubRegistrationActivity";
-import { ClubRegistrationActivityDetail } from "pages/club/ClubRegistrationActivityDetail";
-import { EditClubRegistrationActivity } from "pages/club/EditClubRegistrationActivity";
+import { ClubRegistration } from "pages/registration/ClubRegistration";
+import { AddClubRegistration } from "pages/registration/AddClubRegistration";
+import { AddClubRegistrationActivity } from "pages/registration/AddClubRegistrationActivity";
+import { ClubRegistrationActivityDetail } from "pages/registration/ClubRegistrationActivityDetail";
+import { EditClubRegistrationActivity } from "pages/registration/EditClubRegistrationActivity";
+import { ClubRegistrationDetail } from "pages/registration/ClubRegistrationDetail";
+import { EditClubRegistration } from "pages/registration/EditClubRegistration";
 
 export default function RouteSetup() {
   return (
@@ -49,6 +51,8 @@ export default function RouteSetup() {
       <Route path="/edit_meeting/:id" element={<EditMeeting />} />
       <Route path="/club_detail/:id" element={<ClubDetail />} />
       <Route path="/club_manage" element={<ClubManage />} />
+
+      {/* 등록 */}
       <Route path="/club_registration" element={<ClubRegistration />} />
       <Route
         path="/add_club_registration/promotional"
@@ -67,22 +71,33 @@ export default function RouteSetup() {
         element={<AddClubRegistrationActivity />}
       />
       <Route
-        path="/add_club_registration/edit_activity"
+        path="/add_club_registration/edit_activity/:id"
         element={<EditClubRegistrationActivity />}
       />
       <Route
-        path="/add_club_registration/activity_detail"
+        path="/add_club_registration/activity_detail/:id"
         element={<ClubRegistrationActivityDetail />}
       />
+      <Route
+        path="/club_registration_detail/:id"
+        element={<ClubRegistrationDetail />}
+      />
+      <Route
+        path="/edit_club_registration/:id"
+        element={<EditClubRegistration />}
+      />
 
+      {/* 활동 보고서 */}
       <Route path="/add_activity" element={<AddActivity />} />
       <Route path="/activity_detail/:id" element={<ActivityDetail />} />
       <Route path="/edit_activity/:id" element={<EditActivity />} />
 
+      {/* 지원금 */}
       <Route path="/add_funding" element={<AddFunding />} />
       <Route path="/funding_detail/:id" element={<FundingDetail />} />
       <Route path="/edit_funding/:id" element={<EditFunding />} />
 
+      {/*활동보고서 검토 */}
       <Route path="/admin" element={<Admin />} />
       <Route
         path="/admin/activity_feedback"
@@ -92,6 +107,7 @@ export default function RouteSetup() {
       <Route path="/admin/club_activity/:id" element={<ClubActivityList />} />
       <Route path="/admin/activity/:id" element={<ActivityAdminDetail />} />
 
+      {/*지원금 검토 */}
       <Route
         path="/admin/funding_feedback"
         element={<FundingFeedbackScreen />}

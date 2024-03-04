@@ -150,7 +150,7 @@ export const ClubRegistration = (): JSX.Element => {
                   {Array.isArray(registrations) &&
                     registrations.map((registration, index) => (
                       <Activity
-                        // isRegistration={true}
+                        isRegistration={2}
                         key={index}
                         index={index + 1}
                         name={registration.currentName}

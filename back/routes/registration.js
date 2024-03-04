@@ -19,9 +19,147 @@ const {
   ActivityType,
   Club,
   SemesterClub,
+  RegistrationEvidenceType,
 } = require("../models");
 const checkPermission = require("../utils/permission");
 const { checkRegistrationDuration } = require("../utils/duration");
+
+router.get("/get_registration", async (req, res) => {
+  const { id } = req.query;
+
+  if (!id) {
+    return res.status(400).json({
+      success: false,
+      message: "ID query parameter is required",
+    });
+  }
+
+  try {
+    const registration = await Registration.findByPk(id, {
+      include: [
+        {
+          model: RegistrationEvidence,
+          as: "RegistrationEvidences", // 모델 정의에 따른 alias 사용
+          attributes: [
+            "image_url",
+            "description",
+            "registration_evidence_type",
+          ],
+        },
+        {
+          model: RegistrationActivity,
+          as: "RegistrationActivities", // 모델 정의에 따른 alias 사용
+          attributes: [
+            "id",
+            "title",
+            "activity_type_id",
+            "start_date",
+            "end_date",
+            "feedback_type",
+          ],
+        },
+        {
+          model: RegistrationSign,
+          as: "RegistrationSigns",
+          attributes: ["sign_type"],
+        },
+      ],
+      attributes: [
+        "type_id",
+        "club_id",
+        "prev_name",
+        "current_name",
+        "founding_month",
+        "founding_year",
+        "phone_number",
+        "division",
+        "is_advisor",
+        "advisor_name",
+        "advisor_email",
+        "advisor_level",
+        "characteristic_kr",
+        "characteristic_en",
+        "division_consistency",
+        "purpose",
+        "main_plan",
+        "advisor_plan",
+      ],
+    });
+
+    if (registration.type_id != 2) {
+      const authorized = await checkPermission(req, res, [
+        { club_rep: 4, club_id: registration.club_id },
+        { executive: 4 },
+      ]);
+      if (!authorized) {
+        return;
+      }
+    }
+
+    if (!registration) {
+      return res.status(404).json({ message: "Registration not found" });
+    }
+    console.log(registration.RegistrationEvidences);
+
+    const formattedRegistration = {
+      typeId: registration.type_id,
+      prevName: registration.prev_name,
+      currentName: registration.current_name,
+      phoneNumber: registration.phone_number,
+      foundingYear: registration.founding_year,
+      foundingMonth: registration.founding_month,
+      division: registration.division,
+      isSelectiveAdvisor: registration.is_advisor === 1 ? true : false, // 예시로, DB에서는 0 또는 1로 저장될 수 있습니다.
+      advisorName: registration.advisor_name,
+      advisorEmail: registration.advisor_email,
+      advisorLevel: registration.advisor_level,
+      characteristicKr: registration.characteristic_kr,
+      characteristicEn: registration.characteristic_en,
+      divisionConsistency: registration.division_consistency,
+      purpose: registration.purpose,
+      mainPlan: registration.main_plan,
+      activityReport: registration.RegistrationActivities
+        ? registration.RegistrationActivities
+        : [],
+      activityPlan: registration.RegistrationEvidences
+        ? registration.RegistrationEvidences.filter(
+            (e) => e.registration_evidence_type === 1
+          ).map((e) => ({
+            imageUrl: e.image_url,
+            fileName: e.description,
+          }))
+        : [],
+      regulation: registration.RegistrationEvidences
+        ? registration.RegistrationEvidences.filter(
+            (e) => e.registration_evidence_type === 2
+          ).map((e) => ({
+            imageUrl: e.image_url,
+            fileName: e.description,
+          }))
+        : [],
+      externalTeacher: registration.RegistrationEvidences
+        ? registration.RegistrationEvidences.filter(
+            (e) => e.registration_evidence_type === 3
+          ).map((e) => ({
+            imageUrl: e.image_url,
+            fileName: e.description,
+          }))
+        : [],
+      advisorPlan: registration.advisor_plan,
+      representativeSignature: registration.RegistrationSigns.some(
+        (sign) => sign.sign_type === 1
+      ),
+      advisorSignature: registration.RegistrationSigns.some(
+        (sign) => sign.sign_type === 2
+      ),
+    };
+
+    res.json({ success: true, data: formattedRegistration });
+  } catch (error) {
+    console.error("Error fetching registration:", error);
+    res.status(500).json({ success: false, message: "Server error occurred" });
+  }
+});
 
 router.get("/registration_list", async (req, res) => {
   const currentDate = new Date();
@@ -132,10 +270,16 @@ router.get("/additional_info", async (req, res) => {
         "advisor_mail",
         "characteristic_kr",
         "characteristic_en",
+        "type_id",
       ],
     });
 
-    const isSelectiveAdvisor = semesterClubInfo.advisor ? false : true;
+    const isSelectiveAdvisor =
+      semesterClubInfo.type_id === 2
+        ? false
+        : semesterClubInfo.advisor
+        ? false
+        : true;
     const advisorName = semesterClubInfo.advisor;
     const advisorEmail = semesterClubInfo.get("advisor_mail");
     const characteristicKr = semesterClubInfo.get("characteristic_kr");
@@ -242,7 +386,7 @@ router.post("/add_registration", async (req, res) => {
       foundingYear,
       phoneNumber,
       division,
-      isAdvisor,
+      isSelectiveAdvisor,
       advisorName,
       advisorEmail,
       advisorLevel,
@@ -286,7 +430,7 @@ router.post("/add_registration", async (req, res) => {
     });
 
     // Convert isAdvisor to a format suitable for the database (e.g., from boolean to smallint)
-    const isAdvisorDb = isAdvisor ? 1 : 0;
+    const isAdvisorDb = isSelectiveAdvisor ? 1 : 0;
     const semester_id = currentSemester.id;
 
     const founding_month =

@@ -15,7 +15,7 @@ interface Props {
   className?: string;
   activityStateProperty1: number;
   index?: number;
-  isRegistration?: boolean;
+  isRegistration?: number;
   name?: string;
   type?: string;
   start_date?: string;
@@ -25,7 +25,7 @@ interface Props {
 export const Activity = ({
   property1 = "default",
   className = "activity-instance",
-  isRegistration = false,
+  isRegistration = 0,
   activityStateProperty1 = 1,
   index = 0,
   name = "",
@@ -42,9 +42,10 @@ export const Activity = ({
         onClick={() => {
           {
             if (property1 === "default") {
-              if (isRegistration) {
-                console.log("resgs");
+              if (isRegistration === 1) {
                 navigate(`/add_club_registration/activity_detail/${id}`);
+              } else if (isRegistration === 2) {
+                navigate(`/club_registration_detail/${id}`);
               } else {
                 navigate(`/activity_detail/${id}`);
               }
