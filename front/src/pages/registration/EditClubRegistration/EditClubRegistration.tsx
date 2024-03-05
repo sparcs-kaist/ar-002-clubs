@@ -116,6 +116,8 @@ export const EditClubRegistration = (): JSX.Element => {
         },
         (error) => {
           console.error("Error fetching activities:", error);
+          alert("권한이 없습니다.");
+          navigate(-1);
         }
       );
     };
@@ -163,6 +165,10 @@ export const EditClubRegistration = (): JSX.Element => {
   const handleSubmit = async () => {
     let requiredFields = [registration.currentName, registration.division];
     if (type === "provisional") {
+      if (!registration.representativeSignature) {
+        alert("대표자 서명이 필요합니다.");
+        return;
+      }
     } else if (type === "promotional") {
       if (!registration.representativeSignature) {
         alert("대표자 서명이 필요합니다.");
@@ -194,7 +200,8 @@ export const EditClubRegistration = (): JSX.Element => {
     // Success callback
     const handleSuccess = (response: any) => {
       console.log("Activity added successfully:", response);
-      navigate(`/club_registration_detail/${id}`);
+      setRegistration(initialState);
+      navigate(-1);
       // Additional success logic here (e.g., redirecting or showing a success message)
     };
 
@@ -202,16 +209,14 @@ export const EditClubRegistration = (): JSX.Element => {
     const handleError = (error: any) => {
       console.error("Error adding activity:", error);
       alert(
-        "등록 신청을 추가하는 중 문제가 발생했습니다. 잠시 후 다시 시도해주세요"
+        "등록 신청을 수정하는 중 문제가 발생했습니다. 잠시 후 다시 시도해주세요"
       );
       // Additional error handling logic here (e.g., showing an error message)
     };
 
-    setRegistration(initialState);
-
     // Send the POST request
     postRequest(
-      "registration/edit_registration",
+      `registration/edit_registration?id=${id}`,
       dataToSend,
       handleSuccess,
       handleError
@@ -728,14 +733,14 @@ export const EditClubRegistration = (): JSX.Element => {
                       양식 다운로드
                     </a>
                   </div>
-                  {/* <input
+                  <input
                     type="file"
                     onChange={(e) => {
                       if (e.target.files?.[0]) {
                         handleFileUpload(e.target.files[0], "regulation");
                       }
                     }}
-                  /> */}
+                  />
                   {groupProofImagesInPairs("regulation").map(
                     (pair, pairIndex) => (
                       <div key={pairIndex} className="frame-13">
@@ -776,14 +781,14 @@ export const EditClubRegistration = (): JSX.Element => {
                       양식 다운로드
                     </a>
                   </div>
-                  {/* <input
+                  <input
                     type="file"
                     onChange={(e) => {
                       if (e.target.files?.[0]) {
                         handleFileUpload(e.target.files[0], "externalTeacher");
                       }
                     }}
-                  /> */}
+                  />
                   {groupProofImagesInPairs("externalTeacher").map(
                     (pair, pairIndex) => (
                       <div key={pairIndex} className="frame-13">

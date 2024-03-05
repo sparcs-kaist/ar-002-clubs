@@ -24,6 +24,259 @@ const {
 const checkPermission = require("../utils/permission");
 const { checkRegistrationDuration } = require("../utils/duration");
 
+router.post("/edit_registration", async (req, res) => {
+  try {
+    const {
+      clubId,
+      typeId,
+      prevName,
+      currentName,
+      foundingMonth,
+      foundingYear,
+      phoneNumber,
+      division,
+      isSelectiveAdvisor,
+      advisorName,
+      advisorEmail,
+      advisorLevel,
+      characteristicKr,
+      characteristicEn,
+      divisionConsistency,
+      purpose,
+      mainPlan,
+      activityPlan,
+      regulation,
+      externalTeacher,
+      advisorPlan,
+      activityReport,
+    } = req.body;
+
+    // const authorized = await checkPermission(req, res, [
+    //   { club_rep: 4, club_id: clubId },
+    // ]);
+    // if (!authorized) {
+    //   return;
+    // }
+
+    const { id } = req.query;
+
+    if (!id) {
+      return res.status(400).json({
+        success: false,
+        message: "Registration ID query parameter is required",
+      });
+    }
+
+    console.log(req.body);
+    const durationCheck = await checkRegistrationDuration();
+    if (durationCheck.registrationStatus !== 1) {
+      return res.status(400).send({ message: "활동 추가 기한이 지났습니다." });
+    }
+
+    const transaction = await sequelize.transaction();
+
+    // Calculate the current date/time in KST (Korean Standard Time)
+    const currentDateTimeUTC = new Date();
+    const kstOffset = 9 * 60; // 9 hours in minutes
+    currentDateTimeUTC.setMinutes(currentDateTimeUTC.getMinutes() + kstOffset);
+
+    const currentDate = new Date();
+    const currentSemester = await Semester.findOne({
+      where: {
+        start_date: { [Op.lte]: currentDate },
+        end_date: { [Op.gte]: currentDate },
+      },
+    });
+
+    // Convert isAdvisor to a format suitable for the database (e.g., from boolean to smallint)
+    const isAdvisorDb = isSelectiveAdvisor ? 1 : 0;
+    const semester_id = currentSemester.id;
+
+    const founding_month =
+      foundingMonth > 0 && foundingMonth < 13 ? foundingMonth : null;
+
+    // Create a new registration entry
+    const registration = await Registration.findByPk(id, { transaction });
+    if (!registration) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Registration not found" });
+    }
+
+    await registration.update(
+      {
+        club_id: clubId,
+        student_id: req.session.user.student_id,
+        type_id: typeId,
+        feedback_type: 1,
+        semester_id,
+        prev_name: prevName,
+        current_name: currentName,
+        founding_month: foundingMonth,
+        founding_year: foundingYear,
+        phone_number: phoneNumber,
+        division,
+        is_advisor: isAdvisorDb,
+        advisor_name: advisorName,
+        advisor_email: advisorEmail,
+        advisor_level: advisorLevel,
+        characteristic_kr: characteristicKr,
+        characteristic_en: characteristicEn,
+        division_consistency: divisionConsistency,
+        purpose,
+        main_plan: mainPlan,
+        advisor_plan: advisorPlan,
+        recent_edit: currentDateTimeUTC,
+        recent_edit: currentDateTimeUTC,
+      },
+      { transaction }
+    );
+
+    await RegistrationActivity.destroy({
+      where: { registration: id },
+      transaction,
+    });
+
+    // 관련 RegistrationEvidence 삭제
+    await RegistrationEvidence.destroy({
+      where: { registration_id: id },
+      transaction,
+    });
+
+    // 관련 RegistrationSign 삭제
+    await RegistrationSign.destroy({
+      where: { registration: id },
+      transaction,
+    });
+
+    await RegistrationSign.bulkCreate(
+      [
+        {
+          registration: registration.id, // 수정: 'registration' -> 'registration_id'
+          sign_type: 1,
+          sign_time: currentDateTimeUTC,
+        },
+      ],
+      { transaction }
+    );
+
+    // Insert FundingEvidence for transaction images
+    await RegistrationEvidence.bulkCreate(
+      activityPlan.map((image) => ({
+        registration_id: registration.id,
+        image_url: image.imageUrl,
+        description: image.fileName,
+        registration_evidence_type: 1,
+      })),
+      { transaction }
+    );
+
+    // Insert FundingEvidence for transaction images
+    await RegistrationEvidence.bulkCreate(
+      regulation.map((image) => ({
+        registration_id: registration.id,
+        image_url: image.imageUrl,
+        description: image.fileName,
+        registration_evidence_type: 2,
+      })),
+      { transaction }
+    );
+
+    // Insert FundingEvidence for transaction images
+    await RegistrationEvidence.bulkCreate(
+      externalTeacher.map((image) => ({
+        registration_id: registration.id,
+        image_url: image.imageUrl,
+        description: image.fileName,
+        registration_evidence_type: 3,
+      })),
+      { transaction }
+    );
+
+    // activityReport 배열 처리
+    if (activityReport && activityReport.length > 0) {
+      for (const activity of activityReport) {
+        console.log(activity);
+        await RegistrationActivity.update(
+          {
+            registration: registration.id, // registration_id 업데이트
+          },
+          {
+            where: { id: activity.id },
+            transaction,
+          }
+        );
+      }
+    }
+
+    // Commit the transaction
+    await transaction.commit();
+
+    res.status(201).json({
+      message: "Registration added successfully",
+      data: registration,
+    });
+  } catch (error) {
+    console.error("Error adding registration:", error);
+    res.status(500).json({ message: "Server error occurred" });
+  }
+});
+
+router.post("/delete_registration", async (req, res) => {
+  const { id } = req.query;
+
+  if (!id) {
+    return res.status(400).json({
+      success: false,
+      message: "Registration ID query parameter is required",
+    });
+  }
+
+  const transaction = await sequelize.transaction();
+
+  try {
+    // 관련 RegistrationActivity 삭제
+    await RegistrationActivity.destroy({
+      where: { registration: id },
+      transaction,
+    });
+
+    // 관련 RegistrationEvidence 삭제
+    await RegistrationEvidence.destroy({
+      where: { registration_id: id },
+      transaction,
+    });
+
+    // 관련 RegistrationSign 삭제
+    await RegistrationSign.destroy({
+      where: { registration: id },
+      transaction,
+    });
+
+    // 마지막으로 Registration 삭제
+    const result = await Registration.destroy({
+      where: { id: id },
+      transaction,
+    });
+
+    // 모든 작업이 성공적으로 완료된 경우 트랜잭션 커밋
+    await transaction.commit();
+
+    if (result > 0) {
+      res.json({ success: true, message: "Registration deleted successfully" });
+    } else {
+      res
+        .status(404)
+        .json({ success: false, message: "Registration not found" });
+    }
+  } catch (error) {
+    // 오류 발생 시 트랜잭션 롤백
+    await transaction.rollback();
+    console.error("Error deleting registration:", error);
+    res.status(500).json({ success: false, message: "Server error occurred" });
+  }
+});
+
 router.get("/get_registration", async (req, res) => {
   const { id } = req.query;
 
@@ -89,7 +342,7 @@ router.get("/get_registration", async (req, res) => {
     if (registration.type_id != 2) {
       const authorized = await checkPermission(req, res, [
         { club_rep: 4, club_id: registration.club_id },
-        { executive: 4 },
+        // { executive: 4 },
       ]);
       if (!authorized) {
         return;
@@ -509,6 +762,22 @@ router.post("/add_registration", async (req, res) => {
       })),
       { transaction }
     );
+
+    // activityReport 배열 처리
+    if (activityReport && activityReport.length > 0) {
+      for (const activity of activityReport) {
+        console.log(activity);
+        await RegistrationActivity.update(
+          {
+            registration: registration.id, // registration_id 업데이트
+          },
+          {
+            where: { id: activity.id },
+            transaction,
+          }
+        );
+      }
+    }
 
     // Commit the transaction
     await transaction.commit();

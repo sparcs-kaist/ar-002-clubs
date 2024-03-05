@@ -180,6 +180,10 @@ export const AddClubRegistration = ({ type = "provisional" }): JSX.Element => {
   const handleSubmit = async () => {
     let requiredFields = [registration.currentName, registration.division];
     if (type === "provisional") {
+      if (!registration.representativeSignature) {
+        alert("대표자 서명이 필요합니다.");
+        return;
+      }
     } else if (type === "promotional") {
       if (!registration.representativeSignature) {
         alert("대표자 서명이 필요합니다.");
@@ -211,6 +215,7 @@ export const AddClubRegistration = ({ type = "provisional" }): JSX.Element => {
     // Success callback
     const handleSuccess = (response: any) => {
       console.log("Activity added successfully:", response);
+      setRegistration(initialState);
       navigate("/club_registration");
       // Additional success logic here (e.g., redirecting or showing a success message)
     };
@@ -223,8 +228,6 @@ export const AddClubRegistration = ({ type = "provisional" }): JSX.Element => {
       );
       // Additional error handling logic here (e.g., showing an error message)
     };
-
-    setRegistration(initialState);
 
     // Send the POST request
     postRequest(

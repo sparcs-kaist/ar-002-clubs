@@ -116,6 +116,8 @@ export const ClubRegistrationDetail = (): JSX.Element => {
         },
         (error) => {
           console.error("Error fetching activities:", error);
+          alert("권한이 없습니다.");
+          navigate(-1);
         }
       );
     };
@@ -344,6 +346,31 @@ export const ClubRegistrationDetail = (): JSX.Element => {
         ...prevState,
         advisorSignature: false,
       }));
+    }
+  };
+
+  const handleDelete = async () => {
+    const confirmDelete = window.confirm("신청을 삭제하시겠습니까?");
+    if (!confirmDelete) {
+      return; // Stop if the user cancels
+    }
+
+    try {
+      await postRequest(
+        `registration/delete_registration?id=${id}`,
+        {},
+        () => {},
+        (error) => {
+          console.error(error);
+          alert(
+            "등록 신청을 삭제하는 중 에러가 발생했습니다. 다시 시도해주세요."
+          );
+        }
+      );
+      navigate(-1);
+    } catch (error) {
+      console.error("Error deleting activity:", error);
+      // Optionally, handle the error (e.g., show error message)
     }
   };
 
@@ -683,14 +710,14 @@ export const ClubRegistrationDetail = (): JSX.Element => {
                       양식 다운로드
                     </a>
                   </div>
-                  <input
+                  {/* <input
                     type="file"
                     onChange={(e) => {
                       if (e.target.files?.[0]) {
                         handleFileUpload(e.target.files[0], "activityPlan");
                       }
                     }}
-                  />
+                  /> */}
                   {groupProofImagesInPairs("activityPlan").map(
                     (pair, pairIndex) => (
                       <div key={pairIndex} className="frame-13">
@@ -699,7 +726,7 @@ export const ClubRegistrationDetail = (): JSX.Element => {
                             key={index}
                             url={image.imageUrl}
                             className="activity-proof-instance"
-                            property1="default"
+                            property1="variant-2"
                             fileName={image.fileName}
                             onDelete={() =>
                               handleDeleteImage(image.fileName, "activityPlan")
@@ -744,7 +771,7 @@ export const ClubRegistrationDetail = (): JSX.Element => {
                             key={index}
                             url={image.imageUrl}
                             className="activity-proof-instance"
-                            property1="default"
+                            property1="variant-2"
                             fileName={image.fileName}
                             onDelete={() =>
                               handleDeleteImage(image.fileName, "regulation")
@@ -792,7 +819,7 @@ export const ClubRegistrationDetail = (): JSX.Element => {
                             key={index}
                             url={image.imageUrl}
                             className="activity-proof-instance"
-                            property1="default"
+                            property1="variant-2"
                             fileName={image.fileName}
                             onDelete={() =>
                               handleDeleteImage(
@@ -926,7 +953,7 @@ export const ClubRegistrationDetail = (): JSX.Element => {
             {durationStatus == 1 && (
               <div
                 className="frame-17"
-                // onClick={handleDeleteFunding}
+                onClick={handleDelete}
                 style={{ cursor: "pointer" }}
               >
                 삭제
