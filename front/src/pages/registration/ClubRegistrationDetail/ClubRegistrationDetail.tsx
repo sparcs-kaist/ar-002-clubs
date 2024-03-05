@@ -95,56 +95,29 @@ export const ClubRegistrationDetail = (): JSX.Element => {
   });
 
   const [type, setType] = useState<string>("provisional");
+  const [isAdvisor, setIsAdvisor] = useState<Boolean>(false);
 
-  useEffect(() => {
-    const fetchRegistrationInfo = async () => {
-      if (!id) {
-        return;
-      }
-      console.log(`Fetching activities for clubId: ${id}`);
-      await getRequest(
-        `registration/get_registration?id=${id}`,
-        (data) => {
-          setRegistration(data.data);
-          const typeString =
-            data.data.typeId === 1
-              ? "provisioanl"
-              : data.data.typeId === 2
-              ? "promotional"
-              : "renewal";
-          setType(typeString);
-        },
-        (error) => {
-          console.error("Error fetching activities:", error);
-          alert("권한이 없습니다.");
-          navigate(-1);
-        }
-      );
-    };
-    fetchRegistrationInfo();
-  }, [id]);
-
-  useEffect(() => {
-    const fetchActivities = async () => {
-      if (!clubId) {
-        return;
-      }
-      console.log(`Fetching activities for clubId: ${clubId}`);
-      await getRequest(
-        `registration/activity_list?club_id=${clubId}`,
-        (data) => {
-          setRegistration({ ...registration, activityReport: data.activities });
-          console.log(data.activities);
-        },
-        (error) => {
-          console.error("Error fetching activities:", error);
-        }
-      );
-    };
-    {
-      type === "promotional" && fetchActivities();
-    }
-  }, [clubId, type]); // clubId를 의존성 배열에 추가
+  // useEffect(() => {
+  //   const fetchActivities = async () => {
+  //     if (!clubId) {
+  //       return;
+  //     }
+  //     console.log(`Fetching activities for clubId: ${clubId}`);
+  //     await getRequest(
+  //       `registration/activity_list?club_id=${clubId}`,
+  //       (data) => {
+  //         setRegistration({ ...registration, activityReport: data.activities });
+  //         console.log(data.activities);
+  //       },
+  //       (error) => {
+  //         console.error("Error fetching activities:", error);
+  //       }
+  //     );
+  //   };
+  //   {
+  //     type === "promotional" && fetchActivities();
+  //   }
+  // }, [clubId, type]); // clubId를 의존성 배열에 추가
 
   const noChange = () => {};
 
@@ -160,6 +133,24 @@ export const ClubRegistrationDetail = (): JSX.Element => {
       : value;
 
     setRegistration({ ...registration, [name]: inputValue });
+  };
+
+  const handleAdvisorChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >
+  ) => {
+    if (isAdvisor) {
+      const { name, value, type } = e.target;
+      const isCheckbox = type === "checkbox";
+      const inputValue = isCheckbox
+        ? (e.target as HTMLInputElement).checked
+        : value;
+
+      setRegistration({ ...registration, [name]: inputValue });
+    } else {
+      alert("지도교수만 입력 가능합니다.");
+    }
   };
 
   const handleSubmit = async () => {
@@ -329,23 +320,47 @@ export const ClubRegistrationDetail = (): JSX.Element => {
     }
   };
 
-  const handleAdvisorSign = () => {
-    if (!registration.advisorSignature) {
+  const checkAdvisorSignStatus = async () => {
+    await getRequest(
+      `registration/advisor_sign?id=${id}`,
+      (data) => {
+        setRegistration((prevState) => ({
+          ...prevState,
+          advisorSignature: data.signed,
+        }));
+      },
+      (error) => {
+        console.error("Error fetching sign status:", error);
+      }
+    );
+  };
+
+  const handleAdvisorSign = async () => {
+    if (isAdvisor) {
       const isConfirmed = window.confirm(
         "동아리가 작성한 등록 신청서의 내용을 모두 확인하였으며, 위 학생단체의 지도교수로 취임할 것을 승낙합니다."
       );
 
       if (isConfirmed) {
-        setRegistration((prevState) => ({
-          ...prevState,
-          advisorSignature: true,
-        }));
+        try {
+          // Sign request
+          await postRequest(
+            "registration/advisor_sign",
+            { id, advisor_plan: registration.advisorPlan },
+            () => {
+              checkAdvisorSignStatus();
+              alert("서명이 완료되었습니다.");
+            },
+            (error) => {
+              console.error("Error signing:", error);
+            }
+          );
+        } catch (error) {
+          console.error("Error sending sign request:", error);
+        }
       }
     } else {
-      setRegistration((prevState) => ({
-        ...prevState,
-        advisorSignature: false,
-      }));
+      alert("지도교수만 서명할 수 있습니다.");
     }
   };
 
@@ -373,6 +388,47 @@ export const ClubRegistrationDetail = (): JSX.Element => {
       // Optionally, handle the error (e.g., show error message)
     }
   };
+
+  useEffect(() => {
+    const fetchAdvisorRegistrations = async () => {
+      await getRequest(
+        `registration/is_advisor`,
+        (data) => {
+          setIsAdvisor(data.isAdvisor === 1);
+        },
+        (error) => {
+          console.error("Error fetching activities:", error);
+        }
+      );
+    };
+    const fetchRegistrationInfo = async () => {
+      if (!id) {
+        return;
+      }
+      console.log(`Fetching activities for clubId: ${id}`);
+      await getRequest(
+        `registration/get_registration?id=${id}`,
+        (data) => {
+          setRegistration(data.data);
+          const typeString =
+            data.data.typeId === 1
+              ? "provisioanl"
+              : data.data.typeId === 2
+              ? "promotional"
+              : "renewal";
+          setType(typeString);
+        },
+        (error) => {
+          console.error("Error fetching activities:", error);
+          alert("권한이 없습니다.");
+          navigate(-1);
+        }
+      );
+    };
+    fetchAdvisorRegistrations();
+    fetchRegistrationInfo();
+    checkAdvisorSignStatus();
+  }, [id]);
 
   return (
     <div className="club-registration">
@@ -871,12 +927,12 @@ export const ClubRegistrationDetail = (): JSX.Element => {
                   </p>
                   <div
                     className="frame-20"
-                    onClick={handleRepresentativeSign}
-                    style={
-                      !registration.representativeSignature
-                        ? { cursor: "pointer" }
-                        : {}
-                    }
+                    // onClick={handleRepresentativeSign}
+                    // style={
+                    //   !registration.representativeSignature
+                    //     ? { cursor: "pointer" }
+                    //     : {}
+                    // }
                   >
                     <div className="text-wrapper-11">
                       {registration.representativeSignature
@@ -897,7 +953,7 @@ export const ClubRegistrationDetail = (): JSX.Element => {
                       <textarea
                         name="advisorPlan"
                         value={registration.advisorPlan}
-                        onChange={handleChange}
+                        onChange={handleAdvisorChange}
                         placeholder="지도계획을 입력하세요."
                         className="text-wrapper-10"
                         style={{ height: "300px" }}
@@ -941,7 +997,8 @@ export const ClubRegistrationDetail = (): JSX.Element => {
           </div>
         </div>
         <UnderBar />
-        {durationStatus > 0 && (
+
+        {durationStatus > 0 && !isAdvisor && (
           <div className="frame-16">
             <div
               className="frame-17"

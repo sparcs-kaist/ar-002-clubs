@@ -24,6 +24,147 @@ const {
 const checkPermission = require("../utils/permission");
 const { checkRegistrationDuration } = require("../utils/duration");
 
+router.post("/advisor_sign", async (req, res) => {
+  const { id, advisor_plan } = req.body;
+
+  const registration = await Registration.findByPk(id);
+  if (!registration) {
+    return res
+      .status(404)
+      .json({ success: false, message: "Registration not found" });
+  }
+
+  try {
+    const signTime = new Date();
+    signTime.setHours(signTime.getHours() + 9); // UTC+9로 조정
+
+    await RegistrationSign.create({
+      registration: id,
+      sign_type: 2,
+      sign_time: signTime,
+    });
+
+    await registration.update({ advisor_plan });
+
+    res.json({ success: true, message: "Advisor sign recorded successfully" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, message: "Internal Server Error" });
+  }
+});
+
+router.get("/advisor_sign", async (req, res) => {
+  const { id } = req.query;
+
+  const currentDate = new Date();
+  const currentSemester = await Semester.findOne({
+    where: {
+      start_date: { [Op.lte]: currentDate },
+      end_date: { [Op.gte]: currentDate },
+    },
+  });
+
+  if (!currentSemester) {
+    return res
+      .status(404)
+      .json({ success: false, message: "Current semester not found" });
+  }
+
+  try {
+    const latestSign = await RegistrationSign.findOne({
+      where: {
+        registration: id,
+        sign_type: 2,
+      },
+      order: [["sign_time", "DESC"]],
+    });
+
+    const latestEdit = await Registration.findOne({
+      where: {
+        id,
+        semester_id: currentSemester.id,
+      },
+      order: [["recent_edit", "DESC"]],
+    });
+
+    const signed =
+      latestSign &&
+      (!latestEdit || latestSign.sign_time > latestEdit.recent_edit);
+
+    res.json({ signed });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, message: "Internal Server Error" });
+  }
+});
+
+router.get("/is_advisor", async (req, res) => {
+  const currentDate = new Date();
+  const currentSemester = await Semester.findOne({
+    where: {
+      start_date: { [Op.lte]: currentDate },
+      end_date: { [Op.gte]: currentDate },
+    },
+  });
+
+  if (!currentSemester) {
+    return res.status(404).json({
+      success: false,
+      message: "Current semester not found",
+    });
+  }
+
+  try {
+    const registrations = await Registration.findAll({
+      where: {
+        advisor_email: req.session.user.email,
+        semester_id: currentSemester.id,
+      },
+      include: [
+        {
+          model: RegistrationType,
+          as: "type",
+          attributes: ["registration_type"],
+        },
+      ],
+      attributes: [
+        "id",
+        "current_name",
+        "type_id",
+        "recent_edit",
+        "feedback_type",
+      ],
+      order: [["recent_edit", "ASC"]],
+    });
+
+    const formatDateString = (date) => {
+      if (!date) return "";
+      const d = new Date(date);
+      const year = d.getFullYear();
+      const month = String(d.getMonth() + 1).padStart(2, "0");
+      const day = String(d.getDate()).padStart(2, "0");
+      return `${year}.${month}.${day}.`;
+    };
+
+    // console.log(registration);
+    if (registrations.length == 0) return res.json({ isAdvisor: 0 });
+    else
+      return res.json({
+        isAdvisor: 1,
+        registrations: registrations.map((registration) => ({
+          id: registration.id,
+          currentName: registration.current_name,
+          registrationType: registration.type.registration_type,
+          recentEdit: formatDateString(registration.recent_edit),
+          feedbackType: registration.feedback_type,
+        })),
+      });
+  } catch (error) {
+    console.error("Error adding registration:", error);
+    res.status(500).json({ message: "Server error occurred" });
+  }
+});
+
 router.post("/edit_registration", async (req, res) => {
   try {
     const {
@@ -101,6 +242,18 @@ router.post("/edit_registration", async (req, res) => {
       return res
         .status(404)
         .json({ success: false, message: "Registration not found" });
+    }
+
+    if (!registration.student_id === req.session.user.student_id) {
+      if (registration.type_id != 2) {
+        const authorized = await checkPermission(req, res, [
+          { club_rep: 4, club_id: registration.club_id },
+          // { executive: 4 },
+        ]);
+        if (!authorized) {
+          return;
+        }
+      }
     }
 
     await registration.update(
@@ -225,6 +378,25 @@ router.post("/edit_registration", async (req, res) => {
 router.post("/delete_registration", async (req, res) => {
   const { id } = req.query;
 
+  const registration = await Registration.findByPk(id);
+  if (!registration) {
+    return res
+      .status(404)
+      .json({ success: false, message: "Registration not found" });
+  }
+
+  if (!registration.student_id === req.session.user.student_id) {
+    if (registration.type_id != 2) {
+      const authorized = await checkPermission(req, res, [
+        { club_rep: 4, club_id: registration.club_id },
+        // { executive: 4 },
+      ]);
+      if (!authorized) {
+        return;
+      }
+    }
+  }
+
   if (!id) {
     return res.status(400).json({
       success: false,
@@ -320,6 +492,7 @@ router.get("/get_registration", async (req, res) => {
       attributes: [
         "type_id",
         "club_id",
+        "student_id",
         "prev_name",
         "current_name",
         "founding_month",
@@ -339,13 +512,18 @@ router.get("/get_registration", async (req, res) => {
       ],
     });
 
-    if (registration.type_id != 2) {
-      const authorized = await checkPermission(req, res, [
-        { club_rep: 4, club_id: registration.club_id },
-        // { executive: 4 },
-      ]);
-      if (!authorized) {
-        return;
+    if (
+      !registration.advisor_email === req.session.user.email ||
+      !registration.student_id === req.session.user.student_id
+    ) {
+      if (registration.type_id != 2) {
+        const authorized = await checkPermission(req, res, [
+          { club_rep: 4, club_id: registration.club_id },
+          // { executive: 4 },
+        ]);
+        if (!authorized) {
+          return;
+        }
       }
     }
 
@@ -401,9 +579,6 @@ router.get("/get_registration", async (req, res) => {
       advisorPlan: registration.advisor_plan,
       representativeSignature: registration.RegistrationSigns.some(
         (sign) => sign.sign_type === 1
-      ),
-      advisorSignature: registration.RegistrationSigns.some(
-        (sign) => sign.sign_type === 2
       ),
     };
 
