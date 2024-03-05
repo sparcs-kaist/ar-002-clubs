@@ -412,7 +412,7 @@ export const ClubRegistrationDetail = (): JSX.Element => {
           setRegistration(data.data);
           const typeString =
             data.data.typeId === 1
-              ? "provisioanl"
+              ? "provisional"
               : data.data.typeId === 2
               ? "promotional"
               : "renewal";

@@ -108,7 +108,7 @@ export const EditClubRegistration = (): JSX.Element => {
           setRegistration(data.data);
           const typeString =
             data.data.typeId === 1
-              ? "provisioanl"
+              ? "provisional"
               : data.data.typeId === 2
               ? "promotional"
               : "renewal";
@@ -196,9 +196,13 @@ export const EditClubRegistration = (): JSX.Element => {
       clubId,
       typeId: type === "provisional" ? 1 : type === "promotional" ? 2 : 3,
     };
+    console.log(dataToSend.typeId);
+    console.log(type);
 
     // Success callback
     const handleSuccess = (response: any) => {
+      console.log(dataToSend);
+      console.log(type);
       console.log("Activity added successfully:", response);
       setRegistration(initialState);
       navigate(-1);
