@@ -51,6 +51,7 @@ var _RegistrationActivityEvidence = require("./RegistrationActivityEvidence");
 var _RegistrationActivityMember = require("./RegistrationActivityMember");
 var _RegistrationEvidence = require("./RegistrationEvidence");
 var _RegistrationEvidenceType = require("./RegistrationEvidenceType");
+var _RegistrationFeedback = require("./RegistrationFeedback");
 var _RegistrationSign = require("./RegistrationSign");
 var _RegistrationSignType = require("./RegistrationSignType");
 var _RegistrationType = require("./RegistrationType");
@@ -113,6 +114,7 @@ function initModels(sequelize) {
   var RegistrationActivityMember = _RegistrationActivityMember(sequelize, DataTypes);
   var RegistrationEvidence = _RegistrationEvidence(sequelize, DataTypes);
   var RegistrationEvidenceType = _RegistrationEvidenceType(sequelize, DataTypes);
+  var RegistrationFeedback = _RegistrationFeedback(sequelize, DataTypes);
   var RegistrationSign = _RegistrationSign(sequelize, DataTypes);
   var RegistrationSignType = _RegistrationSignType(sequelize, DataTypes);
   var RegistrationType = _RegistrationType(sequelize, DataTypes);
@@ -244,12 +246,16 @@ function initModels(sequelize) {
   Member.hasMany(Registration, { as: "Registrations", foreignKey: "student_id"});
   RegistrationActivityMember.belongsTo(Member, { as: "member_student", foreignKey: "member_student_id"});
   Member.hasMany(RegistrationActivityMember, { as: "RegistrationActivityMembers", foreignKey: "member_student_id"});
+  RegistrationFeedback.belongsTo(Member, { as: "student", foreignKey: "student_id"});
+  Member.hasMany(RegistrationFeedback, { as: "RegistrationFeedbacks", foreignKey: "student_id"});
   MemberClub.belongsTo(MemberStatus, { as: "semester", foreignKey: "semester_id"});
   MemberStatus.hasMany(MemberClub, { as: "MemberClubs", foreignKey: "semester_id"});
   RegistrationActivity.belongsTo(Registration, { as: "registration_Registration", foreignKey: "registration"});
   Registration.hasMany(RegistrationActivity, { as: "RegistrationActivities", foreignKey: "registration"});
   RegistrationEvidence.belongsTo(Registration, { as: "registration", foreignKey: "registration_id"});
   Registration.hasMany(RegistrationEvidence, { as: "RegistrationEvidences", foreignKey: "registration_id"});
+  RegistrationFeedback.belongsTo(Registration, { as: "registration_Registration", foreignKey: "registration"});
+  Registration.hasMany(RegistrationFeedback, { as: "RegistrationFeedbacks", foreignKey: "registration"});
   RegistrationSign.belongsTo(Registration, { as: "registration_Registration", foreignKey: "registration"});
   Registration.hasMany(RegistrationSign, { as: "RegistrationSigns", foreignKey: "registration"});
   RegistrationActivityEvidence.belongsTo(RegistrationActivity, { as: "activity", foreignKey: "activity_id"});
@@ -330,6 +336,7 @@ function initModels(sequelize) {
     RegistrationActivityMember,
     RegistrationEvidence,
     RegistrationEvidenceType,
+    RegistrationFeedback,
     RegistrationSign,
     RegistrationSignType,
     RegistrationType,

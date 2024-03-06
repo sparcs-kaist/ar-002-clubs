@@ -19,10 +19,26 @@ const {
   ActivityType,
   Club,
   SemesterClub,
-  RegistrationEvidenceType,
+  RegistrationFeedback,
 } = require("../models");
 const checkPermission = require("../utils/permission");
 const { checkRegistrationDuration } = require("../utils/duration");
+
+const formatSignTime = (signTime) => {
+  if (!signTime) return null;
+  const date = new Date(signTime);
+  const year = date.getFullYear();
+  const month = date.getMonth() + 1; // 0-11 -> 1-12
+  const day = date.getDate();
+  const hours = date.getHours();
+  const minutes = date.getMinutes();
+  const seconds = date.getSeconds();
+  return `${year}.${month.toString().padStart(2, "0")}.${day
+    .toString()
+    .padStart(2, "0")}. ${hours.toString().padStart(2, "0")}:${minutes
+    .toString()
+    .padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
+};
 
 router.post("/advisor_sign", async (req, res) => {
   const { id, advisor_plan } = req.body;
@@ -488,6 +504,11 @@ router.get("/get_registration", async (req, res) => {
           as: "RegistrationSigns",
           attributes: ["sign_type"],
         },
+        {
+          model: RegistrationFeedback,
+          as: "RegistrationFeedbacks",
+          attributes: ["added_time", "feedback"],
+        },
       ],
       attributes: [
         "type_id",
@@ -580,6 +601,18 @@ router.get("/get_registration", async (req, res) => {
       representativeSignature: registration.RegistrationSigns.some(
         (sign) => sign.sign_type === 1
       ),
+      feedbackResults: registration.RegistrationFeedbacks
+        ? registration.RegistrationFeedbacks.filter(
+            (feedback) => feedback.feedback.trim() !== ""
+          ) // Exclude empty feedback
+            .map((feedback) => {
+              return {
+                feedbackTime: formatSignTime(feedback.added_time),
+                text: feedback.feedback,
+                // reviewerName: feedback.student.name, // assuming you want to include the name of the reviewer
+              };
+            })
+        : [],
     };
 
     res.json({ success: true, data: formattedRegistration });

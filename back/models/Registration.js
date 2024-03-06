@@ -118,6 +118,10 @@ module.exports = function(sequelize, DataTypes) {
         model: 'Member',
         key: 'student_id'
       }
+    },
+    recent_feedback: {
+      type: DataTypes.DATE,
+      allowNull: true
     }
   }, {
     sequelize,
