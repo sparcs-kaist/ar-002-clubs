@@ -28,6 +28,11 @@ interface ActivityInfo {
   feedbackType: number;
 }
 
+interface FeedbackResult {
+  feedbackTime: string;
+  text: string;
+}
+
 interface RegistrationState {
   prevName: string;
   currentName: string;
@@ -51,6 +56,7 @@ interface RegistrationState {
   advisorPlan: string;
   representativeSignature: boolean;
   advisorSignature: boolean;
+  feedbackResults: FeedbackResult[];
 }
 
 const initialState: RegistrationState = {
@@ -76,6 +82,7 @@ const initialState: RegistrationState = {
   advisorPlan: "",
   representativeSignature: false,
   advisorSignature: false,
+  feedbackResults: [],
 };
 
 export const EditClubRegistration = (): JSX.Element => {

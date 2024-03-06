@@ -1,0 +1,436 @@
+.club-registration {
+  background-color: #f6feff;
+  height: 493px;
+  width: 1728px;
+}
+
+.club-registration .frame-3 {
+  align-items: flex-start;
+  background-color: #f6feff;
+  display: inline-flex;
+  flex-direction: column;
+  gap: 23px;
+  position: relative;
+}
+
+.club-registration .upper-bar {
+  background-size: 100% 100%;
+  height: 245px;
+  position: relative;
+  width: 1728px;
+}
+
+.club-registration .frame-wrapper {
+  align-items: flex-start;
+  display: flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+  gap: 10px;
+  padding: 10px 155px;
+  position: relative;
+  width: 1195px;
+}
+
+.club-registration .frame-7 {
+  align-items: flex-start;
+  display: flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+  gap: 40px;
+  margin-right: -155px;
+  position: relative;
+  width: 1040px;
+}
+
+.club-registration .frame-8 {
+  align-items: flex-start;
+  display: flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+  gap: 15px;
+  position: relative;
+  width: 1040px;
+}
+
+.club-registration .sub-title-instance {
+  margin-right: unset !important;
+}
+
+.club-registration .frame-9 {
+  align-items: flex-start;
+  display: inline-flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+  gap: 15px;
+  padding: 0px 20px;
+  position: relative;
+}
+
+.club-registration .div-2 {
+  color: #000000;
+  font-family: "NanumBarunGothic-Regular", Helvetica;
+  font-size: 20px;
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: normal;
+  margin-top: -1px;
+  position: relative;
+  white-space: nowrap;
+  width: fit-content;
+}
+
+.club-registration .span {
+  font-weight: 700;
+}
+
+.club-registration .span-notice {
+  font-weight: 400;
+  color: #888888 !important;
+}
+
+.club-registration .text-wrapper-8 {
+  padding: 5px;
+  color: #000000;
+  font-family: "NanumBarunGothic-Regular", Helvetica;
+  font-size: 20px;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+
+.club-registration .check-box {
+  width: 20px;
+  height: 20px;
+  position: relative;
+  margin-right: 10px;
+  margin-left: 3px;
+  transform: translate(0, 14%);
+}
+
+.club-registration .div-3 {
+  color: #000000;
+  font-family: "NanumBarunGothic-Regular", Helvetica;
+  font-size: 20px;
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: normal;
+  position: relative;
+  white-space: nowrap;
+  width: fit-content;
+  align-items: center;
+}
+
+.club-registration .frame-10 {
+  align-items: flex-start;
+  display: inline-flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+  gap: 15px;
+  margin-right: -3px;
+  position: relative;
+}
+
+.club-registration .text-wrapper-9 {
+  color: #000000;
+  font-family: "NanumBarunGothic-Regular", Helvetica;
+  font-size: 20px;
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: 30px;
+  position: relative;
+  width: 1003px;
+}
+
+.club-registration .frame-11 {
+  align-items: flex-start;
+  display: inline-flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+  gap: 15px;
+  position: relative;
+}
+
+.club-registration .text-wrapper-10 {
+  padding: 5px;
+  color: #000000;
+  font-family: "NanumBarunGothic-Regular", Helvetica;
+  font-size: 20px;
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: 30px;
+  margin-top: -1px;
+  position: relative;
+  width: 1000px;
+}
+
+.club-registration .frame-12 {
+  flex-direction: column;
+  gap: 15px;
+  margin-right: -1px;
+  position: relative;
+}
+
+.club-registration .frame-13 {
+  align-items: flex-start;
+  display: inline-flex;
+  flex: 0 0 auto;
+  gap: 15px;
+  position: relative;
+}
+
+.club-registration .activity-proof-instance {
+  position: relative !important;
+}
+
+.club-registration .frame-14 {
+  /* align-items: center; */
+  display: flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+  gap: 10px;
+  /* justify-content: center; */
+  /* padding: 10px; */
+  position: relative;
+  /* width: 1041px; */
+}
+
+.club-registration .frame-15 {
+  align-items: center;
+  background-color: #7cd2d8;
+  border-radius: 10px;
+  display: flex;
+  gap: 10px;
+  height: 32px;
+  justify-content: center;
+  overflow: hidden;
+  padding: 12px 9px;
+  position: relative;
+  width: 116px;
+}
+
+.club-registration .text-wrapper-11 {
+  color: #000000;
+  font-family: "NanumBarunGothic-Regular", Helvetica;
+  font-size: 18px;
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: 20px;
+  margin-bottom: -5px;
+  margin-top: -7px;
+  position: relative;
+  white-space: nowrap;
+  width: fit-content;
+}
+
+.club-registration .frame-21 {
+  align-items: flex-start;
+  display: inline-flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+  gap: 40px;
+  margin-right: -20px;
+  position: relative;
+}
+
+.club-registration .frame-22 {
+  align-items: flex-start;
+  display: inline-flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+  padding: 0px 20px;
+  position: relative;
+}
+
+.club-registration .activity-instance {
+  position: relative !important;
+}
+
+.club-registration .frame-28 {
+  align-items: flex-start;
+  display: flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+  gap: 10px;
+  padding: 0px 20px;
+  position: relative;
+  width: 1000px;
+}
+
+.club-registration .add-activity-button {
+  border: 1px solid;
+  border-color: #7cd2d8;
+  border-radius: 20px;
+  height: 48px;
+  margin-bottom: -1px;
+  margin-left: -1px;
+  margin-right: -1px;
+  margin-top: -1px;
+  position: relative;
+  width: 1000px;
+}
+
+.club-registration .frame-29 {
+  align-items: center;
+  display: flex;
+  gap: 20px;
+  left: 450px;
+  position: absolute;
+  top: 5px;
+  width: 150px;
+}
+
+.club-registration .group-3 {
+  height: 36px;
+  position: relative;
+  width: 30px;
+}
+
+.club-registration .overlap-group-2 {
+  height: 36px;
+  position: relative;
+  width: 28px;
+}
+
+.club-registration .ellipse {
+  background-color: #7cd2d8;
+  border-radius: 14px;
+  height: 28px;
+  left: 0;
+  position: absolute;
+  top: 6px;
+  width: 28px;
+}
+
+.club-registration .text-wrapper-13 {
+  color: #000000;
+  font-family: "Inter-Bold", Helvetica;
+  font-size: 30px;
+  font-weight: 700;
+  height: 36px;
+  left: 3px;
+  letter-spacing: 0;
+  line-height: normal;
+  position: absolute;
+  text-align: center;
+  top: 0;
+  white-space: nowrap;
+}
+
+.club-registration .text-wrapper-14 {
+  color: #000000;
+  font-family: "Inter-Regular", Helvetica;
+  font-size: 18px;
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: normal;
+  position: relative;
+  text-align: center;
+  width: fit-content;
+}
+
+.club-registration .text-wrapper-15 {
+  color: #000000;
+  font-family: "NanumBarunGothic-Regular", Helvetica;
+  font-size: 20px;
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: 30px;
+  margin-top: -1px;
+  position: relative;
+  width: 1000px;
+}
+
+.club-registration .activity-instance {
+  position: relative !important;
+  width: 1000px;
+}
+
+.club-registration .activity-state-wrapper {
+  width: 144px;
+}
+
+.club-registration .frame-4 {
+  width: 1000px;
+}
+
+.club-registration .frame-5 {
+  width: 42px;
+}
+
+.club-registration .frame-6 {
+  width: 144px;
+}
+
+.club-registration .frame-30 {
+  width: 258px;
+}
+.club-registration .div-wrapper {
+  width: 250px;
+}
+
+.club-registration .frame-31 {
+  width: 1000px;
+}
+
+.club-registration .frame-20 {
+  align-items: center;
+  background-color: #7cd2d8;
+  border-radius: 10px;
+  display: flex;
+  gap: 10px;
+  height: 32px;
+  justify-content: center;
+  overflow: hidden;
+  padding: 12px 9px;
+  position: relative;
+  width: 116px;
+}
+
+.club-registration .frame-14 {
+  align-items: center;
+  display: flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+  gap: 10px;
+  justify-content: center;
+  padding: 10px;
+  position: relative;
+  width: 1041px;
+}
+
+.club-registration .frame-15 {
+  align-items: center;
+  background-color: #7cd2d8;
+  border-radius: 10px;
+  display: flex;
+  gap: 10px;
+  height: 32px;
+  justify-content: center;
+  overflow: hidden;
+  padding: 12px 9px;
+  position: relative;
+  width: 116px;
+}
+
+.club-registration .frame-16 {
+  align-items: center;
+  display: flex;
+  gap: 11px;
+  justify-content: flex-end;
+  left: 1002px;
+  position: absolute;
+  top: 283px;
+  width: 192px;
+}
+
+.club-registration .frame-17 {
+  color: #000000;
+  font-family: "Inter-Regular", Helvetica;
+  font-size: 18px;
+  font-weight: 400;
+  height: 25px;
+  letter-spacing: 0;
+  line-height: normal;
+  margin-top: -1px;
+  position: relative;
+  width: 36px;
+}

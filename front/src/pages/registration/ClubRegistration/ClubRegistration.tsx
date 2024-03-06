@@ -34,33 +34,31 @@ export const ClubRegistration = (): JSX.Element => {
     const fetchAdvisorRegistrations = async () => {
       await getRequest(
         `registration/is_advisor`,
-        (data) => {
+        async (data) => {
           setRegistrations(data.registrations);
-          setIsAdvisor(data.isAdvisor === 1);
+          setIsAdvisor(data.isAdvisor === 1); // 이 호출은 비동기적으로 상태를 설정합니다.
           console.log(data);
+          if (data.isAdvisor === 0) {
+            await getRequest(
+              `registration/registration_list`,
+              (data) => {
+                setRegistrations(data.registrations);
+                console.log(data);
+              },
+              (error) => {
+                console.error("Error fetching registrations:", error);
+              }
+            );
+          }
         },
         (error) => {
-          console.error("Error fetching activities:", error);
+          console.error("Error fetching advisor registrations:", error);
         }
       );
     };
-    const fetchRegistrations = async () => {
-      await getRequest(
-        `registration/registration_list`,
-        (data) => {
-          setRegistrations(data.registrations);
-          console.log(data);
-        },
-        (error) => {
-          console.error("Error fetching activities:", error);
-        }
-      );
-    };
+
     fetchAdvisorRegistrations();
-    if (!isAdvisor) {
-      fetchRegistrations();
-    }
-  }, [clubId]);
+  }, [clubId]); // clubId가 변경될 때만 이 useEffect를 실행합니다.
 
   return (
     <div className="club-registration">

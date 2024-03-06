@@ -31,6 +31,8 @@ import { ClubRegistrationActivityDetail } from "pages/registration/ClubRegistrat
 import { EditClubRegistrationActivity } from "pages/registration/EditClubRegistrationActivity";
 import { ClubRegistrationDetail } from "pages/registration/ClubRegistrationDetail";
 import { EditClubRegistration } from "pages/registration/EditClubRegistration";
+import { ClubRegistrationDashboard } from "pages/admin/ClubRegistrationDashboard";
+import { ClubRegistrationAdminDetail } from "pages/admin/ClubRegistrationAdminDetail";
 
 export default function RouteSetup() {
   return (
@@ -115,6 +117,15 @@ export default function RouteSetup() {
       <Route path="/admin/funding_dashboard" element={<FundingDashboard />} />
       <Route path="/admin/club_funding/:id" element={<ClubFundingList />} />
       <Route path="/admin/funding/:id" element={<FundingAdminDetail />} />
+
+      <Route
+        path="/admin/registration_dashboard"
+        element={<ClubRegistrationDashboard />}
+      />
+      <Route
+        path="/admin/registration/:id"
+        element={<ClubRegistrationAdminDetail />}
+      />
     </Routes>
   );
 }

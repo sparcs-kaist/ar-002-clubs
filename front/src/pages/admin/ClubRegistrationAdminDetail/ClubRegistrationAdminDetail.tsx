@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { ActivityProof } from "components/activity/ActivityProof";
 import { SubTitle } from "components/home/SubTitle";
 import { UnderBar } from "components/home/UnderBar";
-import "./ClubRegistrationDetail.css";
+import "./ClubRegistrationAdminDetail.css";
 import { UpperBar } from "components/home/UpperBar";
 import { ActivityFeedback } from "components/activity/ActivityFeedback";
 import { getRequest, postRequest } from "utils/api";
@@ -54,6 +54,7 @@ interface RegistrationState {
   regulation: ProofImage[];
   externalTeacher: ProofImage[];
   advisorPlan: string;
+  feedback: string;
   representativeSignature: boolean;
   advisorSignature: boolean;
   feedbackResults: FeedbackResult[];
@@ -80,12 +81,13 @@ const initialState: RegistrationState = {
   regulation: [],
   externalTeacher: [],
   advisorPlan: "",
+  feedback: "",
   representativeSignature: false,
   advisorSignature: false,
   feedbackResults: [],
 };
 
-export const ClubRegistrationDetail = (): JSX.Element => {
+export const ClubRegistrationAdminDetail = (): JSX.Element => {
   const { userStatuses, isLoading } = useUserRepresentativeStatus(true);
   const { durationStatus } = useRegistrationDurationStatus();
   const navigate = useNavigate();
@@ -95,11 +97,8 @@ export const ClubRegistrationDetail = (): JSX.Element => {
   console.log(clubId);
   const typeId = userStatuses.length > 0 ? userStatuses[0].typeId : 0;
 
-  const [registration, setRegistration] = useState<RegistrationState>(() => {
-    // Try to load the registration state from local storage
-    const savedRegistration = localStorage.getItem("registration");
-    return savedRegistration ? JSON.parse(savedRegistration) : initialState;
-  });
+  const [registration, setRegistration] =
+    useState<RegistrationState>(initialState);
 
   const [type, setType] = useState<string>("provisional");
   const [isAdvisor, setIsAdvisor] = useState<Boolean>(false);
@@ -414,7 +413,7 @@ export const ClubRegistrationDetail = (): JSX.Element => {
       }
       console.log(`Fetching activities for clubId: ${id}`);
       await getRequest(
-        `registration/get_registration?id=${id}`,
+        `registration_feedback/get_registration?id=${id}`,
         (data) => {
           setRegistration(data.data);
           const typeString =
@@ -436,6 +435,23 @@ export const ClubRegistrationDetail = (): JSX.Element => {
     fetchRegistrationInfo();
     checkAdvisorSignStatus();
   }, [id]);
+
+  const handleReviewComplete = async () => {
+    try {
+      await postRequest(
+        "registration_feedback/feedback",
+        {
+          id,
+          reviewResult: registration.feedback,
+        },
+        () => navigate(-1)
+      );
+      // Go back after successful submission
+    } catch (error) {
+      console.error("Failed to post review:", error);
+      // Handle error (e.g., show an alert or message)
+    }
+  };
 
   const renderActivityFeedback = () => {
     return registration.feedbackResults?.map((feedback, index) => (
@@ -1013,12 +1029,31 @@ export const ClubRegistrationDetail = (): JSX.Element => {
             </div> */}
             <div className="frame-11">
               <SubTitle className="sub-title-instance" text="검토 결과" />
-              <div className="frame-9">{renderActivityFeedback()}</div>
+              <div className="frame-9">
+                <textarea
+                  name="feedback"
+                  value={registration.feedback}
+                  onChange={handleChange}
+                  placeholder="검토 내용을 입력하세요."
+                  className="text-wrapper-10"
+                  style={{ height: "300px" }}
+                />
+                <div className="frame-14">
+                  <div
+                    className="frame-15"
+                    style={{ cursor: "pointer" }}
+                    onClick={handleReviewComplete}
+                  >
+                    <div className="text-wrapper-11">검토 완료</div>
+                  </div>
+                </div>
+                {renderActivityFeedback()}
+              </div>
             </div>
           </div>
         </div>
         <UnderBar />
-
+        {/* 
         {durationStatus > 0 && !isAdvisor && (
           <div className="frame-16">
             <div
@@ -1038,7 +1073,7 @@ export const ClubRegistrationDetail = (): JSX.Element => {
               </div>
             )}
           </div>
-        )}
+        )} */}
       </div>
     </div>
   );
