@@ -264,7 +264,7 @@ router.post("/edit_registration", async (req, res) => {
       if (registration.type_id != 2) {
         const authorized = await checkPermission(req, res, [
           { club_rep: 4, club_id: registration.club_id },
-          // { executive: 4 },
+          { executive: 3 },
         ]);
         if (!authorized) {
           return;
@@ -394,6 +394,18 @@ router.post("/edit_registration", async (req, res) => {
 router.post("/delete_registration", async (req, res) => {
   const { id } = req.query;
 
+  if (!registration.student_id === req.session.user.student_id) {
+    if (registration.type_id != 2) {
+      const authorized = await checkPermission(req, res, [
+        { club_rep: 4, club_id: registration.club_id },
+        { executive: 3 },
+      ]);
+      if (!authorized) {
+        return;
+      }
+    }
+  }
+
   const registration = await Registration.findByPk(id);
   if (!registration) {
     return res
@@ -432,6 +444,11 @@ router.post("/delete_registration", async (req, res) => {
     // 관련 RegistrationEvidence 삭제
     await RegistrationEvidence.destroy({
       where: { registration_id: id },
+      transaction,
+    });
+
+    await RegistrationFeedback.destroy({
+      where: { registration: id },
       transaction,
     });
 
@@ -540,7 +557,7 @@ router.get("/get_registration", async (req, res) => {
       if (registration.type_id != 2) {
         const authorized = await checkPermission(req, res, [
           { club_rep: 4, club_id: registration.club_id },
-          // { executive: 4 },
+          { executive: 4 },
         ]);
         if (!authorized) {
           return;
