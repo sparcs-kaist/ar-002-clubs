@@ -128,7 +128,13 @@ async function checkRegistrationDuration() {
   const durations = await Duration.findAll({
     where: {
       semester_id: currentSemester.id,
-      duration_name: { [Op.or]: ["ClubRegistration", "MemberRegistration"] },
+      duration_name: {
+        [Op.or]: [
+          "ClubRegistration",
+          "ClubRegistrationModify",
+          "MemberRegistration",
+        ],
+      },
     },
     attributes: ["duration_name", "start_date", "end_date"],
   });

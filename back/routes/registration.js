@@ -225,8 +225,8 @@ router.post("/edit_registration", async (req, res) => {
 
     console.log(req.body);
     const durationCheck = await checkRegistrationDuration();
-    if (durationCheck.registrationStatus !== 1) {
-      return res.status(400).send({ message: "활동 추가 기한이 지났습니다." });
+    if (durationCheck.registrationStatus === 0) {
+      return res.status(400).send({ message: "활동 수정 기한이 지났습니다." });
     }
 
     const transaction = await sequelize.transaction();
@@ -477,6 +477,11 @@ router.get("/get_registration", async (req, res) => {
       success: false,
       message: "ID query parameter is required",
     });
+  }
+
+  const durationCheck = await checkRegistrationDuration();
+  if (durationCheck.registrationStatus === 0) {
+    return res.status(400).send({ message: "활동 수정 기한이 지났습니다." });
   }
 
   try {
@@ -1006,7 +1011,7 @@ router.post("/add_registration", async (req, res) => {
 
 router.post("/addActivity", async (req, res) => {
   const durationCheck = await checkRegistrationDuration();
-  if (durationCheck.registrationStatus !== 1) {
+  if (durationCheck.registrationStatus === 0) {
     console.log("활동 추가 기한이 지났습니다.");
     return res.status(400).send({ message: "활동 추가 기한이 지났습니다." });
   }
