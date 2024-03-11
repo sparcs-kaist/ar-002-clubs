@@ -150,7 +150,7 @@ async function checkRegistrationDuration() {
     ) {
       responseCode = 1;
     } else if (
-      duration.duration_name === "MemberRegistration" &&
+      duration.duration_name === "ClubRegistrationModify" &&
       currentDate >= startDate &&
       currentDate <= endDate
     ) {

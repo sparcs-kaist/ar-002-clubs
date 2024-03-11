@@ -83,15 +83,21 @@ export const ClubRegistration = (): JSX.Element => {
                     </p>
                     <div className="frame-12">
                       <div className="frame-14">
-                        <div
-                          className="frame-15"
-                          style={{ cursor: "pointer" }}
-                          onClick={() =>
-                            navigate("/add_club_registration/provisional")
-                          }
-                        >
-                          <div className="text-wrapper-11">등록 신청</div>
-                        </div>
+                        {durationStatus === 1 ? (
+                          <div
+                            className="frame-15"
+                            style={{ cursor: "pointer" }}
+                            onClick={() =>
+                              navigate("/add_club_registration/provisional")
+                            }
+                          >
+                            <div className="text-wrapper-11">등록 신청</div>
+                          </div>
+                        ) : (
+                          <div className="frame-15">
+                            <div className="text-wrapper-11">등록 불가</div>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -110,15 +116,21 @@ export const ClubRegistration = (): JSX.Element => {
                     </p>
                     <div className="frame-12">
                       <div className="frame-14">
-                        <div
-                          className="frame-15"
-                          style={{ cursor: "pointer" }}
-                          onClick={() =>
-                            navigate("/add_club_registration/promotional")
-                          }
-                        >
-                          <div className="text-wrapper-11">등록 신청</div>
-                        </div>
+                        {durationStatus === 1 ? (
+                          <div
+                            className="frame-15"
+                            style={{ cursor: "pointer" }}
+                            onClick={() =>
+                              navigate("/add_club_registration/promotional")
+                            }
+                          >
+                            <div className="text-wrapper-11">등록 신청</div>
+                          </div>
+                        ) : (
+                          <div className="frame-15">
+                            <div className="text-wrapper-11">등록 불가</div>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -132,7 +144,7 @@ export const ClubRegistration = (): JSX.Element => {
                     </p>
                     <div className="frame-12">
                       <div className="frame-14">
-                        {typeId ? (
+                        {typeId && durationStatus === 1 ? (
                           <div
                             className="frame-15"
                             style={{ cursor: "pointer" }}

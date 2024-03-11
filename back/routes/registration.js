@@ -103,9 +103,8 @@ router.get("/advisor_sign", async (req, res) => {
       order: [["recent_edit", "DESC"]],
     });
 
-    const signed =
-      latestSign &&
-      (!latestEdit || latestSign.sign_time > latestEdit.recent_edit);
+    const signed = latestSign ? true : false;
+    // (!latestEdit || latestSign.sign_time > latestEdit.recent_edit);
 
     res.json({ signed });
   } catch (error) {
