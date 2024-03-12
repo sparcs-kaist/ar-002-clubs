@@ -44,7 +44,7 @@ app.use(
     cookie: {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production", // HTTPS 환경에서만 true
-      maxAge: 1000 * 60 * 60 * 3, // 예: 24시간
+      maxAge: 1000 * 60 * 60 * 3,
     },
   })
 );

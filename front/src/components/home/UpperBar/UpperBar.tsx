@@ -3,7 +3,7 @@ We're constantly improving the code you see.
 Please share your feedback here: https://form.asana.com/?k=uvp-HPgd3_hyoXRBw1IcNg&d=1152665201300829
 */
 
-import React, { useState, FormEvent } from "react";
+import React, { useState, FormEvent, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { LoadingBar } from "../LoadingBar";
 import { UpperbarMenu } from "../UpperbarMenu";
@@ -52,8 +52,8 @@ export const UpperBar = ({ className, title }: Props): JSX.Element => {
     }
   };
 
-  const handleLogout = async (e: FormEvent) => {
-    e.preventDefault();
+  const handleLogout = async () => {
+    // e.preventDefault();
 
     // Confirmation dialog
     const isConfirmed = window.confirm("정말 로그아웃 하시겠습니까?");
@@ -79,6 +79,34 @@ export const UpperBar = ({ className, title }: Props): JSX.Element => {
       }
     }
   };
+
+  useEffect(() => {
+    const checkSession = async () => {
+      getRequest(
+        "auth/check-session",
+        (data) => {
+          if (!data.isLoggedIn) {
+            alert("세션이 만료되었습니다");
+            logout(); // Assuming 'logout' is a function that handles the client-side logout process
+            deleteExecutive();
+          }
+        },
+        (error) => {
+          alert("세션이 만료되었습니다");
+          logout(); // Assuming 'logout' is a function that handles the client-side logout process
+          deleteExecutive();
+          console.error("세션 확인 중 오류가 발생했습니다.", error);
+        }
+      );
+    };
+    if (user) {
+      checkSession();
+      // 선택적으로, setInterval을 사용하여 정기적으로 세션 상태를 확인할 수 있습니다.
+      const intervalId = setInterval(checkSession, 1000 * 60 * 5); // 예: 5분마다 세션 확인
+      // 컴포넌트가 언마운트될 때 setInterval을 정리합니다.
+      return () => clearInterval(intervalId);
+    }
+  }, [deleteExecutive, logout, user]);
 
   return (
     <div className={`upper-bar ${className}`}>

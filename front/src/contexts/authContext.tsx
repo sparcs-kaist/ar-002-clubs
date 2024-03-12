@@ -1,4 +1,11 @@
-import React, { createContext, ReactNode, useContext, useState, useEffect } from 'react';
+import React, {
+  createContext,
+  ReactNode,
+  useContext,
+  useState,
+  useEffect,
+} from "react";
+import { getRequest } from "utils/api";
 
 interface AuthContextProps {
   user: any | null;
@@ -17,7 +24,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   useEffect(() => {
     // 페이지를 로드할 때 localStorage에서 사용자 정보를 로드합니다.
-    const userInfo = localStorage.getItem('user');
+    const userInfo = localStorage.getItem("user");
     if (userInfo) {
       setUser(JSON.parse(userInfo));
     }
@@ -25,12 +32,12 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   const login = (userInfo: any) => {
     setUser(userInfo);
-    localStorage.setItem('user', JSON.stringify(userInfo));
+    localStorage.setItem("user", JSON.stringify(userInfo));
   };
 
   const logout = () => {
     setUser(null);
-    localStorage.removeItem('user');
+    localStorage.removeItem("user");
   };
 
   const value = {
@@ -45,7 +52,10 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
 };
+function deleteExecutive() {
+  throw new Error("Function not implemented.");
+}

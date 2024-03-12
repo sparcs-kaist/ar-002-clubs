@@ -14,6 +14,18 @@ const client = new Client(clientId, secretKey);
 //   saveUninitialized: true
 // }));
 
+router.get("/check-session", (req, res) => {
+  if (!req.session.user) {
+    // 세션이 만료되었거나 로그인 상태가 아님
+    res
+      .status(401)
+      .json({ message: "세션이 만료되었습니다", isLoggedIn: false });
+  } else {
+    // 세션이 유효함
+    res.status(200).json({ isLoggedIn: true, user: req.session.user });
+  }
+});
+
 router.get("/login", async (req, res) => {
   const { url, state } = client.getLoginParams();
   req.session.state = state;
