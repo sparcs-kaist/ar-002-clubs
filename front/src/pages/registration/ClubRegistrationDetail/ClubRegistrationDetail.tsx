@@ -402,6 +402,7 @@ export const ClubRegistrationDetail = (): JSX.Element => {
         `registration/is_advisor`,
         (data) => {
           setIsAdvisor(data.isAdvisor === 1);
+          checkAdvisorSignStatus();
         },
         (error) => {
           console.error("Error fetching activities:", error);
@@ -424,6 +425,7 @@ export const ClubRegistrationDetail = (): JSX.Element => {
               ? "promotional"
               : "renewal";
           setType(typeString);
+          checkAdvisorSignStatus();
         },
         (error) => {
           console.error("Error fetching activities:", error);
@@ -434,7 +436,6 @@ export const ClubRegistrationDetail = (): JSX.Element => {
     };
     fetchAdvisorRegistrations();
     fetchRegistrationInfo();
-    checkAdvisorSignStatus();
   }, [id]);
 
   const renderActivityFeedback = () => {
@@ -556,17 +557,25 @@ export const ClubRegistrationDetail = (): JSX.Element => {
                     </select>
                   </div>
                 </p>
+                {type === "provisional" && (
+                  <p className="div-3">
+                    <input
+                      type="checkbox"
+                      name="isSelectiveAdvisor"
+                      checked={registration.isSelectiveAdvisor}
+                      onChange={noChange}
+                      className="check-box"
+                    />
+                    <span className="span">지도교수 없음</span>
+                  </p>
+                )}
               </div>
             </div>
-            {(type === "promotional" || type === "renewal") &&
-              !registration.isSelectiveAdvisor && (
-                <div className="frame-8">
-                  <SubTitle
-                    className="sub-title-instance"
-                    text="지도교수 정보"
-                  />
-                  <div className="frame-9">
-                    {/* <p className="div-3">
+            {!registration.isSelectiveAdvisor && (
+              <div className="frame-8">
+                <SubTitle className="sub-title-instance" text="지도교수 정보" />
+                <div className="frame-9">
+                  {/* <p className="div-3">
                     <input
                       type="checkbox"
                       name="isAdvisor"
@@ -580,52 +589,50 @@ export const ClubRegistrationDetail = (): JSX.Element => {
                     </span>
                   </p> */}
 
-                    <p className="div-3">
-                      <span className="span">성함: </span>
-                      <input
-                        type="text"
-                        name="advisorName"
-                        value={registration.advisorName}
+                  <p className="div-3">
+                    <span className="span">성함: </span>
+                    <input
+                      name="advisorName"
+                      value={registration.advisorName}
+                      onChange={noChange}
+                      placeholder="지도교수 성함을 입력하세요."
+                      className="text-wrapper-8"
+                      style={{ width: "954px" }}
+                    />
+                  </p>
+                  <p className="div-3">
+                    <span className="span">카이스트 이메일: </span>
+                    <input
+                      name="advisorEmail"
+                      value={registration.advisorEmail}
+                      onChange={noChange}
+                      placeholder="지도교수 카이스트 이메일을 입력하세요."
+                      className="text-wrapper-8"
+                      style={{ width: "860px" }}
+                    />
+                  </p>
+                  <p className="div-3">
+                    <div className="dropdown-container">
+                      <label className="span" htmlFor="activity-type">
+                        직급:
+                      </label>
+                      <select
+                        name="advisorLevel"
+                        id="activity-type"
+                        value={registration.advisorLevel}
                         onChange={noChange}
-                        placeholder="지도교수 성함을 입력하세요."
                         className="text-wrapper-8"
-                        style={{ width: "954px" }}
-                      />
-                    </p>
-                    <p className="div-3">
-                      <span className="span">카이스트 이메일: </span>
-                      <input
-                        type="text"
-                        name="advisorEmail"
-                        value={registration.advisorEmail}
-                        onChange={noChange}
-                        placeholder="지도교수 카이스트 이메일을 입력하세요."
-                        className="text-wrapper-8"
-                        style={{ width: "860px" }}
-                      />
-                    </p>
-                    <p className="div-3">
-                      <div className="dropdown-container">
-                        <label className="span" htmlFor="activity-type">
-                          직급:
-                        </label>
-                        <select
-                          name="advisorLevel"
-                          id="activity-type"
-                          value={registration.advisorLevel}
-                          onChange={noChange}
-                          className="text-wrapper-8"
-                        >
-                          <option value="-1">직급 선택...</option>
-                          <option value="1">정교수</option>
-                          <option value="2">부교수</option>
-                          <option value="3">조교수</option>
-                        </select>
-                      </div>
-                    </p>
-                  </div>
+                      >
+                        <option value="-1">직급 선택...</option>
+                        <option value="1">정교수</option>
+                        <option value="2">부교수</option>
+                        <option value="3">조교수</option>
+                      </select>
+                    </div>
+                  </p>
                 </div>
-              )}
+              </div>
+            )}
             <div className="frame-8">
               <SubTitle className="sub-title-instance" text="활동분야" />
               <div className="frame-9">
@@ -1028,15 +1035,13 @@ export const ClubRegistrationDetail = (): JSX.Element => {
             >
               수정
             </div>
-            {durationStatus == 1 && (
-              <div
-                className="frame-17"
-                onClick={handleDelete}
-                style={{ cursor: "pointer" }}
-              >
-                삭제
-              </div>
-            )}
+            <div
+              className="frame-17"
+              onClick={handleDelete}
+              style={{ cursor: "pointer" }}
+            >
+              삭제
+            </div>
           </div>
         )}
       </div>

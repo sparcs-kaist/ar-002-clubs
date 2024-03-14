@@ -400,6 +400,11 @@ router.post("/delete_registration", async (req, res) => {
       .json({ success: false, message: "Registration not found" });
   }
 
+  const durationCheck = await checkRegistrationDuration();
+  if (durationCheck.registrationStatus === 0) {
+    return res.status(400).send({ message: "활동 수정 기한이 지났습니다." });
+  }
+
   if (!registration.student_id === req.session.user.student_id) {
     if (registration.type_id != 2) {
       const authorized = await checkPermission(req, res, [
@@ -477,11 +482,6 @@ router.get("/get_registration", async (req, res) => {
       success: false,
       message: "ID query parameter is required",
     });
-  }
-
-  const durationCheck = await checkRegistrationDuration();
-  if (durationCheck.registrationStatus === 0) {
-    return res.status(400).send({ message: "활동 수정 기한이 지났습니다." });
   }
 
   try {

@@ -120,6 +120,7 @@ export const EditClubRegistration = (): JSX.Element => {
               ? "promotional"
               : "renewal";
           setType(typeString);
+          // if(type === 'provisional') setRegistration({...registration,isSelectiveAdvisor:true})
         },
         (error) => {
           console.error("Error fetching activities:", error);
@@ -472,76 +473,70 @@ export const EditClubRegistration = (): JSX.Element => {
                     </select>
                   </div>
                 </p>
-              </div>
-            </div>
-            {(type === "promotional" || type === "renewal") &&
-              !registration.isSelectiveAdvisor && (
-                <div className="frame-8">
-                  <SubTitle
-                    className="sub-title-instance"
-                    text="지도교수 정보"
-                  />
-                  <div className="frame-9">
-                    {/* <p className="div-3">
+                {type === "provisional" && (
+                  <p className="div-3">
                     <input
                       type="checkbox"
-                      name="isAdvisor"
+                      name="isSelectiveAdvisor"
                       checked={registration.isSelectiveAdvisor}
                       onChange={handleChange}
                       className="check-box"
                     />
-                    <span className="span">
-                      지도교수 없음 (기존에 선택적 교수를 신청했던 동아리만
-                      가능합니다.)
-                    </span>
-                  </p> */}
-
-                    <p className="div-3">
-                      <span className="span">성함: </span>
-                      <input
-                        type="text"
-                        name="advisorName"
-                        value={registration.advisorName}
+                    <span className="span">지도교수 없음</span>
+                  </p>
+                )}
+              </div>
+            </div>
+            {!registration.isSelectiveAdvisor && (
+              <div className="frame-8">
+                <SubTitle className="sub-title-instance" text="지도교수 정보" />
+                <div className="frame-9">
+                  <p className="div-3">
+                    <span className="span">성함: </span>
+                    <input
+                      type="text"
+                      name="advisorName"
+                      value={registration.advisorName}
+                      onChange={handleChange}
+                      placeholder="지도교수 성함을 입력하세요."
+                      className="text-wrapper-8"
+                      style={{ width: "954px" }}
+                    />
+                  </p>
+                  <p className="div-3">
+                    <span className="span">카이스트 이메일: </span>
+                    <input
+                      type="text"
+                      name="advisorEmail"
+                      value={registration.advisorEmail}
+                      onChange={handleChange}
+                      placeholder="지도교수 카이스트 이메일을 입력하세요."
+                      className="text-wrapper-8"
+                      style={{ width: "860px" }}
+                    />
+                  </p>
+                  <p className="div-3">
+                    <div className="dropdown-container">
+                      <label className="span" htmlFor="activity-type">
+                        직급:
+                      </label>
+                      <select
+                        name="advisorLevel"
+                        id="activity-type"
+                        value={registration.advisorLevel}
                         onChange={handleChange}
-                        placeholder="지도교수 성함을 입력하세요."
                         className="text-wrapper-8"
-                        style={{ width: "954px" }}
-                      />
-                    </p>
-                    <p className="div-3">
-                      <span className="span">카이스트 이메일: </span>
-                      <input
-                        type="text"
-                        name="advisorEmail"
-                        value={registration.advisorEmail}
-                        onChange={handleChange}
-                        placeholder="지도교수 카이스트 이메일을 입력하세요."
-                        className="text-wrapper-8"
-                        style={{ width: "860px" }}
-                      />
-                    </p>
-                    <p className="div-3">
-                      <div className="dropdown-container">
-                        <label className="span" htmlFor="activity-type">
-                          직급:
-                        </label>
-                        <select
-                          name="advisorLevel"
-                          id="activity-type"
-                          value={registration.advisorLevel}
-                          onChange={handleChange}
-                          className="text-wrapper-8"
-                        >
-                          <option value="-1">직급 선택...</option>
-                          <option value="1">정교수</option>
-                          <option value="2">부교수</option>
-                          <option value="3">조교수</option>
-                        </select>
-                      </div>
-                    </p>
-                  </div>
+                      >
+                        <option value="-1">직급 선택...</option>
+                        <option value="1">정교수</option>
+                        <option value="2">부교수</option>
+                        <option value="3">조교수</option>
+                      </select>
+                    </div>
+                  </p>
                 </div>
-              )}
+              </div>
+            )}
             <div className="frame-8">
               <SubTitle className="sub-title-instance" text="활동분야" />
               <div className="frame-9">

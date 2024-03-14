@@ -401,6 +401,7 @@ export const ClubRegistrationAdminDetail = (): JSX.Element => {
         `registration/is_advisor`,
         (data) => {
           setIsAdvisor(data.isAdvisor === 1);
+          checkAdvisorSignStatus();
         },
         (error) => {
           console.error("Error fetching activities:", error);
@@ -423,6 +424,7 @@ export const ClubRegistrationAdminDetail = (): JSX.Element => {
               ? "promotional"
               : "renewal";
           setType(typeString);
+          checkAdvisorSignStatus();
         },
         (error) => {
           console.error("Error fetching activities:", error);
@@ -433,7 +435,6 @@ export const ClubRegistrationAdminDetail = (): JSX.Element => {
     };
     fetchAdvisorRegistrations();
     fetchRegistrationInfo();
-    checkAdvisorSignStatus();
   }, [id]);
 
   const handleReviewComplete = async () => {
