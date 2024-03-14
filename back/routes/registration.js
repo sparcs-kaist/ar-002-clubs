@@ -1216,7 +1216,7 @@ router.get("/getActivity/:activityId", async (req, res) => {
     const authorized = await checkPermission(req, res, [
       { club_rep: 4, club_id: activity.club_id },
       { advisor: activity.club_id },
-      // { executive: 4 },
+      { executive: 4 },
     ]);
     if (!authorized) {
       return;
