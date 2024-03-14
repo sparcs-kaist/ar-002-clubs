@@ -13,10 +13,12 @@ const {
   RegistrationActivity,
   RegistrationActivityEvidence,
   RegistrationActivityMember,
+  RegistrationActivityFeedback,
   Semester,
   RegistrationEvidence,
   RegistrationSign,
   ActivityType,
+  Member,
   Club,
   SemesterClub,
   RegistrationFeedback,
@@ -300,11 +302,6 @@ router.post("/edit_registration", async (req, res) => {
       { transaction }
     );
 
-    await RegistrationActivity.destroy({
-      where: { registration: id },
-      transaction,
-    });
-
     // 관련 RegistrationEvidence 삭제
     await RegistrationEvidence.destroy({
       where: { registration_id: id },
@@ -507,6 +504,13 @@ router.get("/get_registration", async (req, res) => {
             "end_date",
             "feedback_type",
           ],
+          include: [
+            {
+              model: ActivityType,
+              as: "activity_type",
+              attributes: ["type"],
+            },
+          ],
         },
         {
           model: RegistrationSign,
@@ -562,6 +566,15 @@ router.get("/get_registration", async (req, res) => {
     }
     console.log(registration.RegistrationEvidences);
 
+    const formatDateString = (date) => {
+      if (!date) return "";
+      const d = new Date(date);
+      const year = d.getFullYear();
+      const month = String(d.getMonth() + 1).padStart(2, "0");
+      const day = String(d.getDate()).padStart(2, "0");
+      return `${year}.${month}.${day}.`;
+    };
+
     const formattedRegistration = {
       typeId: registration.type_id,
       prevName: registration.prev_name,
@@ -580,7 +593,14 @@ router.get("/get_registration", async (req, res) => {
       purpose: registration.purpose,
       mainPlan: registration.main_plan,
       activityReport: registration.RegistrationActivities
-        ? registration.RegistrationActivities
+        ? registration.RegistrationActivities.map((activity) => ({
+            id: activity.id,
+            title: activity.title,
+            activityType: activity.activity_type_id,
+            startDate: formatDateString(activity.start_date),
+            endDate: formatDateString(activity.end_date),
+            feedbackType: activity.feedback_type,
+          }))
         : [],
       activityPlan: registration.RegistrationEvidences
         ? registration.RegistrationEvidences.filter(
@@ -1006,6 +1026,299 @@ router.post("/add_registration", async (req, res) => {
   } catch (error) {
     console.error("Error adding registration:", error);
     res.status(500).json({ message: "Server error occurred" });
+  }
+});
+
+router.post("/editActivity", async (req, res) => {
+  const {
+    activityId, // Added this line to handle existing activity ID
+    clubId,
+    name: title,
+    type: activityTypeId,
+    category,
+    startDate,
+    endDate,
+    location,
+    purpose,
+    content,
+    proofText,
+    participants,
+    proofImages,
+    feedbackResults,
+  } = req.body;
+
+  const transaction = await sequelize.transaction();
+
+  // Calculate the current date/time in KST (Korean Standard Time)
+  const currentDateTimeUTC = new Date();
+  const kstOffset = 9 * 60; // 9 hours in minutes
+  currentDateTimeUTC.setMinutes(currentDateTimeUTC.getMinutes() + kstOffset);
+
+  try {
+    let activity;
+    if (activityId) {
+      // Update existing activity
+      activity = await RegistrationActivity.findByPk(activityId);
+      const authorized = await checkPermission(req, res, [
+        { club_rep: 4, club_id: activity.club_id },
+      ]);
+      if (!authorized) {
+        return;
+      }
+      await activity.update(
+        {
+          club_id: clubId,
+          title,
+          activity_type_id: activityTypeId,
+          start_date: startDate,
+          end_date: endDate,
+          location,
+          purpose,
+          content,
+          proof_text: proofText,
+          feedback_type: 1,
+          recent_edit: currentDateTimeUTC,
+        },
+        { transaction }
+      );
+
+      // Delete existing evidence and participants
+      await RegistrationActivityEvidence.destroy({
+        where: { activity_id: activityId },
+        transaction,
+      });
+      await RegistrationActivityMember.destroy({
+        where: { activity_id: activityId },
+        transaction,
+      });
+    } else {
+      // Create new activity
+      activity = await RegistrationActivity.create(
+        {
+          club_id: clubId,
+          title,
+          activity_type_id: activityTypeId,
+          start_date: startDate,
+          end_date: endDate,
+          location,
+          purpose,
+          content,
+          proof_text: proofText,
+          feedback_type: 1,
+          recent_edit: new Date(),
+        },
+        { transaction }
+      );
+    }
+
+    // Add new evidence and participants
+    await Promise.all(
+      proofImages.map((image) =>
+        RegistrationActivityEvidence.create(
+          {
+            activity_id: activity.id,
+            image_url: image.imageUrl,
+            description: image.fileName,
+          },
+          { transaction }
+        )
+      )
+    );
+    await Promise.all(
+      participants.map((participant) =>
+        RegistrationActivityMember.create(
+          {
+            activity_id: activity.id,
+            member_student_id: participant.student_id,
+          },
+          { transaction }
+        )
+      )
+    );
+
+    await transaction.commit();
+    res.status(200).send({
+      message: "Activity updated successfully",
+      activityId: activity.id,
+    });
+  } catch (error) {
+    await transaction.rollback();
+    console.error("Error updating activity:", error);
+    res.status(500).send("Error updating activity");
+  }
+});
+
+router.post("/deleteActivity/:activityId", async (req, res) => {
+  const durationCheck = await checkRegistrationDuration();
+  if (!durationCheck.found || durationCheck.reportStatus == 0) {
+    return res.status(400).send({ message: "활동 추가 기한이 지났습니다." });
+  }
+
+  const { activityId } = req.params;
+  const transaction = await sequelize.transaction();
+
+  try {
+    const activity = await RegistrationActivity.findByPk(activityId);
+    const authorized = await checkPermission(req, res, [
+      { club_rep: 4, club_id: activity.club_id },
+    ]);
+    if (!authorized) {
+      return;
+    }
+
+    // Delete from ActivityEvidence
+    await RegistrationActivityEvidence.destroy({
+      where: { activity_id: activityId },
+      transaction,
+    });
+
+    // Delete from ActivityMember
+    await RegistrationActivityMember.destroy({
+      where: { activity_id: activityId },
+      transaction,
+    });
+
+    // Delete from Activity
+    await RegistrationActivity.destroy({
+      where: { id: activityId },
+      transaction,
+    });
+
+    await transaction.commit();
+    res
+      .status(200)
+      .send({ message: "Activity and related data deleted successfully" });
+  } catch (error) {
+    await transaction.rollback();
+    console.error("Error deleting activity:", error);
+    res.status(500).send("Error deleting activity");
+  }
+});
+
+router.get("/getActivity/:activityId", async (req, res) => {
+  const durationCheck = await checkRegistrationDuration();
+  // if (!durationCheck.found || durationCheck.reportStatus !== 1) {
+  //   return res.status(400).send({ message: "활동 추가 기한이 지났습니다." });
+  // }
+  const { activityId } = req.params;
+
+  try {
+    let activity;
+    let evidence;
+    let participants;
+
+    // Fetch activity details
+    activity = await RegistrationActivity.findByPk(activityId);
+    if (!activity) {
+      return res.status(404).send("Activity not found");
+    }
+
+    const authorized = await checkPermission(req, res, [
+      { club_rep: 4, club_id: activity.club_id },
+      { advisor: activity.club_id },
+      // { executive: 4 },
+    ]);
+    if (!authorized) {
+      return;
+    }
+
+    const isAdvisor = authorized.some((auth) => auth.hasOwnProperty("advisor"));
+
+    if (durationCheck.reportStatus === 2 && isAdvisor) {
+      activity = await RegistrationActivity.findByPk(activityId);
+      evidence = await RegistrationActivityEvidence.findAll({
+        where: { activity_id: activityId },
+      });
+      participants = await RegistrationActivityMember.findAll({
+        where: { activity_id: activityId },
+        include: [
+          {
+            model: Member,
+            attributes: ["name"],
+            as: "member_student",
+          },
+        ],
+      });
+    } else {
+      activity = await RegistrationActivity.findByPk(activityId);
+      evidence = await RegistrationActivityEvidence.findAll({
+        where: { activity_id: activityId },
+      });
+      participants = await RegistrationActivityMember.findAll({
+        where: { activity_id: activityId },
+        include: [
+          {
+            model: Member,
+            attributes: ["name"],
+            as: "member_student",
+          },
+        ],
+      });
+    }
+
+    // Function to extract the timestamp from the S3 URL
+    const extractTimestamp = (url) => {
+      const matches = url.match(
+        /uploads\/(\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2})/
+      );
+      return matches ? new Date(matches[1].replace(/-/g, ":")) : new Date();
+    };
+
+    // Sort evidence by the extracted timestamp
+    evidence.sort((a, b) => {
+      const timestampA = extractTimestamp(a.image_url);
+      const timestampB = extractTimestamp(b.image_url);
+      return timestampA - timestampB;
+    });
+
+    const feedbacks = await RegistrationActivityFeedback.findAll({
+      where: { activity: activityId },
+      include: [
+        {
+          model: Member,
+          attributes: ["name"],
+          as: "student",
+        },
+      ],
+    });
+
+    // Filter and format feedback results
+    const feedbackResults = feedbacks
+      .filter((feedback) => feedback.feedback.trim() !== "") // Exclude empty feedback
+      .map((feedback) => {
+        return {
+          addedTime: feedback.added_time,
+          text: feedback.feedback,
+          reviewerName: feedback.student.name, // assuming you want to include the name of the reviewer
+        };
+      });
+
+    // Format the response
+    const response = {
+      clubId: activity.club_id,
+      name: activity.title,
+      type: activity.activity_type_id,
+      startDate: activity.start_date,
+      endDate: activity.end_date,
+      location: activity.location,
+      purpose: activity.purpose,
+      content: activity.content,
+      proofText: activity.proof_text,
+      participants: participants.map((p) => ({
+        student_id: p.member_student_id,
+        name: p.member_student.name,
+      })),
+      proofImages: evidence.map((e) => ({
+        imageUrl: e.image_url,
+        fileName: e.description,
+      })),
+      feedbackResults, // Adjust based on how you store 'feedbackResults'
+    };
+
+    res.status(200).send(response);
+  } catch (error) {
+    console.error("Error fetching activity:", error);
+    res.status(500).send("Error fetching activity");
   }
 });
 

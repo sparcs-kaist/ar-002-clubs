@@ -69,15 +69,15 @@ export default function RouteSetup() {
         element={<AddClubRegistration type="renewal" />}
       />
       <Route
-        path="/add_club_registration/add_activity"
+        path="/club_registration/add_activity"
         element={<AddClubRegistrationActivity />}
       />
       <Route
-        path="/add_club_registration/edit_activity/:id"
+        path="/club_registration/edit_activity/:id"
         element={<EditClubRegistrationActivity />}
       />
       <Route
-        path="/add_club_registration/activity_detail/:id"
+        path="/club_registration/activity_detail/:id"
         element={<ClubRegistrationActivityDetail />}
       />
       <Route

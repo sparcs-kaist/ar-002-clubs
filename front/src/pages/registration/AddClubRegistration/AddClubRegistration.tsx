@@ -633,7 +633,7 @@ export const AddClubRegistration = ({ type = "provisional" }): JSX.Element => {
                         <div
                           className="add-activity-button"
                           onClick={() =>
-                            navigate("/add_club_registration/add_activity")
+                            navigate("/club_registration/add_activity")
                           }
                           style={{ cursor: "pointer" }}
                         />
@@ -641,7 +641,7 @@ export const AddClubRegistration = ({ type = "provisional" }): JSX.Element => {
                         <div
                           className="frame-29"
                           onClick={() =>
-                            navigate("/add_club_registration/add_activity")
+                            navigate("/club_registration/add_activity")
                           }
                           style={{ cursor: "pointer" }}
                         >

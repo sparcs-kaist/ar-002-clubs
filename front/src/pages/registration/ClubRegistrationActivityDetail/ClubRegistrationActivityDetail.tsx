@@ -77,7 +77,7 @@ export const ClubRegistrationActivityDetail = (): JSX.Element => {
       if (!isLoading) {
         try {
           await getRequest(
-            `activity/getActivity/${id}`,
+            `registration/getActivity/${id}`,
             (data) => {
               setActivity({
                 name: data.name,
@@ -271,7 +271,7 @@ export const ClubRegistrationActivityDetail = (): JSX.Element => {
 
     try {
       await postRequest(
-        `activity/deleteActivity/${id}`,
+        `registration/deleteActivity/${id}`,
         {},
         () => {},
         (error) => {
@@ -408,20 +408,18 @@ export const ClubRegistrationActivityDetail = (): JSX.Element => {
           <div className="frame-16">
             <div
               className="frame-17"
-              onClick={() => navigate(`/edit_activity/${id}`)}
+              onClick={() => navigate(`/club_registration/edit_activity/${id}`)}
               style={{ cursor: "pointer" }}
             >
               수정
             </div>
-            {durationStatus == 1 && (
-              <div
-                className="frame-17"
-                onClick={handleDeleteActivity}
-                style={{ cursor: "pointer" }}
-              >
-                삭제
-              </div>
-            )}
+            <div
+              className="frame-17"
+              onClick={handleDeleteActivity}
+              style={{ cursor: "pointer" }}
+            >
+              삭제
+            </div>
           </div>
         )}
       </div>

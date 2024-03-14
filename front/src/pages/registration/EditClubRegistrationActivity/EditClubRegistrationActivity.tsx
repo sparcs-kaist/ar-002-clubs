@@ -72,7 +72,7 @@ export const EditClubRegistrationActivity = (): JSX.Element => {
     const fetchActivityData = async () => {
       try {
         await getRequest(
-          `activity/getActivity/${id}`,
+          `registration/getActivity/${id}`,
           (data) => {
             setActivity({
               name: data.name,
@@ -282,15 +282,8 @@ export const EditClubRegistrationActivity = (): JSX.Element => {
     // Validation for date range and order
     const startDate = new Date(activity.startDate);
     const endDate = new Date(activity.endDate);
-    const minDate = new Date("2023-06-17");
-    const maxDate = new Date("2023-12-15");
 
-    if (
-      startDate > endDate ||
-      startDate < minDate ||
-      endDate > maxDate ||
-      endDate < minDate
-    ) {
+    if (startDate > endDate) {
       alert("날짜 범위가 올바르지 않습니다. 다시 확인해주세요.");
       return;
     }
@@ -316,7 +309,7 @@ export const EditClubRegistrationActivity = (): JSX.Element => {
     const handleSuccess = (response: any) => {
       console.log("Activity added successfully:", response);
       const activityId = response.data.activityId; // Adjust according to your API response structure
-      navigate(`/activity_detail/${activityId}`);
+      navigate(-1);
       // Additional success logic here (e.g., redirecting or showing a success message)
     };
 
@@ -328,7 +321,7 @@ export const EditClubRegistrationActivity = (): JSX.Element => {
 
     // Send the POST request
     postRequest(
-      "activity/editActivity",
+      "registration/editActivity",
       dataToSend,
       handleSuccess,
       handleError

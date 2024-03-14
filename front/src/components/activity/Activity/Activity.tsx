@@ -40,10 +40,11 @@ export const Activity = ({
       <div
         className="frame-31"
         onClick={() => {
+          // eslint-disable-next-line no-lone-blocks
           {
             if (property1 === "default") {
               if (isRegistration === 1) {
-                navigate(`/add_club_registration/activity_detail/${id}`);
+                navigate(`/club_registration/activity_detail/${id}`);
               } else if (isRegistration === 2) {
                 navigate(`/club_registration_detail/${id}`);
               } else if (isRegistration === 3) {

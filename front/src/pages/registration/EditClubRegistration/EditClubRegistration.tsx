@@ -639,12 +639,12 @@ export const EditClubRegistration = (): JSX.Element => {
                 <div className="frame-28">
                   {registration.activityReport?.length < 20 &&
                     typeId < 4 &&
-                    durationStatus == 1 && (
+                    durationStatus > 0 && (
                       <>
                         <div
                           className="add-activity-button"
                           onClick={() =>
-                            navigate("/add_club_registration/add_activity")
+                            navigate("/club_registration/add_activity")
                           }
                           style={{ cursor: "pointer" }}
                         />
@@ -652,7 +652,7 @@ export const EditClubRegistration = (): JSX.Element => {
                         <div
                           className="frame-29"
                           onClick={() =>
-                            navigate("/add_club_registration/add_activity")
+                            navigate("/club_registration/add_activity")
                           }
                           style={{ cursor: "pointer" }}
                         >

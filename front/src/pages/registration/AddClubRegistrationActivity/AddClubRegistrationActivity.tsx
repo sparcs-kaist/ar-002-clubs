@@ -305,7 +305,7 @@ export const AddClubRegistrationActivity = (): JSX.Element => {
   }, [clubId, activity.startDate, activity.endDate]);
 
   useEffect(() => {
-    if (!isLoading && durationStatus != 1) {
+    if (!isLoading && durationStatus == 0) {
       alert("활동 추가 기간이 아닙니다. 기간을 확인해주세요.");
       navigate(-1);
     }
