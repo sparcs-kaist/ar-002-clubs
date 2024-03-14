@@ -596,7 +596,7 @@ router.get("/get_registration", async (req, res) => {
         ? registration.RegistrationActivities.map((activity) => ({
             id: activity.id,
             title: activity.title,
-            activityType: activity.activity_type_id,
+            activityType: activity.activity_type.type,
             startDate: formatDateString(activity.start_date),
             endDate: formatDateString(activity.end_date),
             feedbackType: activity.feedback_type,

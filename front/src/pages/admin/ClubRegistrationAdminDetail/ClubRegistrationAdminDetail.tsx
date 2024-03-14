@@ -414,7 +414,7 @@ export const ClubRegistrationAdminDetail = (): JSX.Element => {
       }
       console.log(`Fetching activities for clubId: ${id}`);
       await getRequest(
-        `registration_feedback/get_registration?id=${id}`,
+        `registration/get_registration?id=${id}`,
         (data) => {
           setRegistration(data.data);
           const typeString =
@@ -729,7 +729,7 @@ export const ClubRegistrationAdminDetail = (): JSX.Element => {
                     {Array.isArray(registration.activityReport) &&
                       registration.activityReport.map((activity, index) => (
                         <Activity
-                          isRegistration={1}
+                          isRegistration={4}
                           key={index}
                           index={index + 1}
                           name={activity.title}

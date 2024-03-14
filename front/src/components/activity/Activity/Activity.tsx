@@ -49,6 +49,8 @@ export const Activity = ({
                 navigate(`/club_registration_detail/${id}`);
               } else if (isRegistration === 3) {
                 navigate(`/admin/registration/${id}`);
+              } else if (isRegistration === 4) {
+                navigate(`/admin/registration/activity/${id}`);
               } else {
                 navigate(`/activity_detail/${id}`);
               }

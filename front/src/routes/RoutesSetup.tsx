@@ -33,6 +33,7 @@ import { ClubRegistrationDetail } from "pages/registration/ClubRegistrationDetai
 import { EditClubRegistration } from "pages/registration/EditClubRegistration";
 import { ClubRegistrationDashboard } from "pages/admin/ClubRegistrationDashboard";
 import { ClubRegistrationAdminDetail } from "pages/admin/ClubRegistrationAdminDetail";
+import { ClubRegistrationActivityAdminDetail } from "pages/admin/ClubRegistrationActivityAdminDetail";
 
 export default function RouteSetup() {
   return (
@@ -118,6 +119,7 @@ export default function RouteSetup() {
       <Route path="/admin/club_funding/:id" element={<ClubFundingList />} />
       <Route path="/admin/funding/:id" element={<FundingAdminDetail />} />
 
+      {/*등록 검토 */}
       <Route
         path="/admin/registration_dashboard"
         element={<ClubRegistrationDashboard />}
@@ -125,6 +127,10 @@ export default function RouteSetup() {
       <Route
         path="/admin/registration/:id"
         element={<ClubRegistrationAdminDetail />}
+      />
+      <Route
+        path="/admin/registration/activity/:id"
+        element={<ClubRegistrationActivityAdminDetail />}
       />
     </Routes>
   );
