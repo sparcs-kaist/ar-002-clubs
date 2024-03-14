@@ -91,6 +91,9 @@ async function checkPermission(req, res, permissionsArray) {
   const isAuthorized = permissionsArray.some((permission) => {
     return Object.entries(permission).every(([key, value]) => {
       if (key === "club_rep") {
+        console.log("value");
+        console.log(value);
+        console.log(userPermissions);
         // Special check for club_rep permissions
         if ("club_id" in permission) {
           // Check for club_rep and club_id

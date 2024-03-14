@@ -84,6 +84,8 @@ const registration = require("./routes/registration");
 app.use("/api/registration", registration);
 const registration_feedback = require("./routes/registration_feedback");
 app.use("/api/registration_feedback", registration_feedback);
+const member = require("./routes/member");
+app.use("/api/member", member);
 
 const httpServer = http.createServer(app);
 httpServer.listen(80, () => {

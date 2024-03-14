@@ -45,6 +45,15 @@ type FundingInfo = {
   feedbackType: number;
 };
 
+type ApplyInfo = {
+  id: number;
+  name: string;
+  email: string;
+  studentId: number;
+  startDate: string;
+  feedbackType: number;
+};
+
 export const ClubManage = (): JSX.Element => {
   const userRepresentativeStatuses = useUserRepresentativeStatus(); // 배열을 반환한다고 가정
   const { durationStatus } = useReportDurationStatus();
@@ -56,6 +65,9 @@ export const ClubManage = (): JSX.Element => {
   }>({});
   const [activitiesLists, setActivitiesLists] = useState<{
     [key: number]: ActivityInfo[];
+  }>({});
+  const [applyLists, setApplyLists] = useState<{
+    [key: number]: ApplyInfo[];
   }>({});
   const [fundingLists, setFundingLists] = useState<{
     [key: number]: FundingInfo[];
@@ -147,9 +159,40 @@ export const ClubManage = (): JSX.Element => {
           }
         );
       };
+      const fetchApplies = async () => {
+        await getRequest(
+          `member/list?club_id=${clubId}`,
+          (data) => {
+            const formattedData = data.data.map(
+              (item: {
+                student_id: any;
+                memberEmail: any;
+                memberName: any;
+                apply_time_formatted: any;
+                approved_type: any;
+              }) => ({
+                studentId: item.student_id,
+                email: item.memberEmail,
+                name: item.memberName,
+                startDate: item.apply_time_formatted,
+                feedbackType: item.approved_type,
+              })
+            );
+
+            setApplyLists((applyLists) => ({
+              ...applyLists,
+              [clubId]: formattedData,
+            }));
+          },
+          (error) => {
+            console.error("Error fetching applies:", error);
+          }
+        );
+      };
       fetchClubMembers();
       fetchClubInfo();
       fetchFundings();
+      fetchApplies();
       setLoadedClubIds((prevIds) => [...prevIds, clubId]);
     });
   }, [userRepresentativeStatuses, clubInfos, loadedClubIds]);
@@ -378,6 +421,102 @@ export const ClubManage = (): JSX.Element => {
                     </div>
                   </div>
                 )}
+                <div className="frame-13">
+                  <SubTitle
+                    className="sub-title-instance"
+                    divClassName="design-component-instance-node"
+                    text={`${currentClubInfo.clubName} 회원 신청`}
+                  />
+                  <div className="frame-22">
+                    <Activity
+                      property1="variant-2"
+                      isRegistration={5}
+                      activityStateProperty1={2}
+                      id={0}
+                    />
+                    {applyLists[status.clubId]?.map((member, index) => (
+                      <Activity
+                        key={index}
+                        index={index + 1}
+                        name={`${member.studentId} ${member.name}`}
+                        type={member.email}
+                        start_date={member.startDate}
+                        activityStateProperty1={member.feedbackType}
+                        isRegistration={5}
+                        handleRegistration={() => {
+                          if (member.feedbackType === 1) {
+                            const isConfirmed = window.confirm(
+                              `${member.name}의 가입을 승인하시겠습니까? ('확인'을 누르면 승인, '취소'를 누르면 반려됩니다.)`
+                            );
+
+                            // Approval case
+                            if (isConfirmed) {
+                              postRequest(
+                                `member/approve?student_id=${member.studentId}&club_id=${status.clubId}`,
+                                {},
+                                () => {
+                                  // Update feedbackType to approved
+                                  const updatedApplies = applyLists[
+                                    status.clubId
+                                  ].map(
+                                    (appl) =>
+                                      appl.studentId === member.studentId
+                                        ? { ...appl, feedbackType: 2 }
+                                        : appl // Assuming feedbackType 2 means approved
+                                  );
+                                  setApplyLists({
+                                    ...applyLists,
+                                    [status.clubId]: updatedApplies,
+                                  });
+                                  // alert(
+                                  //   `${member.name}의 가입이 승인되었습니다.`
+                                  // );
+                                },
+                                (error) => {
+                                  console.error(
+                                    "Error approving member:",
+                                    error
+                                  );
+                                }
+                              );
+                            } else {
+                              // Disapproval case
+                              postRequest(
+                                `member/disapprove?student_id=${member.studentId}&club_id=${status.clubId}`,
+                                {},
+                                () => {
+                                  // Update feedbackType to disapproved
+                                  const updatedApplies = applyLists[
+                                    status.clubId
+                                  ].map(
+                                    (appl) =>
+                                      appl.studentId === member.studentId
+                                        ? { ...appl, feedbackType: 3 }
+                                        : appl // Assuming feedbackType 3 means disapproved
+                                  );
+                                  setApplyLists({
+                                    ...applyLists,
+                                    [status.clubId]: updatedApplies,
+                                  });
+                                  // alert(
+                                  //   `${member.name}의 가입이 거절되었습니다.`
+                                  // );
+                                },
+                                (error) => {
+                                  console.error(
+                                    "Error disapproving member:",
+                                    error
+                                  );
+                                }
+                              );
+                            }
+                          }
+                        }}
+                        id={member.studentId}
+                      />
+                    ))}
+                  </div>
+                </div>
                 <div className="frame-16">
                   <div className="frame-21" style={{ marginBottom: "80px" }}>
                     <div className="frame-13">

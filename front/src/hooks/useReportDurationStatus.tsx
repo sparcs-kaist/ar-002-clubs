@@ -118,3 +118,50 @@ export const useRegistrationDurationStatus = (disable: boolean = false) => {
 
   return reportState;
 };
+
+export const useMemberDuration = (disable: boolean = false) => {
+  const navigate = useNavigate();
+
+  const [state, setState] = useState({
+    status: 0,
+    isLoading: true,
+    error: null,
+  });
+
+  useEffect(() => {
+    const fetchRegistrationDurationStatus = () => {
+      getRequest(
+        "member/duration",
+        (data) => {
+          setState({
+            status: data.status,
+            isLoading: false,
+            error: null,
+          });
+          console.log(state);
+        },
+        (error) => {
+          console.error("Failed to fetch report duration status:", error);
+          setState({
+            status: 0,
+            isLoading: false,
+            error: error,
+          });
+        }
+      );
+    };
+
+    fetchRegistrationDurationStatus();
+  }, []);
+
+  useEffect(() => {
+    if (!state.isLoading && state.status === 0) {
+      if (!disable) {
+        alert("해당 기간이 아닙니다. 기간을 다시 확인해주세요.");
+        navigate(-1);
+      }
+    }
+  }, [state.isLoading]);
+
+  return state;
+};

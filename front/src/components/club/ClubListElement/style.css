@@ -90,3 +90,21 @@
   white-space: nowrap;
   width: fit-content;
 }
+
+.club-list-element .register-button {
+  position: absolute;
+  z-index: 10;
+  width: 100px;
+  height: 30px;
+  border-radius: 10px;
+  right: 15px;
+  bottom: 10px;
+  background: #7dd2d9;
+  text-align: center;
+  padding: 5px;
+  font-family: "NanumBarunGothic-Regular", Helvetica;
+  font-size: 17px;
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: normal;
+}

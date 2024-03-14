@@ -11,7 +11,7 @@ import { useNavigate } from "react-router-dom";
 
 interface Props {
   id: number;
-  property1?: "variant-2" | "default" | "variant-3";
+  property1?: "variant-2" | "default" | "variant-3" | "variant-4";
   className?: string;
   activityStateProperty1: number;
   index?: number;
@@ -20,6 +20,7 @@ interface Props {
   type?: string;
   start_date?: string;
   end_date?: string;
+  handleRegistration?: any;
 }
 
 export const Activity = ({
@@ -33,6 +34,7 @@ export const Activity = ({
   start_date = "",
   end_date = "",
   id = 0,
+  handleRegistration = {},
 }: Props): JSX.Element => {
   const navigate = useNavigate();
   return (
@@ -51,6 +53,10 @@ export const Activity = ({
                 navigate(`/admin/registration/${id}`);
               } else if (isRegistration === 4) {
                 navigate(`/admin/registration/activity/${id}`);
+              } else if (isRegistration === 5) {
+                handleRegistration();
+              } else if (isRegistration === 6) {
+                navigate(`/admin/member_club_dashboard/${id}`);
               } else {
                 navigate(`/activity_detail/${id}`);
               }
@@ -72,7 +78,9 @@ export const Activity = ({
             </div>
             <div className="frame-33">
               <div className="text-wrapper-3">
-                {start_date}~{end_date}
+                {isRegistration === 5
+                  ? `${start_date}`
+                  : `${start_date}~${end_date}`}
               </div>
             </div>
             <div className="activity-state-wrapper">
@@ -95,13 +103,19 @@ export const Activity = ({
               <div className="text-wrapper-2">#</div>
             </div>
             <div className="div-wrapper">
-              <p className="text-wrapper-3">활동명</p>
+              <p className="text-wrapper-3">
+                {isRegistration === 5 ? "회원명" : "활동명"}
+              </p>
             </div>
             <div className="frame-2">
-              <p className="text-wrapper-3">활동 분류</p>
+              <p className="text-wrapper-3">
+                {isRegistration === 5 ? "회원 이메일" : "활동 분류"}
+              </p>
             </div>
             <div className="frame-77">
-              <div className="text-wrapper-3">활동 기간</div>
+              <div className="text-wrapper-3">
+                {isRegistration === 5 ? "신청 일시" : "활동 기간"}
+              </div>
             </div>
             <div className="frame-6">
               <div className="text-wrapper-3">검토 상태</div>
@@ -115,13 +129,19 @@ export const Activity = ({
               <div className="text-wrapper-2">#</div>
             </div>
             <div className="div-wrapper">
-              <p className="text-wrapper-3">신청 동아리</p>
+              <p className="text-wrapper-3">
+                {isRegistration === 6 ? "동아리 명" : "신청 동아리"}
+              </p>
             </div>
             <div className="frame-2">
-              <p className="text-wrapper-3">신청 분류</p>
+              <p className="text-wrapper-3">
+                {isRegistration === 6 ? "동아리 분류" : "신청 분류"}
+              </p>
             </div>
             <div className="frame-30">
-              <div className="text-wrapper-3">신청 일시</div>
+              <div className="text-wrapper-3">
+                {isRegistration === 6 ? "신청 인원" : "신청 일시"}
+              </div>
             </div>
             <div className="frame-6">
               <div className="text-wrapper-3">검토 상태</div>

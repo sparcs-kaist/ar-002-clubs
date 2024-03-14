@@ -5,7 +5,8 @@ import { SubTitle } from "../../../components/home/SubTitle";
 import { UpperBar } from "components/home/UpperBar";
 import { UnderBar } from "components/home/UnderBar";
 import "./ClubList.css";
-import { getRequest } from "utils/api";
+import { getRequest, postRequest } from "utils/api";
+import { useMemberDuration } from "hooks/useReportDurationStatus";
 
 type DivisionType = {
   id: number;
@@ -18,6 +19,8 @@ export const ClubList = (): JSX.Element => {
   const [divisions, setDivisions] = useState<DivisionType[]>([]);
 
   const clubListRef = useRef<HTMLDivElement>(null);
+
+  const { status } = useMemberDuration(false);
 
   // New function to load club data for a division
   const loadClubsForDivision = (division: DivisionType) => {
@@ -96,6 +99,47 @@ export const ClubList = (): JSX.Element => {
     return R;
   };
 
+  const handleRegister = (state: number, clubId: number, clubName: string) => {
+    console.log(state, clubId);
+    if (state === 0) {
+      const isConfirmed = window.confirm(`${clubName}에 가입하시겠습니까?`);
+
+      // Proceed with logout only if user confirms
+      if (isConfirmed) {
+        postRequest(`member/apply?club_id=${clubId}`, {}, () => {
+          //divisons의 clubs 중 id가 club_id인 원소의 registrationState를 1로 변경
+          setDivisions((prevDivisions) =>
+            prevDivisions.map((division) => ({
+              ...division,
+              clubs: division.clubs.map((club) =>
+                club.id === clubId ? { ...club, registrationState: 1 } : club
+              ),
+            }))
+          );
+        });
+      }
+    } else if (state === 1) {
+      const isConfirmed = window.confirm(
+        `${clubName}에 가입을 취소하시겠습니까?`
+      );
+
+      // Proceed with logout only if user confirms
+      if (isConfirmed) {
+        postRequest(`member/cancel?club_id=${clubId}`, {}, () => {
+          //divisons의 clubs 중 id가 club_id인 원소의 registrationState를 0으로 변경
+          setDivisions((prevDivisions) =>
+            prevDivisions.map((division) => ({
+              ...division,
+              clubs: division.clubs.map((club) =>
+                club.id === clubId ? { ...club, registrationState: 0 } : club
+              ),
+            }))
+          );
+        });
+      }
+    }
+  };
+
   return (
     <div className="club-list" ref={clubListRef}>
       <UpperBar className="upper-bar" title="동아리 목록" />
@@ -127,6 +171,15 @@ export const ClubList = (): JSX.Element => {
                         president={club.clubPresident}
                         advisor={club.advisor}
                         totalNumbers={club.totalMembers}
+                        isRegistration={status === 1}
+                        registrationState={club.registrationState}
+                        onRegistrationClick={() =>
+                          handleRegister(
+                            club.registrationState,
+                            club.id,
+                            club.clubName
+                          )
+                        }
                       />
                     ))}
                   </div>

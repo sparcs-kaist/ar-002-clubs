@@ -34,6 +34,8 @@ import { EditClubRegistration } from "pages/registration/EditClubRegistration";
 import { ClubRegistrationDashboard } from "pages/admin/ClubRegistrationDashboard";
 import { ClubRegistrationAdminDetail } from "pages/admin/ClubRegistrationAdminDetail";
 import { ClubRegistrationActivityAdminDetail } from "pages/admin/ClubRegistrationActivityAdminDetail";
+import { MemberDashboard } from "pages/admin/MemberDashboard";
+import { MemberClubDashboard } from "pages/admin/MemberClubDashboard";
 
 export default function RouteSetup() {
   return (
@@ -131,6 +133,11 @@ export default function RouteSetup() {
       <Route
         path="/admin/registration/activity/:id"
         element={<ClubRegistrationActivityAdminDetail />}
+      />
+      <Route path="/admin/member_dashboard" element={<MemberDashboard />} />
+      <Route
+        path="/admin/member_club_dashboard/:id"
+        element={<MemberClubDashboard />}
       />
     </Routes>
   );

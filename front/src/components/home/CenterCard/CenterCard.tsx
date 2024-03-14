@@ -104,6 +104,12 @@ export const CenterCard = ({ SubTitleText }: Props): JSX.Element => {
       setPosts([
         {
           id: "1",
+          title: "회원 신청 대시보드",
+          subtitle: "전체",
+          url: `${process.env.REACT_APP_FRONTEND_URL}/admin/member_dashboard`,
+        },
+        {
+          id: "1",
           title: "등록 신청 대시보드",
           subtitle: "전체",
           url: `${process.env.REACT_APP_FRONTEND_URL}/admin/registration_dashboard`,

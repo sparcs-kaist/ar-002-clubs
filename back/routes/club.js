@@ -13,6 +13,7 @@ const {
   MemberClub,
   MemberStatus,
   ClubBuilding,
+  RegistrationMember,
 } = require("../models");
 
 router.get("/club_detail", async (req, res) => {
@@ -495,6 +496,14 @@ router.get("/division_clubs", async (req, res) => {
           },
         });
 
+        const registrationState = await RegistrationMember.findOne({
+          where: {
+            club_id: club.id,
+            semester_id: currentSemester.id,
+            student_id: req.session.user.student_id,
+          },
+        });
+
         return {
           id: club.id,
           clubName: club.name,
@@ -503,6 +512,9 @@ router.get("/division_clubs", async (req, res) => {
           clubPresident: clubPresident,
           advisor: semesterClubInfo.advisor,
           totalMembers: totalMembersCount,
+          registrationState: registrationState
+            ? registrationState.approved_type
+            : 0,
         };
       })
     );
