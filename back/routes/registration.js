@@ -53,13 +53,19 @@ router.post("/advisor_sign", async (req, res) => {
   }
 
   try {
-    const signTime = new Date();
-    signTime.setHours(signTime.getHours() + 9); // UTC+9로 조정
+    const currentDateTimeUTC = new Date();
+    const kstOffset = 9 * 60; // 9 hours in minutes
+    currentDateTimeUTC.setMinutes(currentDateTimeUTC.getMinutes() + kstOffset);
+
+    await registration.update({
+      feedback_type: 1,
+      recent_edit: currentDateTimeUTC,
+    });
 
     await RegistrationSign.create({
       registration: id,
       sign_type: 2,
-      sign_time: signTime,
+      sign_time: currentDateTimeUTC,
     });
 
     await registration.update({ advisor_plan });

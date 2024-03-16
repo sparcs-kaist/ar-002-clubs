@@ -20,7 +20,7 @@ export const ClubList = (): JSX.Element => {
 
   const clubListRef = useRef<HTMLDivElement>(null);
 
-  const { status } = useMemberDuration(false);
+  const { status } = useMemberDuration(true);
 
   // New function to load club data for a division
   const loadClubsForDivision = (division: DivisionType) => {
