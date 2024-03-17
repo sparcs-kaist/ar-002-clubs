@@ -16,6 +16,24 @@ const {
   RegistrationMember,
 } = require("../../models");
 
+async function getClubRepresentative(clubId, currentDate) {
+  const clubRepresentative = await ClubRepresentative.findOne({
+    where: {
+      club_id: clubId,
+      type_id: 1,
+      start_term: { [Op.lte]: currentDate },
+      [Op.or]: [{ end_term: { [Op.gte]: currentDate } }, { end_term: null }],
+    },
+  });
+  if (clubRepresentative) {
+    const presidentMember = await Member.findByPk(
+      clubRepresentative.student_id
+    );
+    return presidentMember ? presidentMember.name : "";
+  }
+  return "";
+}
+
 router.get("/", async (req, res) => {
   try {
     // Get the current semester
