@@ -649,9 +649,8 @@ router.get("/my_semester_clubs", async (req, res) => {
           attributes: ["type_id", "characteristic_kr", "advisor"],
         });
 
-        // Get the type from the SemesterClubType model
         const semesterClubType = await SemesterClubType.findByPk(
-          semesterClubInfo.type_id
+          semesterClubInfo ? semesterClubInfo.type_id : 3
         );
 
         let clubType;
@@ -704,10 +703,12 @@ router.get("/my_semester_clubs", async (req, res) => {
         return {
           id: club.id,
           clubName: club.name,
-          characteristicKr: semesterClubInfo.characteristic_kr,
+          characteristicKr: semesterClubInfo
+            ? semesterClubInfo.characteristic_kr
+            : "",
           clubType: clubType, // Use the type value from the SemesterClubType model
           clubPresident: clubPresident,
-          advisor: semesterClubInfo.advisor,
+          advisor: semesterClubInfo ? semesterClubInfo.advisor : null,
           totalMembers: totalMembersCount,
         };
       })
