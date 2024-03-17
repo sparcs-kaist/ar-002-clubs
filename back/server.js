@@ -87,6 +87,12 @@ app.use("/api/registration_feedback", registration_feedback);
 const member = require("./routes/member");
 app.use("/api/member", member);
 
+//new api routes
+const clubs = require("./routes/new/clubs");
+app.use("/api/clubs", clubs);
+const notices = require("./routes/new/notices");
+app.use("/api/notices", notices);
+
 const httpServer = http.createServer(app);
 httpServer.listen(80, () => {
   console.log("HTTP Server running on port 80");
