@@ -10,6 +10,7 @@ const {
   Member,
   SemesterClub,
   SemesterClubType,
+  MemberClub,
   Club,
 } = require("../models");
 const checkPermission = require("../utils/permission");
@@ -276,6 +277,13 @@ router.post("/approve", async (req, res) => {
       registration.approved_type = 2;
       registration.approve_time = now;
       await registration.save();
+
+      await MemberClub.upsert({
+        semester_id: currentSemester.id,
+        student_id: studentId,
+        club_id: clubId,
+      });
+
       return res.json({
         success: true,
         message: "Member approved successfully",
@@ -359,6 +367,14 @@ router.post("/disapprove", async (req, res) => {
       registration.approve_time = now;
       await registration.save();
 
+      await MemberClub.destroy({
+        where: {
+          semester_id: currentSemester.id,
+          student_id: studentId,
+          club_id: clubId,
+        },
+      });
+
       res.json({ success: true, message: "Member disapproved successfully" });
     } else {
       return res
@@ -367,86 +383,6 @@ router.post("/disapprove", async (req, res) => {
     }
   } catch (error) {
     console.error("Error in disapprove:", error);
-    res.status(500).json({ message: "서버 오류가 발생했습니다." });
-  }
-});
-
-router.post("/admin_cancel", async (req, res) => {
-  //RegistrationMember db에서 데이터 찾기
-  //semester_id는 currentSemester.id
-  //student_id는 쿼리로 부터 불러옴
-  //club_id는 쿼리로 부터 불러옴
-  //approved_type은 1
-  //위 네 조건을 만족하는 데이터를 찾기
-  //만약 있으면 해당 데이터의 approved_type을 3으로 변경
-  //approve_time은 now로 변경
-  //없으면 "신청하지 않은 회원 입니다" 에러 반환
-
-  try {
-    // Check if the member modification period is still valid
-    const durationCheck = await checkMemberDuration();
-    if (durationCheck.status === 0) {
-      return res.status(400).send({ message: "활동 수정 기한이 지났습니다." });
-    }
-
-    // Assuming the club_id is provided as a query parameter and student_id is obtained from the session
-    const clubId = req.query.club_id;
-    const studentId = req.query.student_id; // Adjust based on how your session management is set up
-
-    // Authorization check for administrative users with executive permissions
-    const authorized = await checkPermission(req, res, [{ executive: 3 }]);
-    if (!authorized) {
-      return res.status(403).send({ message: "권한이 없습니다." });
-    }
-
-    // Calculate the current time in Korea Time Zone
-    const now = new Date(
-      new Date().getTime() +
-        new Date().getTimezoneOffset() * 60000 +
-        9 * 60 * 60 * 1000
-    );
-
-    // Find the current semester based on the current time
-    const currentSemester = await Semester.findOne({
-      where: {
-        start_date: { [Op.lte]: now },
-        end_date: { [Op.gte]: now },
-      },
-    });
-
-    if (!currentSemester) {
-      return res
-        .status(404)
-        .json({ success: false, message: "Current semester not found" });
-    }
-
-    // Find the registration entry to cancel
-    const registration = await RegistrationMember.findOne({
-      where: {
-        semester_id: currentSemester.id,
-        student_id: studentId,
-        club_id: clubId,
-        approved_type: 1, // Targeting only pending approvals
-      },
-    });
-
-    if (registration) {
-      // Update the entry to reflect cancellation
-      registration.approved_type = 3; // 3 to indicate cancellation/disapproval
-      registration.approve_time = now;
-      await registration.save();
-
-      res.json({
-        success: true,
-        message: "Registration cancelled successfully",
-      });
-    } else {
-      res
-        .status(404)
-        .json({ success: false, message: "신청하지 않은 회원 입니다" });
-    }
-  } catch (error) {
-    console.error("Error in admin_cancel:", error);
     res.status(500).json({ message: "서버 오류가 발생했습니다." });
   }
 });
@@ -537,79 +473,6 @@ router.get("/list", async (req, res) => {
     res.json({ success: true, data: formattedRegistrations });
   } catch (error) {
     console.error("Error in /list route:", error);
-    res.status(500).json({ message: "서버 오류가 발생했습니다." });
-  }
-});
-
-router.get("/is_apply", async (req, res) => {
-  //RegistrationMember db에서 데이터 찾기
-  //semester_id는 currentSemester.id
-  //club_id는 쿼리로 부터 불러옴
-  //student_id는 req.session.user.student_id
-  //위 조건을 만족하는 데이터를 찾기
-  //데이터가 존재하면, approved_type을 그대로 반환
-  //데이터가 존재하지 않으면, approved_type은 0 반환
-
-  try {
-    // Check if the member modification period is still valid
-    const durationCheck = await checkMemberDuration();
-    if (durationCheck.status === 0) {
-      return res.status(400).send({ message: "활동 수정 기한이 지났습니다." });
-    }
-
-    // Assuming the club_id is provided as a query parameter and student_id is obtained from the session
-    const clubId = req.query.club_id;
-    const studentId = req.session.user.student_id; // Adjust based on how your session management is set up
-
-    // Authorization check for users with club representative or executive permissions
-    const authorized = await checkPermission(req, res, [
-      { club_rep: 4, club_id: clubId },
-      { executive: 4 },
-    ]);
-    if (!authorized) {
-      return res.status(403).send({ message: "권한이 없습니다." });
-    }
-
-    // Calculate the current time in Korea Time Zone
-    const now = new Date(
-      new Date().getTime() +
-        new Date().getTimezoneOffset() * 60000 +
-        9 * 60 * 60 * 1000
-    );
-
-    // Find the current semester
-    const currentSemester = await Semester.findOne({
-      where: {
-        start_date: { [Op.lte]: now },
-        end_date: { [Op.gte]: now },
-      },
-    });
-
-    if (!currentSemester) {
-      return res
-        .status(404)
-        .json({ success: false, message: "Current semester not found" });
-    }
-
-    // Check if there's an application for the student in the given club and semester
-    const registration = await RegistrationMember.findOne({
-      where: {
-        semester_id: currentSemester.id,
-        club_id: clubId,
-        student_id: studentId,
-      },
-      attributes: ["approved_type"],
-    });
-
-    if (registration) {
-      // Return the application status if found
-      res.json({ success: true, approved_type: registration.approved_type });
-    } else {
-      // Return 0 if no application exists
-      res.json({ success: true, approved_type: 0 });
-    }
-  } catch (error) {
-    console.error("Error in /is_apply route:", error);
     res.status(500).json({ message: "서버 오류가 발생했습니다." });
   }
 });
