@@ -73,16 +73,16 @@ router.get("/club_detail", async (req, res) => {
       attributes: ["type_id", "characteristic_kr", "advisor"],
     });
 
-    if (!semesterClubInfo) {
-      return res.status(404).json({
-        success: false,
-        message: "Semester club information not found",
-      });
-    }
+    // if (!semesterClubInfo) {
+    //   return res.status(404).json({
+    //     success: false,
+    //     message: "Semester club information not found",
+    //   });
+    // }
 
     // Find the type from the SemesterClubType model
     const semesterClubType = await SemesterClubType.findByPk(
-      semesterClubInfo.type_id
+      semesterClubInfo ? semesterClubInfo.type_id : 3
     );
 
     // Determine clubType based on PermanentClub existence
@@ -134,8 +134,10 @@ router.get("/club_detail", async (req, res) => {
         clubName: club.name,
         divisionName: club.division.name ? club.division.name : "",
         clubType: clubType,
-        characteristicKr: semesterClubInfo.characteristic_kr,
-        advisor: semesterClubInfo.advisor,
+        characteristicKr: semesterClubInfo
+          ? semesterClubInfo.characteristic_kr
+          : "",
+        advisor: semesterClubInfo ? semesterClubInfo.advisor : null,
         totalMembers: totalMembersCount,
         clubPresident: clubPresident,
         description: club.description,
