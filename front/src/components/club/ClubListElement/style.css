@@ -30,11 +30,12 @@
 
 .club-list-element .frame {
   align-items: center;
-  display: inline-flex;
+  display: flex; /* Updated from inline-flex to flex */
   gap: 11px;
   left: 24px;
   position: absolute;
   top: 18px;
+  right: 120px; /* Ensure there's space on the right */
 }
 
 .club-list-element .MUSE {
@@ -107,4 +108,17 @@
   font-weight: 400;
   letter-spacing: 0;
   line-height: normal;
+}
+
+.club-list-element .MUSE,
+.club-list-element .text-wrapper-4 {
+  white-space: nowrap;
+  overflow: hidden; /* Added to prevent overflow */
+  text-overflow: ellipsis; /* Added to show ellipsis (...) when text overflows */
+}
+
+/* Add a specific max-width or use flex to the .text-wrapper-4 to ensure it doesn't exceed its parent's width. */
+.club-list-element .text-wrapper-4 {
+  flex-grow: 1; /* Allows the div to grow and fill available space, but not exceed */
+  max-width: calc(100% - 100px); /* Example: adjust the max-width as needed */
 }
