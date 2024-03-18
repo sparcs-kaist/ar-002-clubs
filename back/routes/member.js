@@ -402,13 +402,13 @@ router.get("/list", async (req, res) => {
 
     // Authorization check for users with club representative or executive permissions
     const clubId = req.query.club_id; // Assuming club_id is provided as a query parameter
-    const authorized = await checkPermission(req, res, [
-      { club_rep: 4, club_id: clubId },
-      { executive: 4 },
-    ]);
-    if (!authorized) {
-      return res.status(403).send({ message: "권한이 없습니다." });
-    }
+    // const authorized = await checkPermission(req, res, [
+    //   { club_rep: 4, club_id: clubId },
+    //   { executive: 4 },
+    // ]);
+    // if (!authorized) {
+    //   return res.status(403).send({ message: "권한이 없습니다." });
+    // }
 
     // Calculate the current time in Korea Time Zone
     const now = new Date(

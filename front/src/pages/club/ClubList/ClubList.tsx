@@ -7,6 +7,7 @@ import { UnderBar } from "components/home/UnderBar";
 import "./ClubList.css";
 import { getRequest, postRequest } from "utils/api";
 import { useMemberDuration } from "hooks/useReportDurationStatus";
+import { useAuth } from "contexts/authContext";
 
 type DivisionType = {
   id: number;
@@ -19,6 +20,7 @@ export const ClubList = (): JSX.Element => {
   const [divisions, setDivisions] = useState<DivisionType[]>([]);
 
   const clubListRef = useRef<HTMLDivElement>(null);
+  const { user } = useAuth(); // authContext에서 user 정보 가져오기
 
   const { status } = useMemberDuration(true);
 
@@ -171,7 +173,7 @@ export const ClubList = (): JSX.Element => {
                         president={club.clubPresident}
                         advisor={club.advisor}
                         totalNumbers={club.totalMembers}
-                        isRegistration={status === 1}
+                        isRegistration={status === 1 && user}
                         registrationState={club.registrationState}
                         onRegistrationClick={() =>
                           handleRegister(

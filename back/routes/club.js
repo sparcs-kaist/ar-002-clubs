@@ -498,13 +498,16 @@ router.get("/division_clubs", async (req, res) => {
           },
         });
 
-        const registrationState = await RegistrationMember.findOne({
-          where: {
-            club_id: club.id,
-            semester_id: currentSemester.id,
-            student_id: req.session.user.student_id,
-          },
-        });
+        let registrationState = null;
+        if (!!req.session.user) {
+          registrationState = await RegistrationMember.findOne({
+            where: {
+              club_id: club.id,
+              semester_id: currentSemester.id,
+              student_id: req.session.user.student_id,
+            },
+          });
+        }
 
         return {
           id: club.id,
