@@ -53,6 +53,20 @@ var bodyParser = require("body-parser");
 app.use(bodyParser.json({ limit: "100mb" }));
 app.use(bodyParser.urlencoded({ limit: "100mb", extended: true }));
 
+app.use((req, res, next) => {
+  const start = Date.now(); // 요청 시작 시간
+
+  // 응답이 완료되었을 때 이벤트 리스너
+  res.on("finish", () => {
+    const duration = Date.now() - start; // 처리 시간
+    console.log(
+      `[${req.method}] ${req.url} - ${res.statusCode} [${duration}ms]`
+    );
+  });
+
+  next(); // 다음 미들웨어로 제어권을 넘김
+});
+
 sequelize
   .sync({ force: false }) //true면 서버 실행마다 테이블 재생성
   .then(() => {
