@@ -177,7 +177,7 @@ async function checkMemberDuration() {
   if (!currentSemester) {
     return {
       found: false,
-      registrationStatus: 0,
+      status: 0,
       message: "현재 학기를 찾을 수 없습니다.",
     };
   }
@@ -211,7 +211,7 @@ async function checkMemberDuration() {
     }
   });
 
-  return { found: true, registrationStatus: responseCode };
+  return { found: true, status: responseCode };
 }
 
 module.exports = {

@@ -15,6 +15,7 @@ const {
   ClubBuilding,
   RegistrationMember,
 } = require("../models");
+const { checkMemberDuration } = require("../utils/duration");
 
 router.get("/club_detail", async (req, res) => {
   const clubId = req.query.club_id;
@@ -203,12 +204,43 @@ router.get("/club_members/:clubId", async (req, res) => {
 
     const repStudentIds = representatives.map((rep) => rep.student_id);
 
+    let lastSemesterId = currentSemester.id;
+    const durationCheck = await checkMemberDuration();
+    if (durationCheck.status > 0) {
+      lastSemesterId = lastSemesterId - 1;
+    }
+
+    // Fetch club members excluding representatives
+    const lsatSemesterMembers = await MemberClub.findAll({
+      where: {
+        club_id: clubId,
+        semester_id: lastSemesterId,
+        student_id: { [Op.notIn]: repStudentIds },
+      },
+      include: [
+        {
+          model: Member,
+          as: "student",
+          attributes: ["student_id", "name"],
+        },
+      ],
+    });
+
+    const lastSemesterStudentIds = lsatSemesterMembers.map(
+      (member) => member.student_id
+    );
+
     // Fetch club members excluding representatives
     const members = await MemberClub.findAll({
       where: {
         club_id: clubId,
         semester_id: currentSemester.id,
-        student_id: { [Op.notIn]: repStudentIds },
+        student_id: {
+          [Op.and]: [
+            { [Op.notIn]: repStudentIds },
+            { [Op.in]: lastSemesterStudentIds },
+          ],
+        },
       },
       include: [
         {

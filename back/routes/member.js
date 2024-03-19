@@ -485,7 +485,7 @@ router.get("/duration", async (req, res) => {
       return res.status(404).json({ message: durationCheck.message });
     }
 
-    res.json({ status: durationCheck.registrationStatus });
+    res.json({ status: durationCheck.status });
   } catch (error) {
     console.error("Error checking report duration:", error);
     res.status(500).json({ message: "서버 오류가 발생했습니다." });
