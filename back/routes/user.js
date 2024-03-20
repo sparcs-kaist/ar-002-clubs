@@ -3,12 +3,45 @@ const router = express.Router();
 const { Member, sequelize, ClubRepresentative } = require("../models");
 const { Op } = require("sequelize");
 const checkPermission = require("../utils/permission");
-const searchPermission = require("../utils/permission");
+const Client = require("../utils/sparcssso");
+
+const clientId = process.env.SSO_CLIENT_ID;
+const secretKey = process.env.SSO_SECRET_KEY;
+const client = new Client(clientId, secretKey);
 
 router.post("/", async (req, res) => {
-  const { uid, kaist_info, sid } = req.body;
+  const { code, state } = req.body;
+  const userInfo = await client.getUserInfo(code, state);
 
   try {
+    const DEVUID = process.env.REACT_APP_DEVUID;
+
+    if (userInfo.kaist_info) {
+      userInfo.kaist_info = JSON.parse(userInfo.kaist_info);
+    }
+
+    if (userInfo.uid === DEVUID) {
+      userInfo.kaist_info = {
+        kaist_uid: process.env.REACT_APP_kaist_uid,
+        mail: process.env.REACT_APP_mail,
+        ku_sex: process.env.REACT_APP_ku_sex,
+        ku_acad_prog_code: process.env.REACT_APP_ku_acad_prog_code,
+        ku_kaist_org_id: process.env.REACT_APP_ku_kaist_org_id,
+        ku_kname: process.env.REACT_APP_ku_kname,
+        ku_person_type: process.env.REACT_APP_ku_person_type,
+        ku_person_type_kor: process.env.REACT_APP_ku_person_type_kor,
+        ku_psft_user_status_kor: process.env.REACT_APP_ku_psft_user_status_kor,
+        ku_born_date: process.env.REACT_APP_ku_born_date,
+        ku_std_no: process.env.REACT_APP_ku_std_no,
+        ku_psft_user_status: process.env.REACT_APP_ku_psft_user_status,
+        employeeType: process.env.REACT_APP_employeeType,
+        givenname: process.env.REACT_APP_givenname,
+        displayname: process.env.REACT_APP_displayname,
+        sn: process.env.REACT_APP_sn,
+      };
+    }
+
+    const { uid, kaist_info, sid } = userInfo;
     // 트랜잭션 시작
     const userData = {
       student_id: parseInt(kaist_info.ku_std_no),

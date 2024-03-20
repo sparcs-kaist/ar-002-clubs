@@ -36,17 +36,18 @@ router.get("/login", async (req, res) => {
 });
 
 router.get("/callback", async (req, res) => {
-  const { code } = req.query;
-  const { state } = req.session;
+  const { code, state } = req.query;
+  // const { state } = req.session;
 
   try {
-    const userInfo = await client.getUserInfo(code, state);
+    // const userInfo = await client.getUserInfo(code, state);
+    const loginInfo = { code, state };
     res.redirect(
       `${
         process.env.FRONTEND_URL.includes("http")
           ? process.env.FRONTEND_URL
           : `https://${process.env.FRONTEND_URL}`
-      }/?userInfo=${JSON.stringify(userInfo)}`
+      }/?loginInfo=${JSON.stringify(loginInfo)}`
     );
   } catch (error) {
     res.send("Error: " + error.message);

@@ -20,40 +20,14 @@ export const Home = (): JSX.Element => {
   useEffect(() => {
     const fetchData = async () => {
       const queryParams = new URLSearchParams(location.search);
-      const userInfoStr = queryParams.get("userInfo");
+      const loginInfoStr = queryParams.get("loginInfo");
 
-      if (userInfoStr) {
-        const userInfo = JSON.parse(userInfoStr);
-        const DEVUID = process.env.REACT_APP_DEVUID;
-
-        if (userInfo.kaist_info) {
-          userInfo.kaist_info = JSON.parse(userInfo.kaist_info);
-        }
-
-        if (userInfo.uid === DEVUID) {
-          userInfo.kaist_info = {
-            kaist_uid: process.env.REACT_APP_kaist_uid,
-            mail: process.env.REACT_APP_mail,
-            ku_sex: process.env.REACT_APP_ku_sex,
-            ku_acad_prog_code: process.env.REACT_APP_ku_acad_prog_code,
-            ku_kaist_org_id: process.env.REACT_APP_ku_kaist_org_id,
-            ku_kname: process.env.REACT_APP_ku_kname,
-            ku_person_type: process.env.REACT_APP_ku_person_type,
-            ku_person_type_kor: process.env.REACT_APP_ku_person_type_kor,
-            ku_psft_user_status_kor:
-              process.env.REACT_APP_ku_psft_user_status_kor,
-            ku_born_date: process.env.REACT_APP_ku_born_date,
-            ku_std_no: process.env.REACT_APP_ku_std_no,
-            ku_psft_user_status: process.env.REACT_APP_ku_psft_user_status,
-            employeeType: process.env.REACT_APP_employeeType,
-            givenname: process.env.REACT_APP_givenname,
-            displayname: process.env.REACT_APP_displayname,
-            sn: process.env.REACT_APP_sn,
-          };
-        }
+      if (loginInfoStr) {
+        const loginInfo = JSON.parse(loginInfoStr);
 
         try {
-          await postRequest("user/", userInfo, () => {});
+          console.log(loginInfo);
+          await postRequest("user", loginInfo, () => {});
           await getRequest("user", (data) => {
             login(data);
           });
