@@ -75,9 +75,9 @@ router.post("/", async (req, res) => {
 });
 
 router.get("/", async (req, res) => {
-  const { student_id } = req.session.user;
-
   try {
+    const { student_id } = req.session.user;
+
     const member = await Member.findOne({
       where: { student_id },
     });

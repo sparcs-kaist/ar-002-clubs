@@ -26,15 +26,21 @@ export const Home = (): JSX.Element => {
         const loginInfo = JSON.parse(loginInfoStr);
 
         try {
-          console.log(loginInfo);
-          await postRequest("user", loginInfo, () => {});
+          await postRequest(
+            "user",
+            loginInfo,
+            () => {},
+            () => {
+              alert("로그아웃 후 KAIST 계정으로 다시 로그인해주시기 바랍니다.");
+              window.location.href = "https://sso.sparcs.org";
+            }
+          );
           await getRequest("user", (data) => {
             login(data);
           });
           navigate("/");
         } catch (error) {
           console.error(error);
-          logout();
         }
       }
     };
