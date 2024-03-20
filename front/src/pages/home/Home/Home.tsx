@@ -13,7 +13,7 @@ import { getRequest, postRequest } from "utils/api";
 import { Calendar } from "components/home/Calendar";
 
 export const Home = (): JSX.Element => {
-  const { login } = useAuth();
+  const { login, logout } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -34,6 +34,7 @@ export const Home = (): JSX.Element => {
           navigate("/");
         } catch (error) {
           console.error(error);
+          logout();
         }
       }
     };
