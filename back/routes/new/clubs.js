@@ -250,6 +250,7 @@ router.get("/club/:id", async (req, res) => {
       representative: clubPresident,
       advisor: semesterClubInfo ? semesterClubInfo.advisor : null,
       totalMembers: totalMembersCount,
+      description: club.description,
       divisionName: club.division.name,
       foundingYear: club.founding_year,
       room: roomLocation,

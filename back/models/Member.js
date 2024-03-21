@@ -8,13 +8,11 @@ module.exports = function(sequelize, DataTypes) {
     },
     uid: {
       type: DataTypes.STRING(30),
-      allowNull: true,
-      unique: "uid"
+      allowNull: true
     },
     kaist_uid: {
       type: DataTypes.STRING(30),
-      allowNull: true,
-      unique: "kaist_uid"
+      allowNull: true
     },
     sid: {
       type: DataTypes.STRING(30),
@@ -59,22 +57,6 @@ module.exports = function(sequelize, DataTypes) {
         using: "BTREE",
         fields: [
           { name: "student_id" },
-        ]
-      },
-      {
-        name: "uid",
-        unique: true,
-        using: "BTREE",
-        fields: [
-          { name: "uid" },
-        ]
-      },
-      {
-        name: "kaist_uid",
-        unique: true,
-        using: "BTREE",
-        fields: [
-          { name: "kaist_uid" },
         ]
       },
     ]
