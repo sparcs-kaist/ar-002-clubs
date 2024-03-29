@@ -18,10 +18,10 @@ const { checkMemberDuration } = require("../utils/duration");
 
 router.get("/clubs", async (req, res) => {
   try {
-    const durationCheck = await checkMemberDuration();
-    if (durationCheck.status === 0) {
-      return res.status(400).send({ message: "활동 수정 기한이 지났습니다." });
-    }
+    // const durationCheck = await checkMemberDuration();
+    // if (durationCheck.status === 0) {
+    //   return res.status(400).send({ message: "활동 수정 기한이 지났습니다." });
+    // }
 
     const curr = new Date();
     const utc = curr.getTime() + curr.getTimezoneOffset() * 60 * 1000;
@@ -395,10 +395,10 @@ router.get("/list", async (req, res) => {
   //student_id, approved_type, apply_time, approve_time의 배열 반환
   try {
     // Check if the member modification period is still valid
-    const durationCheck = await checkMemberDuration();
-    if (durationCheck.status === 0) {
-      return res.status(400).send({ message: "활동 수정 기한이 지났습니다." });
-    }
+    // const durationCheck = await checkMemberDuration();
+    // if (durationCheck.status === 0) {
+    //   return res.status(400).send({ message: "활동 수정 기한이 지났습니다." });
+    // }
 
     // Authorization check for users with club representative or executive permissions
     const clubId = req.query.club_id; // Assuming club_id is provided as a query parameter
