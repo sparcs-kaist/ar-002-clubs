@@ -15,6 +15,7 @@ interface Club {
   clubType: string;
   members: number;
   approvedMembers: number;
+  approvedRegularMembers: number;
 }
 
 export const MemberDashboard = (): JSX.Element => {
@@ -33,6 +34,7 @@ export const MemberDashboard = (): JSX.Element => {
             clubType: clubInfo.type, // 가정: clubInfo.type이 객체이고 그 안에 type 문자열이 있다고 가정합니다.
             members: clubInfo.count, // 가정: 받아온 데이터에 count와 totalApproved가 직접 포함되어 있다고 가정합니다.
             approvedMembers: clubInfo.countApproved,
+            approvedRegularMembers: clubInfo.countApprovedRegular,
           }));
 
           setClubs(clubsData);
@@ -75,7 +77,7 @@ export const MemberDashboard = (): JSX.Element => {
                             index={index + 1}
                             name={club.name}
                             type={club.clubType}
-                            start_date={`${club.approvedMembers}명 / ${club.members}명`}
+                            start_date={`${club.approvedRegularMembers}명 /${club.approvedMembers}명 / ${club.members}명`}
                             activityStateProperty1={1}
                             id={club.id}
                           />

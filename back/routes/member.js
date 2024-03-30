@@ -54,7 +54,24 @@ router.get("/clubs", async (req, res) => {
           model: RegistrationMember,
           as: "RegistrationMembers",
           attributes: ["approved_type"],
-          required: false, // This ensures we also get clubs with zero registrations
+          include: [
+            {
+              model: Member,
+              as: "student",
+              include: [
+                {
+                  model: MemberStatus,
+                  as: "MemberStatuses",
+                  where: {
+                    semester_id: currentSemester.id,
+                    is_regular_member: 1,
+                  },
+                  required: false,
+                },
+              ],
+            },
+          ],
+          required: false,
         },
         {
           model: SemesterClubType,
@@ -64,21 +81,39 @@ router.get("/clubs", async (req, res) => {
       ],
     });
 
-    const formattedData = clubsData.map((club) => {
-      const clubInfo = club.toJSON(); // Convert Sequelize instance to JSON
-      const totalMembers = clubInfo.RegistrationMembers.length;
-      const totalApproved = clubInfo.RegistrationMembers.filter(
-        (member) => member.approved_type === 2
-      ).length;
+    console.log(clubsData[0].RegistrationMembers[0].student.MemberStatuses);
+    const formattedData = clubsData
+      .map((club) => {
+        const clubInfo = club.toJSON();
+        const totalMembers = clubInfo.RegistrationMembers.length;
+        const totalApproved = clubInfo.RegistrationMembers.filter(
+          (member) => member.approved_type === 2
+        ).length;
+        const totalApprovedRegular = clubInfo.RegistrationMembers.filter(
+          (member) =>
+            member.approved_type === 2 &&
+            member.student.MemberStatuses.some(
+              (status) => status.is_regular_member === true
+            )
+        ).length;
 
-      return {
-        club_id: clubInfo.club_id,
-        name: clubInfo.club.name,
-        type: clubInfo.type.type,
-        count: totalMembers,
-        countApproved: totalApproved,
-      };
-    });
+        return {
+          club_id: clubInfo.club_id,
+          name: clubInfo.club.name,
+          type: clubInfo.type.type,
+          count: totalMembers,
+          countApproved: totalApproved,
+          countApprovedRegular: totalApprovedRegular,
+        };
+      })
+      .sort((a, b) => {
+        // First sort by type
+        if (a.type < b.type) return 1;
+        if (a.type > b.type) return -1;
+
+        // If types are the same, sort by countApprovedRegular
+        return a.countApprovedRegular - b.countApprovedRegular;
+      });
 
     res.json({ success: true, data: formattedData });
   } catch (error) {
