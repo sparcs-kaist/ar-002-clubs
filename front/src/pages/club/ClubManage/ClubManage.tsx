@@ -52,12 +52,13 @@ type ApplyInfo = {
   studentId: number;
   startDate: string;
   feedbackType: number;
+  isRegularMember: boolean;
 };
 
 export const ClubManage = (): JSX.Element => {
   const userRepresentativeStatuses = useUserRepresentativeStatus(); // 배열을 반환한다고 가정
   const { durationStatus } = useReportDurationStatus();
-  const { durationStatus: fundingStatus } = useReportDurationStatus();
+  const { durationStatus: fundingStatus } = useFundingDurationStatus();
   const navigate = useNavigate();
   const [clubInfos, setClubInfos] = useState<{ [key: number]: ClubInfo }>({});
   const [advisorSignedStatus, setAdvisorSignedStatus] = useState<{
@@ -163,6 +164,7 @@ export const ClubManage = (): JSX.Element => {
         await getRequest(
           `member/list?club_id=${clubId}`,
           (data) => {
+            console.log(data.data[0]);
             const formattedData = data.data.map(
               (item: {
                 student_id: any;
@@ -170,12 +172,14 @@ export const ClubManage = (): JSX.Element => {
                 memberName: any;
                 apply_time_formatted: any;
                 approved_type: any;
+                isRegularMember: any;
               }) => ({
                 studentId: item.student_id,
                 email: item.memberEmail,
                 name: item.memberName,
                 startDate: item.apply_time_formatted,
                 feedbackType: item.approved_type,
+                isRegularMember: item.isRegularMember,
               })
             );
 
@@ -183,6 +187,7 @@ export const ClubManage = (): JSX.Element => {
               ...applyLists,
               [clubId]: formattedData,
             }));
+            console.log(formattedData);
           },
           (error) => {
             console.error("Error fetching applies:", error);
@@ -439,7 +444,9 @@ export const ClubManage = (): JSX.Element => {
                         <Activity
                           key={index}
                           index={index + 1}
-                          name={`${member.studentId} ${member.name}`}
+                          name={`${member.studentId} ${member.name} (${
+                            member.isRegularMember ? "정회원" : "준회원"
+                          })`}
                           type={member.email}
                           start_date={member.startDate}
                           activityStateProperty1={member.feedbackType}
@@ -554,7 +561,7 @@ export const ClubManage = (): JSX.Element => {
                         />
                       </div>
                       <div className="frame-28">
-                        {status.typeId < 4 && durationStatus == 1 && (
+                        {status.typeId < 4 && fundingStatus === 1 && (
                           <>
                             <div
                               className="rectangle"
@@ -611,7 +618,7 @@ export const ClubManage = (): JSX.Element => {
                       <div className="frame-28">
                         {activitiesLists[status.clubId]?.length < 20 &&
                           status.typeId < 4 &&
-                          durationStatus == 1 && (
+                          durationStatus === 1 && (
                             <>
                               <div
                                 className="rectangle"

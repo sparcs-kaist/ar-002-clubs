@@ -477,6 +477,16 @@ router.get("/list", async (req, res) => {
           model: Member,
           as: "student", // Make sure this alias matches the one defined in your association
           attributes: ["name", "email"],
+          include: [
+            {
+              model: MemberStatus,
+              as: "MemberStatuses",
+              attributes: ["is_regular_member"],
+              where: {
+                semester_id: currentSemester.id,
+              },
+            },
+          ],
         },
       ],
       attributes: [
@@ -500,6 +510,7 @@ router.get("/list", async (req, res) => {
         ...reg.toJSON(),
         memberName: reg.student.name,
         memberEmail: reg.student.email,
+        isRegularMember: reg.student.MemberStatuses[0].is_regular_member == 1,
         apply_time: reg.apply_time_formatted, // Use the formatted apply_time
       };
     });
