@@ -144,6 +144,62 @@ export const MemberClubDashboard = (): JSX.Element => {
                                   }
                                 );
                               }
+                            } else if (member.feedbackType === 1) {
+                              const isConfirmed = window.confirm(
+                                `${member.name}의 가입을 승인하시겠습니까? ('확인'을 누르면 승인, '취소'를 누르면 반려됩니다.)`
+                              );
+
+                              // Approval case
+                              if (isConfirmed) {
+                                postRequest(
+                                  `member/approve?student_id=${member.studentId}&club_id=${id}`,
+                                  {},
+                                  () => {
+                                    // Update feedbackType to approved
+                                    const updatedApplies = applyLists.map(
+                                      (appl) =>
+                                        appl.studentId === member.studentId
+                                          ? { ...appl, feedbackType: 2 }
+                                          : appl // Assuming feedbackType 2 means approved
+                                    );
+                                    setApplyLists(updatedApplies);
+                                    // alert(
+                                    //   `${member.name}의 가입이 승인되었습니다.`
+                                    // );
+                                  },
+                                  (error) => {
+                                    console.error(
+                                      "Error approving member:",
+                                      error
+                                    );
+                                  }
+                                );
+                              } else {
+                                // Disapproval case
+                                postRequest(
+                                  `member/disapprove?student_id=${member.studentId}&club_id=${id}`,
+                                  {},
+                                  () => {
+                                    // Update feedbackType to disapproved
+                                    const updatedApplies = applyLists.map(
+                                      (appl) =>
+                                        appl.studentId === member.studentId
+                                          ? { ...appl, feedbackType: 3 }
+                                          : appl // Assuming feedbackType 3 means disapproved
+                                    );
+                                    setApplyLists(updatedApplies);
+                                    // alert(
+                                    //   `${member.name}의 가입이 거절되었습니다.`
+                                    // );
+                                  },
+                                  (error) => {
+                                    console.error(
+                                      "Error disapproving member:",
+                                      error
+                                    );
+                                  }
+                                );
+                              }
                             }
                           }}
                           id={member.studentId}
