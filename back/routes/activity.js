@@ -576,6 +576,7 @@ router.get("/is_report_duration", async (req, res) => {
 
 router.get("/activity_list", async (req, res) => {
   const clubId = req.query.club_id;
+  const isAdvisor = req.query.is_advisor === 1;
   const currentDate = new Date();
 
   if (!clubId) {
@@ -621,8 +622,12 @@ router.get("/activity_list", async (req, res) => {
     const activities = await Activity.findAll({
       where: {
         club_id: clubId,
-        start_date: { [Op.gte]: activityDuration.start_date },
-        end_date: { [Op.lte]: activityDuration.end_date },
+        ...(isAdvisor
+          ? {
+              start_date: { [Op.gte]: activityDuration.start_date },
+              end_date: { [Op.lte]: activityDuration.end_date },
+            }
+          : {}),
       },
       include: [
         {
@@ -639,7 +644,7 @@ router.get("/activity_list", async (req, res) => {
         "end_date",
         "feedback_type",
       ],
-      order: [["start_date", "ASC"]],
+      order: [["recent_edit", "DESC"]],
     });
 
     const formatDateString = (date) => {

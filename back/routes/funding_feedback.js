@@ -65,7 +65,7 @@ router.get("/club_funding_list", async (req, res) => {
     const filteredFundings = await Funding.findAll({
       where: {
         club_id: club_id,
-        semester_id: currentSemester.id,
+        // semester_id: currentSemester.id,
       },
       include: [
         {
@@ -87,7 +87,7 @@ router.get("/club_funding_list", async (req, res) => {
           attributes: ["student_id", "name"],
         },
       ],
-      order: [["funding_feedback_type", "ASC"]],
+      order: [["recent_edit", "DESC"]],
       attributes: [
         "id",
         "name",
@@ -688,15 +688,12 @@ router.get("/funding_submit_list", async (req, res) => {
     );
 
     clubData.sort((a, b) => b.feedbackTypeOne - a.feedbackTypeOne);
-    const filteredClubData = clubData.filter(
-      (data) => data.totalClubActivities > 0
-    );
 
     res.json({
       totalActivities,
       nonFeedbackTypeOneActivities,
       ratio,
-      clubData: filteredClubData,
+      clubData: clubData,
     });
   } catch (error) {
     console.error("Error in /activity_submit_list:", error);

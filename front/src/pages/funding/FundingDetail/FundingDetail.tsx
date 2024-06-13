@@ -197,8 +197,8 @@ export const FundingDetail = (): JSX.Element => {
 
   // Validation for date range and order
   //TODO: 서버에서 불러와서 적용
-  const minDate = new Date("2023-08-28");
-  const maxDate = new Date("2023-12-15");
+  const minDate = "2023-12-16";
+  const maxDate = "2024-06-14";
 
   // useEffect(() => {
   //   removeAllParticipants();
@@ -487,11 +487,11 @@ export const FundingDetail = (): JSX.Element => {
       return;
     }
 
-    const expenditureDate = new Date(funding.expenditureDate);
-    if (expenditureDate < minDate || expenditureDate > maxDate) {
-      alert("날짜 범위가 올바르지 않습니다. 다시 확인해주세요.");
-      return;
-    }
+    // const expenditureDate = new Date(funding.expenditureDate);
+    // // if (expenditureDate < minDate || expenditureDate > maxDate) {
+    // //   alert("날짜 범위가 올바르지 않습니다. 다시 확인해주세요.");
+    // //   return;
+    // // }
 
     // Prepare the data to be sent
     const dataToSend = {
@@ -1246,26 +1246,28 @@ export const FundingDetail = (): JSX.Element => {
           </div>
         </div>
         <UnderBar />
-        {durationStatus > 0 && (
-          <div className="frame-16">
-            <div
-              className="frame-17"
-              onClick={() => navigate(`/edit_funding/${id}`)}
-              style={{ cursor: "pointer" }}
-            >
-              수정
-            </div>
-            {durationStatus == 1 && (
+        {durationStatus > 0 &&
+          minDate <= funding.expenditureDate &&
+          funding.expenditureDate <= maxDate && (
+            <div className="frame-16">
               <div
                 className="frame-17"
-                onClick={handleDeleteFunding}
+                onClick={() => navigate(`/edit_funding/${id}`)}
                 style={{ cursor: "pointer" }}
               >
-                삭제
+                수정
               </div>
-            )}
-          </div>
-        )}
+              {durationStatus == 1 && (
+                <div
+                  className="frame-17"
+                  onClick={handleDeleteFunding}
+                  style={{ cursor: "pointer" }}
+                >
+                  삭제
+                </div>
+              )}
+            </div>
+          )}
       </div>
     </div>
   );

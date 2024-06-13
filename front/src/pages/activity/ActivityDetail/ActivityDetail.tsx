@@ -60,6 +60,9 @@ export const ActivityDetail = (): JSX.Element => {
     feedbackResults: [],
   });
 
+  const minDate = "2023-12-16";
+  const maxDate = "2024-06-14";
+
   const [searchTerm, setSearchTerm] = useState("");
   const [searchResults, setSearchResults] = useState<Participant[]>([]);
   const [originalSearchResults, setOriginalSearchResults] = useState<
@@ -401,26 +404,29 @@ export const ActivityDetail = (): JSX.Element => {
           </div>
         </div>
         <UnderBar />
-        {typeId < 4 && durationStatus > 0 && (
-          <div className="frame-16">
-            <div
-              className="frame-17"
-              onClick={() => navigate(`/edit_activity/${id}`)}
-              style={{ cursor: "pointer" }}
-            >
-              수정
-            </div>
-            {durationStatus == 1 && (
+        {typeId < 4 &&
+          durationStatus > 0 &&
+          minDate <= activity.startDate &&
+          activity.endDate <= maxDate && (
+            <div className="frame-16">
               <div
                 className="frame-17"
-                onClick={handleDeleteActivity}
+                onClick={() => navigate(`/edit_activity/${id}`)}
                 style={{ cursor: "pointer" }}
               >
-                삭제
+                수정
               </div>
-            )}
-          </div>
-        )}
+              {durationStatus == 1 && (
+                <div
+                  className="frame-17"
+                  onClick={handleDeleteActivity}
+                  style={{ cursor: "pointer" }}
+                >
+                  삭제
+                </div>
+              )}
+            </div>
+          )}
       </div>
     </div>
   );

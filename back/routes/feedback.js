@@ -88,10 +88,10 @@ router.get("/club_activity_list", async (req, res) => {
     const filteredActivities = await Activity.findAll({
       where: {
         club_id: club_id,
-        [Sequelize.Op.and]: [
-          { start_date: { [Sequelize.Op.gte]: activityDuration.start_date } },
-          { end_date: { [Sequelize.Op.lte]: activityDuration.end_date } },
-        ],
+        // [Sequelize.Op.and]: [
+        //   { start_date: { [Sequelize.Op.gte]: activityDuration.start_date } },
+        //   { end_date: { [Sequelize.Op.lte]: activityDuration.end_date } },
+        // ],
       },
       include: [
         {
@@ -125,7 +125,7 @@ router.get("/club_activity_list", async (req, res) => {
           ],
         },
       ],
-      order: [["feedback_type", "ASC"]],
+      order: [["recent_edit", "DESC"]],
       attributes: [
         "id",
         "title",

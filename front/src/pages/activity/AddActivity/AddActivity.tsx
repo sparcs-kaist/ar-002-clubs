@@ -68,8 +68,8 @@ export const AddActivity = (): JSX.Element => {
 
   // Validation for date range and order
   //TODO: 서버에서 불러와서 적용
-  const minDate = new Date("2023-06-17");
-  const maxDate = new Date("2023-12-15");
+  const minDate = new Date("2023-12-16");
+  const maxDate = new Date("2024-06-14");
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;

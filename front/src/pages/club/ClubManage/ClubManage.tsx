@@ -109,7 +109,9 @@ export const ClubManage = (): JSX.Element => {
       };
       const fetchActivities = async () => {
         await getRequest(
-          `activity/activity_list?club_id=${clubId}`,
+          `activity/activity_list?club_id=${clubId}?is_advisor=${
+            status.typeId === 4 ? 1 : 0
+          }`,
           (data) => {
             setActivitiesLists((activitiesLists) => ({
               ...activitiesLists,
@@ -426,168 +428,8 @@ export const ClubManage = (): JSX.Element => {
                     </div>
                   </div>
                 )}
-                {status.typeId < 4 && (
-                  <div className="frame-13">
-                    <SubTitle
-                      className="sub-title-instance"
-                      divClassName="design-component-instance-node"
-                      text={`${currentClubInfo.clubName} 회원 신청`}
-                    />
-                    <div className="frame-22">
-                      <Activity
-                        property1="variant-2"
-                        isRegistration={5}
-                        activityStateProperty1={2}
-                        id={0}
-                      />
-                      {applyLists[status.clubId]?.map((member, index) => (
-                        <Activity
-                          key={index}
-                          index={index + 1}
-                          name={`${member.studentId} ${member.name} (${
-                            member.isRegularMember ? "정회원" : "준회원"
-                          })`}
-                          type={member.email}
-                          start_date={member.startDate}
-                          activityStateProperty1={member.feedbackType}
-                          isRegistration={5}
-                          handleRegistration={() => {
-                            if (member.feedbackType === 1) {
-                              const isConfirmed = window.confirm(
-                                `${member.name}의 가입을 승인하시겠습니까? ('확인'을 누르면 승인, '취소'를 누르면 반려됩니다.)`
-                              );
-
-                              // Approval case
-                              if (isConfirmed) {
-                                postRequest(
-                                  `member/approve?student_id=${member.studentId}&club_id=${status.clubId}`,
-                                  {},
-                                  () => {
-                                    // Update feedbackType to approved
-                                    const updatedApplies = applyLists[
-                                      status.clubId
-                                    ].map(
-                                      (appl) =>
-                                        appl.studentId === member.studentId
-                                          ? { ...appl, feedbackType: 2 }
-                                          : appl // Assuming feedbackType 2 means approved
-                                    );
-                                    setApplyLists({
-                                      ...applyLists,
-                                      [status.clubId]: updatedApplies,
-                                    });
-                                    // alert(
-                                    //   `${member.name}의 가입이 승인되었습니다.`
-                                    // );
-                                  },
-                                  (error) => {
-                                    console.error(
-                                      "Error approving member:",
-                                      error
-                                    );
-                                  }
-                                );
-                              } else {
-                                // Disapproval case
-                                postRequest(
-                                  `member/disapprove?student_id=${member.studentId}&club_id=${status.clubId}`,
-                                  {},
-                                  () => {
-                                    // Update feedbackType to disapproved
-                                    const updatedApplies = applyLists[
-                                      status.clubId
-                                    ].map(
-                                      (appl) =>
-                                        appl.studentId === member.studentId
-                                          ? { ...appl, feedbackType: 3 }
-                                          : appl // Assuming feedbackType 3 means disapproved
-                                    );
-                                    setApplyLists({
-                                      ...applyLists,
-                                      [status.clubId]: updatedApplies,
-                                    });
-                                    // alert(
-                                    //   `${member.name}의 가입이 거절되었습니다.`
-                                    // );
-                                  },
-                                  (error) => {
-                                    console.error(
-                                      "Error disapproving member:",
-                                      error
-                                    );
-                                  }
-                                );
-                              }
-                            }
-                          }}
-                          id={member.studentId}
-                        />
-                      ))}
-                    </div>
-                  </div>
-                )}
                 <div className="frame-16">
                   <div className="frame-21" style={{ marginBottom: "80px" }}>
-                    <div className="frame-13">
-                      <SubTitle
-                        className="sub-title-instance"
-                        divClassName="design-component-instance-node"
-                        text={`${currentClubInfo.clubName} 지원금 신청`}
-                      />
-                      <div className="frame-22">
-                        <Funding
-                          property1="variant-2"
-                          activityStateProperty1={2}
-                          id={0}
-                        />
-                        {fundingLists[status.clubId]?.map((funding, index) => (
-                          <Funding
-                            key={index}
-                            index={index + 1}
-                            activityName={funding.activityName}
-                            name={funding.name}
-                            expenditureMoney={funding.expenditureAmount}
-                            approvedMoney={funding.approvedAmount}
-                            activityStateProperty1={funding.feedbackType}
-                            id={funding.id}
-                          />
-                        ))}
-                        <Funding
-                          property1="variant-3"
-                          activityStateProperty1={2}
-                          id={0}
-                          expenditureMoney={totalExpenditureMoney}
-                          approvedMoney={totalApprovedMoney}
-                        />
-                      </div>
-                      <div className="frame-28">
-                        {status.typeId < 4 && fundingStatus === 1 && (
-                          <>
-                            <div
-                              className="rectangle"
-                              onClick={() => navigate("/add_funding")}
-                              style={{ cursor: "pointer" }}
-                            />
-
-                            <div
-                              className="frame-29"
-                              onClick={() => navigate("/add_funding")}
-                              style={{ cursor: "pointer" }}
-                            >
-                              <div className="group-3">
-                                <div className="overlap-group-2">
-                                  <div className="ellipse" />
-                                  <div className="text-wrapper-13">+</div>
-                                </div>
-                              </div>
-                              <div className="text-wrapper-14">
-                                지원금 추가하기
-                              </div>
-                            </div>
-                          </>
-                        )}
-                      </div>
-                    </div>
                     <div className="frame-13">
                       <SubTitle
                         className="sub-title-instance"
@@ -654,7 +496,7 @@ export const ClubManage = (): JSX.Element => {
                         />
                         <div className="frame-14">
                           <p className="text-wrapper-15">
-                            2023.06.17. ~ 2023.12.15. 기간 중 <br />
+                            2023.12.16. ~ 2024.06.14. 기간 중 <br />
                             {clubInfos[status.clubId].clubName}의 동아리
                             활동이 위 활동보고서와 일치함을 확인하고 이에
                             서명합니다.
@@ -691,6 +533,170 @@ export const ClubManage = (): JSX.Element => {
                               </div>
                             </div>
                           </div>
+                        </div>
+                      </div>
+                    )}
+                    {status.typeId < 4 && (
+                      <div className="frame-13">
+                        <SubTitle
+                          className="sub-title-instance"
+                          divClassName="design-component-instance-node"
+                          text={`${currentClubInfo.clubName} 지원금 신청`}
+                        />
+                        <div className="frame-22">
+                          <Funding
+                            property1="variant-2"
+                            activityStateProperty1={2}
+                            id={0}
+                          />
+                          {fundingLists[status.clubId]?.map(
+                            (funding, index) => (
+                              <Funding
+                                key={index}
+                                index={index + 1}
+                                activityName={funding.activityName}
+                                name={funding.name}
+                                expenditureMoney={funding.expenditureAmount}
+                                approvedMoney={funding.approvedAmount}
+                                activityStateProperty1={funding.feedbackType}
+                                id={funding.id}
+                              />
+                            )
+                          )}
+                          <Funding
+                            property1="variant-3"
+                            activityStateProperty1={2}
+                            id={0}
+                            expenditureMoney={totalExpenditureMoney}
+                            approvedMoney={totalApprovedMoney}
+                          />
+                        </div>
+                        <div className="frame-28">
+                          {status.typeId < 4 && fundingStatus === 1 && (
+                            <>
+                              <div
+                                className="rectangle"
+                                onClick={() => navigate("/add_funding")}
+                                style={{ cursor: "pointer" }}
+                              />
+
+                              <div
+                                className="frame-29"
+                                onClick={() => navigate("/add_funding")}
+                                style={{ cursor: "pointer" }}
+                              >
+                                <div className="group-3">
+                                  <div className="overlap-group-2">
+                                    <div className="ellipse" />
+                                    <div className="text-wrapper-13">+</div>
+                                  </div>
+                                </div>
+                                <div className="text-wrapper-14">
+                                  지원금 추가하기
+                                </div>
+                              </div>
+                            </>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                    {status.typeId < 4 && (
+                      <div className="frame-13">
+                        <SubTitle
+                          className="sub-title-instance"
+                          divClassName="design-component-instance-node"
+                          text={`${currentClubInfo.clubName} 회원 신청`}
+                        />
+                        <div className="frame-22">
+                          <Activity
+                            property1="variant-2"
+                            isRegistration={5}
+                            activityStateProperty1={2}
+                            id={0}
+                          />
+                          {applyLists[status.clubId]?.map((member, index) => (
+                            <Activity
+                              key={index}
+                              index={index + 1}
+                              name={`${member.studentId} ${member.name} (${
+                                member.isRegularMember ? "정회원" : "준회원"
+                              })`}
+                              type={member.email}
+                              start_date={member.startDate}
+                              activityStateProperty1={member.feedbackType}
+                              isRegistration={5}
+                              handleRegistration={() => {
+                                if (member.feedbackType === 1) {
+                                  const isConfirmed = window.confirm(
+                                    `${member.name}의 가입을 승인하시겠습니까? ('확인'을 누르면 승인, '취소'를 누르면 반려됩니다.)`
+                                  );
+
+                                  // Approval case
+                                  if (isConfirmed) {
+                                    postRequest(
+                                      `member/approve?student_id=${member.studentId}&club_id=${status.clubId}`,
+                                      {},
+                                      () => {
+                                        // Update feedbackType to approved
+                                        const updatedApplies = applyLists[
+                                          status.clubId
+                                        ].map(
+                                          (appl) =>
+                                            appl.studentId === member.studentId
+                                              ? { ...appl, feedbackType: 2 }
+                                              : appl // Assuming feedbackType 2 means approved
+                                        );
+                                        setApplyLists({
+                                          ...applyLists,
+                                          [status.clubId]: updatedApplies,
+                                        });
+                                        // alert(
+                                        //   `${member.name}의 가입이 승인되었습니다.`
+                                        // );
+                                      },
+                                      (error) => {
+                                        console.error(
+                                          "Error approving member:",
+                                          error
+                                        );
+                                      }
+                                    );
+                                  } else {
+                                    // Disapproval case
+                                    postRequest(
+                                      `member/disapprove?student_id=${member.studentId}&club_id=${status.clubId}`,
+                                      {},
+                                      () => {
+                                        // Update feedbackType to disapproved
+                                        const updatedApplies = applyLists[
+                                          status.clubId
+                                        ].map(
+                                          (appl) =>
+                                            appl.studentId === member.studentId
+                                              ? { ...appl, feedbackType: 3 }
+                                              : appl // Assuming feedbackType 3 means disapproved
+                                        );
+                                        setApplyLists({
+                                          ...applyLists,
+                                          [status.clubId]: updatedApplies,
+                                        });
+                                        // alert(
+                                        //   `${member.name}의 가입이 거절되었습니다.`
+                                        // );
+                                      },
+                                      (error) => {
+                                        console.error(
+                                          "Error disapproving member:",
+                                          error
+                                        );
+                                      }
+                                    );
+                                  }
+                                }
+                              }}
+                              id={member.studentId}
+                            />
+                          ))}
                         </div>
                       </div>
                     )}

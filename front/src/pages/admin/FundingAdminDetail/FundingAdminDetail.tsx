@@ -195,8 +195,8 @@ export const FundingAdminDetail = (): JSX.Element => {
 
   // Validation for date range and order
   //TODO: 서버에서 불러와서 적용
-  const minDate = new Date("2023-08-28");
-  const maxDate = new Date("2023-12-15");
+  const minDate = "2023-12-16";
+  const maxDate = "2024-06-14";
 
   // useEffect(() => {
   //   removeAllParticipants();
@@ -1131,74 +1131,77 @@ export const FundingAdminDetail = (): JSX.Element => {
                 </div>
               </div>
             )}
-            <div className="frame-11">
-              <SubTitle className="sub-title-instance" text="검토 결과" />
-              <div className="frame-9">
-                <p className="div-3">
-                  <span className="span">승인 금액:</span>
-                  <input
-                    type="number"
-                    name="approvedAmount"
-                    value={funding.approvedAmount}
-                    onChange={handleChange}
-                    placeholder="승인 금액"
-                    className="text-wrapper-8"
-                  />
-                  <span className="span">
-                    원 / {funding.expenditureAmount}원
-                  </span>
-                  <button
-                    className="div-3"
-                    style={{ marginLeft: "10px" }}
-                    onClick={() => {
-                      setFunding((prevState) => ({
-                        ...prevState,
-                        approvedAmount: prevState.expenditureAmount,
-                      }));
-                    }}
-                  >
-                    전액승인
-                  </button>
-                  <button
-                    className="div-3"
-                    style={{ marginLeft: "10px" }}
-                    onClick={() => {
-                      setFunding((prevState) => ({
-                        ...prevState,
-                        approvedAmount: 0,
-                      }));
-                    }}
-                  >
-                    미승인
-                  </button>
-                </p>
-                <p className="div-3">
-                  <span className="span">운영위원회 심의 필요 여부</span>
-                  <input
-                    type="checkbox"
-                    name="isCommittee"
-                    checked={funding.isCommittee}
-                    onChange={handleChange}
-                    className="check-box"
-                  />
-                </p>
-                <textarea
-                  className="text-area"
-                  value={reviewResult}
-                  onChange={handleReviewResultChange}
-                />
-                <div className="frame-14">
-                  <div
-                    className="frame-15"
-                    style={{ cursor: "pointer" }}
-                    onClick={handleReviewComplete}
-                  >
-                    <div className="text-wrapper-11">검토 완료</div>
+            {funding.expenditureDate >= minDate &&
+              funding.expenditureDate <= maxDate && (
+                <div className="frame-11">
+                  <SubTitle className="sub-title-instance" text="검토 결과" />
+                  <div className="frame-9">
+                    <p className="div-3">
+                      <span className="span">승인 금액:</span>
+                      <input
+                        type="number"
+                        name="approvedAmount"
+                        value={funding.approvedAmount}
+                        onChange={handleChange}
+                        placeholder="승인 금액"
+                        className="text-wrapper-8"
+                      />
+                      <span className="span">
+                        원 / {funding.expenditureAmount}원
+                      </span>
+                      <button
+                        className="div-3"
+                        style={{ marginLeft: "10px" }}
+                        onClick={() => {
+                          setFunding((prevState) => ({
+                            ...prevState,
+                            approvedAmount: prevState.expenditureAmount,
+                          }));
+                        }}
+                      >
+                        전액승인
+                      </button>
+                      <button
+                        className="div-3"
+                        style={{ marginLeft: "10px" }}
+                        onClick={() => {
+                          setFunding((prevState) => ({
+                            ...prevState,
+                            approvedAmount: 0,
+                          }));
+                        }}
+                      >
+                        미승인
+                      </button>
+                    </p>
+                    <p className="div-3">
+                      <span className="span">운영위원회 심의 필요 여부</span>
+                      <input
+                        type="checkbox"
+                        name="isCommittee"
+                        checked={funding.isCommittee}
+                        onChange={handleChange}
+                        className="check-box"
+                      />
+                    </p>
+                    <textarea
+                      className="text-area"
+                      value={reviewResult}
+                      onChange={handleReviewResultChange}
+                    />
+                    <div className="frame-14">
+                      <div
+                        className="frame-15"
+                        style={{ cursor: "pointer" }}
+                        onClick={handleReviewComplete}
+                      >
+                        <div className="text-wrapper-11">검토 완료</div>
+                      </div>
+                    </div>
+                    {renderActivityFeedback()}
                   </div>
                 </div>
-                {renderActivityFeedback()}
-              </div>
-            </div>
+              )}
           </div>
         </div>
         <UnderBar />

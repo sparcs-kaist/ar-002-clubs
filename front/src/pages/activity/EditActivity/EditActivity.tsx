@@ -280,8 +280,8 @@ export const EditActivity = (): JSX.Element => {
     // Validation for date range and order
     const startDate = new Date(activity.startDate);
     const endDate = new Date(activity.endDate);
-    const minDate = new Date("2023-06-17");
-    const maxDate = new Date("2023-12-15");
+    const minDate = new Date("2023-12-16");
+    const maxDate = new Date("2024-06-14");
 
     if (
       startDate > endDate ||

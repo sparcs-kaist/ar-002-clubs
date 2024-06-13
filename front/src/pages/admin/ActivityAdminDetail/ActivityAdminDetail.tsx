@@ -61,6 +61,10 @@ export const ActivityAdminDetail = (): JSX.Element => {
 
   const [reviewResult, setReviewResult] = useState("");
 
+  const minDate = "2023-12-16";
+  const maxDate = "2024-06-14";
+  // const maxDate = new Date("2024-06-14");
+
   const handleReviewResultChange = (
     event: React.ChangeEvent<HTMLTextAreaElement>
   ) => {
@@ -241,26 +245,28 @@ export const ActivityAdminDetail = (): JSX.Element => {
                 ))}
               </div>
             </div>
-            <div className="frame-11">
-              <SubTitle className="sub-title-instance" text="검토 결과" />
-              <div className="frame-9">
-                <textarea
-                  className="text-area"
-                  value={reviewResult}
-                  onChange={handleReviewResultChange}
-                />
-                <div className="frame-14">
-                  <div
-                    className="frame-15"
-                    style={{ cursor: "pointer" }}
-                    onClick={handleReviewComplete}
-                  >
-                    <div className="text-wrapper-11">검토 완료</div>
+            {activity.startDate >= minDate && activity.endDate <= maxDate && (
+              <div className="frame-11">
+                <SubTitle className="sub-title-instance" text="검토 결과" />
+                <div className="frame-9">
+                  <textarea
+                    className="text-area"
+                    value={reviewResult}
+                    onChange={handleReviewResultChange}
+                  />
+                  <div className="frame-14">
+                    <div
+                      className="frame-15"
+                      style={{ cursor: "pointer" }}
+                      onClick={handleReviewComplete}
+                    >
+                      <div className="text-wrapper-11">검토 완료</div>
+                    </div>
                   </div>
+                  {renderActivityFeedback()}
                 </div>
-                {renderActivityFeedback()}
               </div>
-            </div>
+            )}
           </div>
         </div>
         <UnderBar />

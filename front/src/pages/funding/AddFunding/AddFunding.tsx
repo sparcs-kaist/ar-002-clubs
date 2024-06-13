@@ -153,8 +153,8 @@ export const AddFunding = (): JSX.Element => {
 
   // Validation for date range and order
   //TODO: 서버에서 불러와서 적용
-  const minDate = new Date("2023-08-28");
-  const maxDate = new Date("2023-12-15");
+  const minDate = new Date("2023-12-16");
+  const maxDate = new Date("2024-06-14");
 
   useEffect(() => {
     if (!isLoading && durationStatus != 1) {

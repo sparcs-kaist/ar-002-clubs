@@ -53,7 +53,7 @@ router.get("/funding_list", async (req, res) => {
     const fundings = await Funding.findAll({
       where: {
         club_id: clubId,
-        semester_id: currentSemester.id,
+        // semester_id: currentSemester.id,
       },
       attributes: [
         "id",
@@ -66,8 +66,9 @@ router.get("/funding_list", async (req, res) => {
         // Add other required fields
       ],
       order: [
-        ["purpose", "ASC"],
-        ["expenditure_date", "ASC"],
+        ["recent_edit", "DESC"],
+        // ["purpose", "ASC"],
+        // ["expenditure_date", "ASC"],
       ],
     });
 
