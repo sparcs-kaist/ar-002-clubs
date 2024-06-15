@@ -135,9 +135,9 @@ router.get("/club_activity_list", async (req, res) => {
       ],
     });
 
-    console.log(
-      filteredActivities[0].ActivityFeedbackExecutive.student.student.name
-    );
+    // console.log(
+    //   filteredActivities[0].ActivityFeedbackExecutive.student.student.name
+    // );
 
     // Process and return the response
     const responseArray = filteredActivities.map((activity) => {

@@ -52,7 +52,7 @@ export const ClubActivityList = (): JSX.Element => {
                 <div className="frame-13">
                   <SubTitle
                     className="sub-title-instance"
-                    text="활동 보고서 검토 현황"
+                    text="2024 봄 활동 보고서 검토"
                   />
                   <div className="frame-14">
                     <DashboardActivity
@@ -60,22 +60,63 @@ export const ClubActivityList = (): JSX.Element => {
                       activityStateProperty1="default"
                     />
                     {Array.isArray(activities) &&
-                      activities.map((activity, index) => (
-                        <DashboardActivity
-                          key={index}
-                          type="one"
-                          clubId={parseInt(id ? id : "0")}
-                          activityId={activity.activityId}
-                          number={(index + 1).toString()}
-                          title={activity.title}
-                          editedTime={activity.recent_edit}
-                          feedbackTime={activity.recent_feedback}
-                          feedbackName={activity.feedbackMemberName}
-                          executiveName={activity.executiveName}
-                          executiveId={activity.executive_id}
-                          feedbackState={activity.feedbackType}
-                        />
-                      ))}
+                      activities
+                        ?.filter((activity) => {
+                          const recentDate = new Date(activity.recent_edit);
+                          const targetDate = new Date("2024-06-01");
+                          return recentDate > targetDate;
+                        })
+                        .map((activity, index) => (
+                          <DashboardActivity
+                            key={index}
+                            type="one"
+                            clubId={parseInt(id ? id : "0")}
+                            activityId={activity.activityId}
+                            number={(index + 1).toString()}
+                            title={activity.title}
+                            editedTime={activity.recent_edit}
+                            feedbackTime={activity.recent_feedback}
+                            feedbackName={activity.feedbackMemberName}
+                            executiveName={activity.executiveName}
+                            executiveId={activity.executive_id}
+                            feedbackState={activity.feedbackType}
+                          />
+                        ))}
+                  </div>
+                </div>
+                <div className="frame-13">
+                  <SubTitle
+                    className="sub-title-instance"
+                    text="2023 가을 활동 보고서 검토"
+                  />
+                  <div className="frame-14">
+                    <DashboardActivity
+                      type="zero"
+                      activityStateProperty1="default"
+                    />
+                    {Array.isArray(activities) &&
+                      activities
+                        ?.filter((activity) => {
+                          const recentDate = new Date(activity.recent_edit);
+                          const targetDate = new Date("2024-06-01");
+                          return recentDate <= targetDate;
+                        })
+                        .map((activity, index) => (
+                          <DashboardActivity
+                            key={index}
+                            type="one"
+                            clubId={parseInt(id ? id : "0")}
+                            activityId={activity.activityId}
+                            number={(index + 1).toString()}
+                            title={activity.title}
+                            editedTime={activity.recent_edit}
+                            feedbackTime={activity.recent_feedback}
+                            feedbackName={activity.feedbackMemberName}
+                            executiveName={activity.executiveName}
+                            executiveId={activity.executive_id}
+                            feedbackState={activity.feedbackType}
+                          />
+                        ))}
                   </div>
                 </div>
               </div>

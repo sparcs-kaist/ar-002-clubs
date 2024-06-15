@@ -41,6 +41,7 @@ type FundingInfo = {
   name: string;
   activityName: string;
   expenditureAmount: number;
+  expenditureDate: string;
   approvedAmount: number;
   feedbackType: number;
 };
@@ -79,6 +80,9 @@ export const ClubManage = (): JSX.Element => {
   const [loadedClubIds, setLoadedClubIds] = useState<number[]>([]);
   const [totalApprovedMoney, setTotalApprovedMoney] = useState<number>(0);
   const [totalExpenditureMoney, setTotalExpenditureMoney] = useState<number>(0);
+  const [springApprovedMoney, setSpringApprovedMoney] = useState<number>(0);
+  const [springExpenditureMoney, setSpringExpenditureMoney] =
+    useState<number>(0);
 
   useEffect(() => {
     userRepresentativeStatuses.userStatuses.forEach((status) => {
@@ -133,7 +137,43 @@ export const ClubManage = (): JSX.Element => {
             }));
             setTotalExpenditureMoney(data.totalExpenditureAmount);
             setTotalApprovedMoney(data.totalApprovedAmount);
-            console.log(fundingLists[clubId]);
+
+            setSpringApprovedMoney(
+              data.funding
+                ?.filter((funding: FundingInfo) => {
+                  const expenditureDate = new Date(funding.expenditureDate);
+                  const targetStartDate = new Date("2023-12-16");
+                  const targetEndDate = new Date("2024-06-14");
+                  return (
+                    expenditureDate >= targetStartDate &&
+                    expenditureDate <= targetEndDate
+                  );
+                })
+                .reduce(
+                  (total: number, funding: FundingInfo) =>
+                    total + funding.approvedAmount,
+                  0
+                )
+            );
+            setSpringExpenditureMoney(
+              data.funding
+                ?.filter((funding: FundingInfo) => {
+                  const expenditureDate = new Date(funding.expenditureDate);
+                  const targetStartDate = new Date("2023-12-16");
+                  const targetEndDate = new Date("2024-06-14");
+                  return (
+                    expenditureDate >= targetStartDate &&
+                    expenditureDate <= targetEndDate
+                  );
+                })
+                .reduce(
+                  (total: number, funding: FundingInfo) =>
+                    total + funding.expenditureAmount,
+                  0
+                )
+            );
+
+            // console.log(fundingLists[clubId]);
           },
           (error) => {
             console.error("Error fetching activities:", error);
@@ -166,7 +206,7 @@ export const ClubManage = (): JSX.Element => {
         await getRequest(
           `member/list?club_id=${clubId}`,
           (data) => {
-            console.log(data.data[0]);
+            // console.log(data.data[0]);
             const formattedData = data.data.map(
               (item: {
                 student_id: any;
@@ -189,7 +229,7 @@ export const ClubManage = (): JSX.Element => {
               ...applyLists,
               [clubId]: formattedData,
             }));
-            console.log(formattedData);
+            // console.log(formattedData);
           },
           (error) => {
             console.error("Error fetching applies:", error);
@@ -430,11 +470,12 @@ export const ClubManage = (): JSX.Element => {
                 )}
                 <div className="frame-16">
                   <div className="frame-21" style={{ marginBottom: "80px" }}>
+                    {/* 활동보고서 */}
                     <div className="frame-13">
                       <SubTitle
                         className="sub-title-instance"
                         divClassName="design-component-instance-node"
-                        text={`${currentClubInfo.clubName} 활동 보고서`}
+                        text={`${currentClubInfo.clubName} 2024년 봄 활동 보고서`}
                       />
                       <div className="frame-22">
                         <Activity
@@ -442,8 +483,18 @@ export const ClubManage = (): JSX.Element => {
                           activityStateProperty1={2}
                           id={0}
                         />
-                        {activitiesLists[status.clubId]?.map(
-                          (activity, index) => (
+                        {activitiesLists[status.clubId]
+                          ?.filter((activity) => {
+                            const startDate = new Date(activity.startDate);
+                            const endDate = new Date(activity.endDate);
+                            const targetStartDate = new Date("2023-12-16");
+                            const targetEndDate = new Date("2024-06-14");
+                            return (
+                              startDate >= targetStartDate &&
+                              endDate <= targetEndDate
+                            );
+                          })
+                          .map((activity, index) => (
                             <Activity
                               key={index}
                               index={index + 1}
@@ -454,8 +505,7 @@ export const ClubManage = (): JSX.Element => {
                               activityStateProperty1={activity.feedbackType}
                               id={activity.id}
                             />
-                          )
-                        )}
+                          ))}
                       </div>
                       <div className="frame-28">
                         {activitiesLists[status.clubId]?.length < 20 &&
@@ -487,6 +537,45 @@ export const ClubManage = (): JSX.Element => {
                           )}
                       </div>
                     </div>
+                    {status.typeId < 4 && (
+                      <div className="frame-13">
+                        <SubTitle
+                          className="sub-title-instance"
+                          divClassName="design-component-instance-node"
+                          text={`${currentClubInfo.clubName} 2023년 가을 활동 보고서`}
+                        />
+                        <div className="frame-22">
+                          <Activity
+                            property1="variant-2"
+                            activityStateProperty1={2}
+                            id={0}
+                          />
+                          {activitiesLists[status.clubId]
+                            ?.filter((activity) => {
+                              const startDate = new Date(activity.startDate);
+                              const endDate = new Date(activity.endDate);
+                              const targetStartDate = new Date("2023-06-17");
+                              const targetEndDate = new Date("2023-12-15");
+                              return (
+                                startDate >= targetStartDate &&
+                                endDate <= targetEndDate
+                              );
+                            })
+                            .map((activity, index) => (
+                              <Activity
+                                key={index}
+                                index={index + 1}
+                                name={activity.title}
+                                type={activity.activityType}
+                                start_date={activity.startDate}
+                                end_date={activity.endDate}
+                                activityStateProperty1={activity.feedbackType}
+                                id={activity.id}
+                              />
+                            ))}
+                        </div>
+                      </div>
+                    )}
                     {currentClubInfo.advisor && (
                       <div className="frame-13">
                         <SubTitle
@@ -497,9 +586,8 @@ export const ClubManage = (): JSX.Element => {
                         <div className="frame-14">
                           <p className="text-wrapper-15">
                             2023.12.16. ~ 2024.06.14. 기간 중 <br />
-                            {clubInfos[status.clubId].clubName}의 동아리
-                            활동이 위 활동보고서와 일치함을 확인하고 이에
-                            서명합니다.
+                            {clubInfos[status.clubId].clubName}의 동아리 활동이
+                            위 활동보고서와 일치함을 확인하고 이에 서명합니다.
                           </p>
                         </div>
                         <div className="frame-14">
@@ -541,7 +629,7 @@ export const ClubManage = (): JSX.Element => {
                         <SubTitle
                           className="sub-title-instance"
                           divClassName="design-component-instance-node"
-                          text={`${currentClubInfo.clubName} 지원금 신청`}
+                          text={`${currentClubInfo.clubName} 2024년 봄 지원금 신청`}
                         />
                         <div className="frame-22">
                           <Funding
@@ -549,8 +637,19 @@ export const ClubManage = (): JSX.Element => {
                             activityStateProperty1={2}
                             id={0}
                           />
-                          {fundingLists[status.clubId]?.map(
-                            (funding, index) => (
+                          {fundingLists[status.clubId]
+                            ?.filter((funding) => {
+                              const expenditureDate = new Date(
+                                funding.expenditureDate
+                              );
+                              const targetStartDate = new Date("2023-12-16");
+                              const targetEndDate = new Date("2024-06-14");
+                              return (
+                                expenditureDate >= targetStartDate &&
+                                expenditureDate <= targetEndDate
+                              );
+                            })
+                            .map((funding, index) => (
                               <Funding
                                 key={index}
                                 index={index + 1}
@@ -561,14 +660,91 @@ export const ClubManage = (): JSX.Element => {
                                 activityStateProperty1={funding.feedbackType}
                                 id={funding.id}
                               />
-                            )
-                          )}
+                            ))}
                           <Funding
                             property1="variant-3"
                             activityStateProperty1={2}
                             id={0}
-                            expenditureMoney={totalExpenditureMoney}
-                            approvedMoney={totalApprovedMoney}
+                            expenditureMoney={springExpenditureMoney}
+                            approvedMoney={springApprovedMoney}
+                          />
+                        </div>
+                        <div className="frame-28">
+                          {status.typeId < 4 && fundingStatus === 1 && (
+                            <>
+                              <div
+                                className="rectangle"
+                                onClick={() => navigate("/add_funding")}
+                                style={{ cursor: "pointer" }}
+                              />
+
+                              <div
+                                className="frame-29"
+                                onClick={() => navigate("/add_funding")}
+                                style={{ cursor: "pointer" }}
+                              >
+                                <div className="group-3">
+                                  <div className="overlap-group-2">
+                                    <div className="ellipse" />
+                                    <div className="text-wrapper-13">+</div>
+                                  </div>
+                                </div>
+                                <div className="text-wrapper-14">
+                                  지원금 추가하기
+                                </div>
+                              </div>
+                            </>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                    {status.typeId < 4 && (
+                      <div className="frame-13">
+                        <SubTitle
+                          className="sub-title-instance"
+                          divClassName="design-component-instance-node"
+                          text={`${currentClubInfo.clubName} 2023년 가을 지원금 신청`}
+                        />
+                        <div className="frame-22">
+                          <Funding
+                            property1="variant-2"
+                            activityStateProperty1={2}
+                            id={0}
+                          />
+                          {fundingLists[status.clubId]
+                            ?.filter((funding) => {
+                              const expenditureDate = new Date(
+                                funding.expenditureDate
+                              );
+                              const targetStartDate = new Date("2023-06-17");
+                              const targetEndDate = new Date("2023-12-15");
+                              return (
+                                expenditureDate >= targetStartDate &&
+                                expenditureDate <= targetEndDate
+                              );
+                            })
+                            .map((funding, index) => (
+                              <Funding
+                                key={index}
+                                index={index + 1}
+                                activityName={funding.activityName}
+                                name={funding.name}
+                                expenditureMoney={funding.expenditureAmount}
+                                approvedMoney={funding.approvedAmount}
+                                activityStateProperty1={funding.feedbackType}
+                                id={funding.id}
+                              />
+                            ))}
+                          <Funding
+                            property1="variant-3"
+                            activityStateProperty1={2}
+                            id={0}
+                            expenditureMoney={
+                              totalExpenditureMoney - springExpenditureMoney
+                            }
+                            approvedMoney={
+                              totalApprovedMoney - springApprovedMoney
+                            }
                           />
                         </div>
                         <div className="frame-28">
