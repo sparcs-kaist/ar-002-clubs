@@ -508,7 +508,16 @@ export const ClubManage = (): JSX.Element => {
                           ))}
                       </div>
                       <div className="frame-28">
-                        {activitiesLists[status.clubId]?.length < 20 &&
+                        {activitiesLists[status.clubId]?.filter((activity) => {
+                          const startDate = new Date(activity.startDate);
+                          const endDate = new Date(activity.endDate);
+                          const targetStartDate = new Date("2023-12-16");
+                          const targetEndDate = new Date("2024-06-14");
+                          return (
+                            startDate >= targetStartDate &&
+                            endDate <= targetEndDate
+                          );
+                        }).length < 20 &&
                           status.typeId < 4 &&
                           durationStatus === 1 && (
                             <>
