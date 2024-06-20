@@ -210,16 +210,16 @@ router.post("/addActivity", async (req, res) => {
   }
 
   try {
-    const existingActivitiesCount = await Activity.count({
-      where: { club_id: clubId },
-    });
+    // const existingActivitiesCount = await Activity.count({
+    //   where: { club_id: clubId },
+    // });
 
-    // If there are already 20 or more activities, do not proceed
-    if (existingActivitiesCount >= 20) {
-      return res
-        .status(400)
-        .send({ message: "Cannot add more than 20 activities." });
-    }
+    // // If there are already 20 or more activities, do not proceed
+    // if (existingActivitiesCount >= 20) {
+    //   return res
+    //     .status(400)
+    //     .send({ message: "Cannot add more than 20 activities." });
+    // }
 
     // Calculate the current date/time in KST (Korean Standard Time)
     const currentDateTimeUTC = new Date();
