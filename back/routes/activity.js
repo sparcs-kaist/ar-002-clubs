@@ -642,6 +642,7 @@ router.get("/activity_list", async (req, res) => {
         "activity_type_id",
         "start_date",
         "end_date",
+        "recent_edit",
         "feedback_type",
       ],
       order: [["recent_edit", "DESC"]],
@@ -664,6 +665,7 @@ router.get("/activity_list", async (req, res) => {
         activityType: activity.activity_type.type,
         startDate: formatDateString(activity.start_date),
         endDate: formatDateString(activity.end_date),
+        recentEdit: formatDateString(activity.recent_edit),
         feedbackType: activity.feedback_type,
       })),
     });

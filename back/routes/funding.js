@@ -63,6 +63,7 @@ router.get("/funding_list", async (req, res) => {
         "approved_amount",
         "purpose",
         "funding_feedback_type",
+        "recent_edit",
         // Add other required fields
       ],
       order: [
@@ -100,6 +101,7 @@ router.get("/funding_list", async (req, res) => {
           approvedAmount: funding.approved_amount,
           feedbackType: funding.funding_feedback_type,
           activityName: activityName,
+          recentEdit: funding.recent_edit,
           // Map other required fields
         };
       })

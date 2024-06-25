@@ -34,6 +34,7 @@ type ActivityInfo = {
   startDate: string;
   endDate: string;
   feedbackType: number;
+  recentEdit: string;
 };
 
 type FundingInfo = {
@@ -44,6 +45,7 @@ type FundingInfo = {
   expenditureDate: string;
   approvedAmount: number;
   feedbackType: number;
+  recentEdit: string;
 };
 
 type ApplyInfo = {
@@ -141,13 +143,9 @@ export const ClubManage = (): JSX.Element => {
             setSpringApprovedMoney(
               data.funding
                 ?.filter((funding: FundingInfo) => {
-                  const expenditureDate = new Date(funding.expenditureDate);
-                  const targetStartDate = new Date("2023-12-16");
-                  const targetEndDate = new Date("2024-06-14");
-                  return (
-                    expenditureDate >= targetStartDate &&
-                    expenditureDate <= targetEndDate
-                  );
+                  const recentDate = new Date(funding.recentEdit);
+                  const targetDate = new Date("2024-06-01");
+                  return recentDate > targetDate;
                 })
                 .reduce(
                   (total: number, funding: FundingInfo) =>
@@ -158,13 +156,9 @@ export const ClubManage = (): JSX.Element => {
             setSpringExpenditureMoney(
               data.funding
                 ?.filter((funding: FundingInfo) => {
-                  const expenditureDate = new Date(funding.expenditureDate);
-                  const targetStartDate = new Date("2023-12-16");
-                  const targetEndDate = new Date("2024-06-14");
-                  return (
-                    expenditureDate >= targetStartDate &&
-                    expenditureDate <= targetEndDate
-                  );
+                  const recentDate = new Date(funding.recentEdit);
+                  const targetDate = new Date("2024-06-01");
+                  return recentDate > targetDate;
                 })
                 .reduce(
                   (total: number, funding: FundingInfo) =>
@@ -485,14 +479,9 @@ export const ClubManage = (): JSX.Element => {
                         />
                         {activitiesLists[status.clubId]
                           ?.filter((activity) => {
-                            const startDate = new Date(activity.startDate);
-                            const endDate = new Date(activity.endDate);
-                            const targetStartDate = new Date("2023-12-16");
-                            const targetEndDate = new Date("2024-06-14");
-                            return (
-                              startDate >= targetStartDate &&
-                              endDate <= targetEndDate
-                            );
+                            const recentDate = new Date(activity.recentEdit);
+                            const targetDate = new Date("2024-06-01");
+                            return recentDate > targetDate;
                           })
                           .map((activity, index) => (
                             <Activity
@@ -509,14 +498,9 @@ export const ClubManage = (): JSX.Element => {
                       </div>
                       <div className="frame-28">
                         {activitiesLists[status.clubId]?.filter((activity) => {
-                          const startDate = new Date(activity.startDate);
-                          const endDate = new Date(activity.endDate);
-                          const targetStartDate = new Date("2023-12-16");
-                          const targetEndDate = new Date("2024-06-14");
-                          return (
-                            startDate >= targetStartDate &&
-                            endDate <= targetEndDate
-                          );
+                          const recentDate = new Date(activity.recentEdit);
+                          const targetDate = new Date("2024-06-01");
+                          return recentDate > targetDate;
                         }).length < 20 &&
                           status.typeId < 4 &&
                           durationStatus === 1 && (
@@ -561,14 +545,9 @@ export const ClubManage = (): JSX.Element => {
                           />
                           {activitiesLists[status.clubId]
                             ?.filter((activity) => {
-                              const startDate = new Date(activity.startDate);
-                              const endDate = new Date(activity.endDate);
-                              const targetStartDate = new Date("2023-06-17");
-                              const targetEndDate = new Date("2023-12-15");
-                              return (
-                                startDate >= targetStartDate &&
-                                endDate <= targetEndDate
-                              );
+                              const recentDate = new Date(activity.recentEdit);
+                              const targetDate = new Date("2024-06-01");
+                              return recentDate <= targetDate;
                             })
                             .map((activity, index) => (
                               <Activity
@@ -648,15 +627,9 @@ export const ClubManage = (): JSX.Element => {
                           />
                           {fundingLists[status.clubId]
                             ?.filter((funding) => {
-                              const expenditureDate = new Date(
-                                funding.expenditureDate
-                              );
-                              const targetStartDate = new Date("2023-12-16");
-                              const targetEndDate = new Date("2024-06-14");
-                              return (
-                                expenditureDate >= targetStartDate &&
-                                expenditureDate <= targetEndDate
-                              );
+                              const recentDate = new Date(funding.recentEdit);
+                              const targetDate = new Date("2024-06-01");
+                              return recentDate > targetDate;
                             })
                             .map((funding, index) => (
                               <Funding
@@ -721,16 +694,10 @@ export const ClubManage = (): JSX.Element => {
                             id={0}
                           />
                           {fundingLists[status.clubId]
-                            ?.filter((funding) => {
-                              const expenditureDate = new Date(
-                                funding.expenditureDate
-                              );
-                              const targetStartDate = new Date("2023-06-17");
-                              const targetEndDate = new Date("2023-12-15");
-                              return (
-                                expenditureDate >= targetStartDate &&
-                                expenditureDate <= targetEndDate
-                              );
+                            ?.filter((activity) => {
+                              const recentDate = new Date(activity.recentEdit);
+                              const targetDate = new Date("2024-06-01");
+                              return recentDate <= targetDate;
                             })
                             .map((funding, index) => (
                               <Funding
