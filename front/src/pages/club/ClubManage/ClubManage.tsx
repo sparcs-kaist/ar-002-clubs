@@ -723,33 +723,6 @@ export const ClubManage = (): JSX.Element => {
                             }
                           />
                         </div>
-                        <div className="frame-28">
-                          {status.typeId < 4 && fundingStatus === 1 && (
-                            <>
-                              <div
-                                className="rectangle"
-                                onClick={() => navigate("/add_funding")}
-                                style={{ cursor: "pointer" }}
-                              />
-
-                              <div
-                                className="frame-29"
-                                onClick={() => navigate("/add_funding")}
-                                style={{ cursor: "pointer" }}
-                              >
-                                <div className="group-3">
-                                  <div className="overlap-group-2">
-                                    <div className="ellipse" />
-                                    <div className="text-wrapper-13">+</div>
-                                  </div>
-                                </div>
-                                <div className="text-wrapper-14">
-                                  지원금 추가하기
-                                </div>
-                              </div>
-                            </>
-                          )}
-                        </div>
                       </div>
                     )}
                     {status.typeId < 4 && (

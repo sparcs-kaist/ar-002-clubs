@@ -180,7 +180,7 @@ export const FundingDetail = (): JSX.Element => {
   useEffect(() => {
     const fetchActivities = async () => {
       getRequest(
-        `activity/activity_list?club_id=${clubId}`,
+        `funding/activity_list?club_id=${clubId}`,
         (data) => {
           setActivities(data.activities || []);
         },

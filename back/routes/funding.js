@@ -9,7 +9,9 @@ const storage = multer.memoryStorage();
 const {
   sequelize,
   ActivityMember,
+  ActivityType,
   Activity,
+  Duration,
   Member,
   Semester,
   Funding,
@@ -119,9 +121,106 @@ router.get("/funding_list", async (req, res) => {
   }
 });
 
+router.get("/activity_list", async (req, res) => {
+  const clubId = req.query.club_id;
+  const isAdvisor = req.query.is_advisor === 1;
+  const currentDate = new Date();
+
+  if (!clubId) {
+    return res.status(400).json({
+      success: false,
+      message: "club_id query parameter is required",
+    });
+  }
+
+  try {
+    // Find current semester
+    const currentSemester = await Semester.findOne({
+      where: {
+        start_date: { [Op.lte]: currentDate },
+        end_date: { [Op.gte]: currentDate },
+      },
+    });
+
+    if (!currentSemester) {
+      return res.status(404).json({
+        success: false,
+        message: "Current semester not found",
+      });
+    }
+
+    // Find the 'Activity' duration
+    const activityDuration = await Duration.findOne({
+      where: {
+        duration_name: "Activity",
+        semester_id: currentSemester.id,
+      },
+      attributes: ["duration_name", "start_date", "end_date", "semester_id"],
+    });
+
+    if (!activityDuration) {
+      return res.status(404).json({
+        success: false,
+        message: "Activity duration not found for the current semester",
+      });
+    }
+
+    // Find activities for the club within the duration
+    const activities = await Activity.findAll({
+      where: {
+        club_id: clubId,
+        start_date: { [Op.gte]: activityDuration.start_date },
+        end_date: { [Op.lte]: activityDuration.end_date },
+      },
+      include: [
+        {
+          model: ActivityType,
+          as: "activity_type",
+          attributes: ["type"],
+        },
+      ],
+      attributes: [
+        "id",
+        "title",
+        "activity_type_id",
+        "start_date",
+        "end_date",
+        "recent_edit",
+        "feedback_type",
+      ],
+      order: [["recent_edit", "DESC"]],
+    });
+
+    const formatDateString = (date) => {
+      if (!date) return "";
+      const d = new Date(date);
+      const year = d.getFullYear();
+      const month = String(d.getMonth() + 1).padStart(2, "0");
+      const day = String(d.getDate()).padStart(2, "0");
+      return `${year}.${month}.${day}.`;
+    };
+
+    res.json({
+      success: true,
+      activities: activities.map((activity) => ({
+        id: activity.id,
+        title: activity.title,
+        activityType: activity.activity_type.type,
+        startDate: formatDateString(activity.start_date),
+        endDate: formatDateString(activity.end_date),
+        recentEdit: formatDateString(activity.recent_edit),
+        feedbackType: activity.feedback_type,
+      })),
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, message: "Internal Server Error" });
+  }
+});
+
 router.post("/deleteFunding/:fundingId", async (req, res) => {
   const durationCheck = await checkFundingDuration();
-  if (!durationCheck.found || durationCheck.reportStatus !== 1) {
+  if (!durationCheck.found || durationCheck.fundingStatus !== 1) {
     return res.status(400).send({ message: "활동 삭제 기한이 지났습니다." });
   }
 
@@ -662,7 +761,7 @@ router.post("/addFunding", async (req, res) => {
   }
 
   const durationCheck = await checkFundingDuration();
-  if (!durationCheck.found || durationCheck.reportStatus !== 1) {
+  if (!durationCheck.found || durationCheck.fundingStatus !== 1) {
     return res.status(400).send({ message: "활동 추가 기한이 지났습니다." });
   }
 
